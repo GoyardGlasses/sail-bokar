@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: sail-bokaro
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: APP_NAME
+        value: SAIL Bokaro
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        value: https://sail-bokaro-frontend.vercel.app,http://localhost:5173
+      - key: MODELS_PATH
+        value: ./ml/models
+      - key: LOGS_PATH
+        value: ./logs
+      - key: API_TIMEOUT
+        value: "30"
+      - key: SECRET_TOKEN
+        value: sail_bokaro_2025_secure_key!123
