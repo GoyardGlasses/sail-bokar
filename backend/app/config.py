@@ -5,6 +5,7 @@ SIH25208 SAIL Bokaro Steel Plant Logistics Optimization System.
 
 from pathlib import Path
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -39,17 +40,20 @@ class Settings(BaseSettings):
     MODE_CLASSIFIER_MODEL_PATH: Path = MODELS_DIR / "mode_classifier.pkl"
     
     # CORS settings
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,http://127.0.0.1:5177,https://sail-bokaro-frontend.vercel.app"
-    
-    @property
-    def cors_origins_list(self) -> list:
-        """Convert CORS_ORIGINS string to list."""
-        if isinstance(self.CORS_ORIGINS, list):
-            return self.CORS_ORIGINS
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+    CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "http://localhost:8080", "http://127.0.0.1:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175", "http://127.0.0.1:5176", "http://127.0.0.1:5177", "https://sail-bokaro-frontend.vercel.app"]
     CORS_CREDENTIALS: bool = True
     CORS_METHODS: list = ["*"]
     CORS_HEADERS: list = ["*"]
+    
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS_ORIGINS from string to list."""
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
     
     # Logging
     LOG_LEVEL: str = "INFO"
