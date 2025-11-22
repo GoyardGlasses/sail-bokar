@@ -1,0 +1,268 @@
+import React, { useState } from 'react'
+import { BarChart, Bar, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Zap, TrendingDown, Maximize2 } from 'lucide-react'
+import axios from 'axios'
+
+const API_BASE = 'http://127.0.0.1:8000'
+
+export default function AdvancedOptimizationPage() {
+  const [orders, setOrders] = useState([
+    { id: '1', material: 'HR_Coils', destination: 'Kolkata', quantity: 500, distance: 250 },
+    { id: '2', material: 'CR_Coils', destination: 'Patna', quantity: 300, distance: 180 },
+    { id: '3', material: 'Plates', destination: 'Ranchi', quantity: 400, distance: 150 }
+  ])
+  const [optimizationResult, setOptimizationResult] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [newOrder, setNewOrder] = useState({
+    material: 'HR_Coils',
+    destination: 'Kolkata',
+    quantity: 100,
+    distance: 250
+  })
+
+  const optimize = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.post(`${API_BASE}/optimize/routes/multi-objective`, {
+        orders: orders.map((o, idx) => ({
+          id: o.id || idx.toString(),
+          ...o
+        }))
+      })
+      setOptimizationResult(response.data.data)
+    } catch (error) {
+      console.error('Error optimizing:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const addOrder = () => {
+    setOrders([...orders, {
+      id: Date.now().toString(),
+      ...newOrder
+    }])
+    setNewOrder({
+      material: 'HR_Coils',
+      destination: 'Kolkata',
+      quantity: 100,
+      distance: 250
+    })
+  }
+
+  const removeOrder = (id) => {
+    setOrders(orders.filter(o => o.id !== id))
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Zap className="w-8 h-8 text-yellow-600" />
+          <h1 className="text-3xl font-bold text-gray-900">Advanced Multi-Objective Optimization</h1>
+        </div>
+        <p className="text-gray-600">NSGA2 Evolutionary Algorithm</p>
+      </div>
+
+      {/* Add Order */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Add Order</h2>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Material</label>
+            <select
+              value={newOrder.material}
+              onChange={(e) => setNewOrder({...newOrder, material: e.target.value})}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            >
+              <option>HR_Coils</option>
+              <option>CR_Coils</option>
+              <option>Plates</option>
+              <option>Wire_Rods</option>
+              <option>TMT_Bars</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+            <select
+              value={newOrder.destination}
+              onChange={(e) => setNewOrder({...newOrder, destination: e.target.value})}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            >
+              <option>Kolkata</option>
+              <option>Patna</option>
+              <option>Ranchi</option>
+              <option>Durgapur</option>
+              <option>Haldia</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity (tonnes)</label>
+            <input
+              type="number"
+              value={newOrder.quantity}
+              onChange={(e) => setNewOrder({...newOrder, quantity: parseFloat(e.target.value)})}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Distance (km)</label>
+            <input
+              type="number"
+              value={newOrder.distance}
+              onChange={(e) => setNewOrder({...newOrder, distance: parseFloat(e.target.value)})}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={addOrder}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Add Order
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Orders List */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Current Orders ({orders.length})</h2>
+        <div className="space-y-2">
+          {orders.map(order => (
+            <div key={order.id} className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex-1">
+                <p className="font-semibold text-gray-900">{order.material} → {order.destination}</p>
+                <p className="text-sm text-gray-600">{order.quantity} tonnes | {order.distance} km</p>
+              </div>
+              <button
+                onClick={() => removeOrder(order.id)}
+                className="px-3 py-1 text-red-600 hover:bg-red-50 rounded"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Optimize Button */}
+      <div className="flex gap-4">
+        <button
+          onClick={optimize}
+          disabled={loading || orders.length === 0}
+          className="flex-1 px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 font-semibold"
+        >
+          {loading ? 'Optimizing...' : 'Run Multi-Objective Optimization'}
+        </button>
+      </div>
+
+      {/* Optimization Results */}
+      {optimizationResult && (
+        <>
+          {/* Best Solution */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <TrendingDown className="w-5 h-5 text-green-600" />
+              Best Solution
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-gray-600 text-sm">Total Cost</p>
+                <p className="text-3xl font-bold text-gray-900">₹{optimizationResult.best_solution.cost.toFixed(0)}</p>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-gray-600 text-sm">Delivery Time</p>
+                <p className="text-3xl font-bold text-gray-900">{optimizationResult.best_solution.time.toFixed(1)} hrs</p>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4">
+                <p className="text-gray-600 text-sm">Efficiency</p>
+                <p className="text-3xl font-bold text-gray-900">{optimizationResult.best_solution.efficiency.toFixed(1)}%</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pareto Front */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Maximize2 className="w-5 h-5 text-purple-600" />
+              Pareto Front (Non-Dominated Solutions)
+            </h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="cost" name="Cost (₹)" />
+                <YAxis dataKey="time" name="Time (hrs)" />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                <Legend />
+                <Scatter
+                  name="Solutions"
+                  data={optimizationResult.pareto_front}
+                  fill="#8884d8"
+                />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Statistics */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Optimization Statistics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-gray-600 text-sm">Method</p>
+                <p className="text-lg font-bold text-gray-900">{optimizationResult.optimization_method}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Solutions Found</p>
+                <p className="text-lg font-bold text-gray-900">{optimizationResult.n_solutions}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Generations</p>
+                <p className="text-lg font-bold text-gray-900">{optimizationResult.statistics.generations}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Population</p>
+                <p className="text-lg font-bold text-gray-900">{optimizationResult.statistics.population_size}</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Algorithm Comparison */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Optimization Algorithms</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="border-2 border-yellow-600 rounded-lg p-4 bg-yellow-50">
+            <h3 className="font-bold text-gray-900 mb-2">NSGA2 (Current)</h3>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>✓ Multi-objective</li>
+              <li>✓ Pareto optimal</li>
+              <li>✓ Scalable</li>
+              <li>✓ Non-dominated solutions</li>
+            </ul>
+          </div>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h3 className="font-bold text-gray-900 mb-2">Genetic Algorithm</h3>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>✓ Population-based</li>
+              <li>✓ Good for large spaces</li>
+              <li>✗ Slower convergence</li>
+              <li>✗ Single objective</li>
+            </ul>
+          </div>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h3 className="font-bold text-gray-900 mb-2">Greedy Heuristic</h3>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>✓ Very fast</li>
+              <li>✓ Simple</li>
+              <li>✗ Local optima</li>
+              <li>✗ Limited quality</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,147 @@
+================================================================================
+                    SAIL BOKARO - QUICK START GUIDE
+================================================================================
+
+🚀 LAUNCH THE SYSTEM IN 3 STEPS:
+
+  1. Double-click: RUN-WEBSITE.bat
+  2. Wait 10-15 seconds
+  3. Browser opens to: http://localhost:5173
+
+================================================================================
+                           WHAT YOU GET
+================================================================================
+
+✅ Modern, responsive website
+✅ Real-time data visualization
+✅ 7 ML models for predictions
+✅ 16+ pages with features
+✅ Dark theme support
+✅ Complete API documentation
+✅ Automatic error handling
+
+================================================================================
+                        AVAILABLE FEATURES
+================================================================================
+
+Dashboard:
+  • Main overview with KPIs
+  • Real-time metrics
+  • System health status
+
+Predictions:
+  • Demand forecasting
+  • Delay prediction
+  • Throughput analysis
+  • Cost analysis
+  • Transport mode optimization
+
+Advanced:
+  • AI forecasting
+  • Blockchain integration
+  • Advanced optimization
+  • 3D visualization
+  • Scenario analysis
+
+================================================================================
+                       SYSTEM REQUIREMENTS
+================================================================================
+
+✓ Node.js v16+ (https://nodejs.org/)
+✓ Python 3.8+ (https://www.python.org/)
+✓ Windows 10/11
+✓ 2GB RAM
+✓ 500MB disk space
+
+================================================================================
+                         LAUNCH OPTIONS
+================================================================================
+
+OPTION 1: Automatic (Recommended)
+  → Double-click: RUN-WEBSITE.bat
+
+OPTION 2: Diagnostic First
+  → Double-click: DIAGNOSE-SYSTEM.bat
+  → Then double-click: RUN-WEBSITE.bat
+
+OPTION 3: Full Rebuild
+  → Double-click: LAUNCH-WEBSITE-FULL.bat
+
+OPTION 4: Manual
+  → Terminal 1: cd backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+  → Terminal 2: cd frontend && npm run dev
+  → Browser: http://localhost:5173
+
+================================================================================
+                         ACCESS POINTS
+================================================================================
+
+Website:
+  URL: http://localhost:5173
+  Browser: Any modern web browser
+
+Backend API:
+  URL: http://127.0.0.1:8000
+  Docs: http://127.0.0.1:8000/api/docs
+  Health: http://127.0.0.1:8000/meta/health
+
+================================================================================
+                       TROUBLESHOOTING
+================================================================================
+
+White Screen?
+  → Wait 10-15 seconds for dev server to start
+
+Port Already in Use?
+  → System will find next available port
+  → Check terminal for actual URL
+
+Backend Not Connecting?
+  → Check .env file has: VITE_API_URL=http://127.0.0.1:8000
+  → Verify backend is running on port 8000
+
+Still Having Issues?
+  → Run: DIAGNOSE-SYSTEM.bat
+  → Run: LAUNCH-WEBSITE-FULL.bat for full rebuild
+
+================================================================================
+                         FILE LOCATIONS
+================================================================================
+
+Frontend:     c:\Users\Admin\CascadeProjects\frontend\
+Backend:      c:\Users\Admin\CascadeProjects\backend\
+Launchers:    c:\Users\Admin\CascadeProjects\
+Docs:         c:\Users\Admin\CascadeProjects\*.md
+
+================================================================================
+                        DOCUMENTATION
+================================================================================
+
+Quick Start:
+  → QUICK-START.txt (this file)
+
+Complete Setup Guide:
+  → SETUP-AND-LAUNCH.md
+
+System Audit Report:
+  → COMPLETE-AUDIT-REPORT.md
+
+Troubleshooting:
+  → SETUP-AND-LAUNCH.md (Troubleshooting section)
+
+================================================================================
+                      YOU'RE ALL SET!
+================================================================================
+
+Your SAIL Bokaro system is fully configured and ready to use.
+
+To get started:
+  1. Double-click: RUN-WEBSITE.bat
+  2. Wait for browser to open
+  3. Explore the features!
+
+For detailed instructions, see: SETUP-AND-LAUNCH.md
+
+Happy optimizing! 🚀
+
+================================================================================

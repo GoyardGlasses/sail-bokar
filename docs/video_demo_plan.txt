@@ -1,0 +1,125 @@
+# SAIL Bokaro - Video Demo Production Plan
+
+## Video Specifications
+- **Duration**: 4 minutes 30 seconds (max 5 minutes)
+- **Resolution**: 1920x1080 (16:9)
+- **Frame Rate**: 30 FPS
+- **Format**: MP4 (H.264)
+- **Aspect Ratio**: 16:9
+- **Audio**: Stereo, 192kbps
+- **File Size**: <100MB
+
+## Storyboard
+
+### Scene 1: Introduction (0:00-0:30)
+- **Visual**: Professional intro with SAIL Bokaro logo
+- **Voiceover**: "In today's competitive steel industry, efficient logistics is not an option - it's a necessity."
+- **On-screen Text**: "SAIL Bokaro Logistics Optimization System"
+- **Background Music**: Upbeat, corporate
+
+### Scene 2: Problem Statement (0:30-1:00)
+- **Visual**: Animated factory with traffic jams and delayed shipments
+- **Voiceover**: "With thousands of tonnes of steel to move daily, even small inefficiencies can cost millions."
+- **Key Points**:
+  - 12,500+ tonnes dispatched daily
+  - 40+ rakes in operation
+  - 15+ destinations
+
+### Scene 3: Solution Overview (1:00-1:45)
+- **Visual**: Split-screen showing before/after scenarios
+- **Voiceover**: "Our AI-powered solution optimizes the entire logistics chain in real-time."
+- **Demo Highlights**:
+  - Dashboard walkthrough
+  - Real-time tracking
+  - Automated scheduling
+
+### Scene 4: Key Features (1:45-3:00)
+1. **Smart Optimization**
+   - Show optimization in action
+   - Before/after comparison
+
+2. **Real-time Monitoring**
+   - Live map view
+   - Alert system
+
+3. **Scenario Planning**
+   - Rake shortage simulation
+   - Alternative routing
+
+### Scene 5: Results & Impact (3:00-4:00)
+- **Visual**: Animated charts and graphs
+- **Voiceover**: "Our solution delivers measurable results from day one."
+- **Metrics**:
+  - 23% cost reduction
+  - 35% better utilization
+  - 92% on-time delivery
+
+### Scene 6: Call to Action (4:00-4:30)
+- **Visual**: Contact information
+- **Voiceover**: "Ready to transform your logistics operations? Contact us today."
+- **On-screen**:
+  - Website: www.sailbokaro-opti.com
+  - Email: contact@sailbokaro-opti.com
+  - Phone: +91-XXX-XXXXXXX
+
+## Production Checklist
+
+### Pre-production
+- [ ] Script finalized and approved
+- [ ] Voiceover recorded
+- [ ] Screen recordings done
+- [ ] B-roll footage prepared
+- [ ] Graphics and animations ready
+
+### Recording
+- [ ] Screen recording at 1920x1080
+- [ ] System audio captured
+- [ ] Voiceover recorded in quiet environment
+- [ ] Multiple takes for each scene
+
+### Post-production
+- [ ] Video editing complete
+- [ ] Audio mixing and leveling
+- [ ] Transitions and effects added
+- [ ] Captions and subtitles
+- [ ] Final review and export
+
+## Technical Requirements
+
+### Software
+- Screen recording: OBS Studio
+- Video editing: Adobe Premiere Pro
+- Graphics: Adobe After Effects
+- Audio: Audacity
+
+### Hardware
+- Microphone: Blue Yeti
+- Computer: 16GB RAM, dedicated GPU
+- Backup storage: 1TB external SSD
+
+## Backup Plan
+1. **Internet Issues**: Local playback version ready
+2. **Audio Problems**: Subtitled version available
+3. **Playback Issues**: Multiple format exports (MP4, WebM)
+4. **Last Resort**: Screenshare with pre-recorded narration
+
+## Delivery
+- **Primary**: YouTube (unlisted)
+- **Backup 1**: Google Drive
+- **Backup 2**: Local USB drive
+- **Format**: 1080p MP4, H.264, AAC
+
+## Timeline
+1. Script & Storyboard: Day 1
+2. Recording: Day 2
+3. Editing: Day 3
+4. Review & Revisions: Day 4
+5. Final Delivery: Day 5
+
+## Contact
+- Project Manager: John Doe (john.doe@example.com)
+- Technical Lead: Jane Smith (jane.smith@example.com)
+- Support: support@sailbokaro-opti.com
+
+---
+*Last Updated: 2025-11-22*

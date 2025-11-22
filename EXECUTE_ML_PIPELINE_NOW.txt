@@ -1,0 +1,200 @@
+================================================================================
+ML DEVOPS PIPELINE - EXECUTION COMMANDS
+SIH25208 SAIL Bokaro Steel Plant Logistics Optimization System
+================================================================================
+
+STATUS: ✅ READY TO EXECUTE
+
+================================================================================
+OPTION 1: RUN FULL PIPELINE (RECOMMENDED)
+================================================================================
+
+Copy and paste this command into your terminal:
+
+cd C:\Users\Admin\CascadeProjects && python backend/ml/ml_devops_pipeline.py
+
+This will:
+1. Generate synthetic data (10 CSV tables)
+2. Train all 7 ML models
+3. Evaluate performance
+4. Generate JSON + Markdown reports
+5. Save 8 trained model files
+
+Expected time: 5-15 minutes
+
+================================================================================
+OPTION 2: RUN STEP-BY-STEP
+================================================================================
+
+Step 1: Generate Synthetic Data
+cd C:\Users\Admin\CascadeProjects && python backend/ml/synthetic/generate_synthetic_data.py
+
+Step 2: Train Model 1 - Demand Forecasting
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_demand.py
+
+Step 3: Train Model 2 - Rake Availability
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_rake_availability.py
+
+Step 4: Train Model 3 - Route Delay Prediction
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_delay.py
+
+Step 5: Train Model 4 - Throughput Prediction
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_throughput.py
+
+Step 6: Train Model 5 - Cost Prediction
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_cost.py
+
+Step 7: Train Model 6 - Anomaly Detection
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_anomaly.py
+
+Step 8: Train Model 7 - Mode Classifier
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_mode_classifier.py
+
+Step 9: Train All Models at Once
+cd C:\Users\Admin\CascadeProjects && python backend/ml/train/train_all.py
+
+================================================================================
+OPTION 3: VERIFY INSTALLATION
+================================================================================
+
+Check if all dependencies are installed:
+pip list | findstr "pandas numpy scikit-learn lightgbm xgboost joblib"
+
+If any are missing, install them:
+pip install pandas numpy scikit-learn lightgbm xgboost joblib
+
+================================================================================
+OPTION 4: SAVE OUTPUT TO LOG FILE
+================================================================================
+
+Run pipeline and save logs:
+cd C:\Users\Admin\CascadeProjects && python backend/ml/ml_devops_pipeline.py > ml_pipeline.log 2>&1
+
+Then view the log:
+type ml_pipeline.log
+
+================================================================================
+EXPECTED OUTPUT
+================================================================================
+
+You should see output like:
+
+================================================================================
+  STEP 1: GENERATING SYNTHETIC DATA
+================================================================================
+Generating material_production_daily...
+✅ Generated 10220 rows
+Generating inventory_bsl...
+✅ Generated 2555 rows
+Generating customer_orders...
+✅ Generated 5847 rows
+...
+✅ SYNTHETIC DATA GENERATION - COMPLETE
+
+================================================================================
+  STEP 2: TRAINING ALL MODELS
+================================================================================
+Training train_demand.py...
+✅ train_demand.py trained successfully
+
+Training train_rake_availability.py...
+✅ train_rake_availability.py trained successfully
+
+...
+
+================================================================================
+  STEP 3: EVALUATING MODELS
+================================================================================
+
+demand:
+  Status: ✅ PASSED
+  MAE: 125.45
+  RMSE: 234.56
+  R2: 0.8765
+
+...
+
+================================================================================
+  FINAL SUMMARY
+================================================================================
+Total Models: 7
+Passed: 7
+Need Optimization: 0
+
+✅ Report saved to ml_reports/ml_evaluation_20240115_120000.json
+✅ Markdown report saved to ml_reports/ml_evaluation_20240115_120000.md
+
+================================================================================
+
+================================================================================
+VERIFY RESULTS
+================================================================================
+
+Check if model files were created:
+dir backend\ml\models\
+
+You should see:
+- demand_model.pkl
+- rake_availability_model.pkl
+- delay_classifier.pkl
+- delay_regressor.pkl
+- throughput_model.pkl
+- cost_model.pkl
+- anomaly_model.pkl
+- mode_classifier.pkl
+
+Check reports:
+dir ml_reports\
+
+You should see:
+- ml_evaluation_*.json
+- ml_evaluation_*.md
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "ModuleNotFoundError: No module named 'lightgbm'"
+FIX: pip install lightgbm xgboost scikit-learn
+
+ERROR: "FileNotFoundError: Data file not found"
+FIX: python backend/ml/synthetic/generate_synthetic_data.py
+
+ERROR: "Permission denied"
+FIX: (Linux/Mac only) chmod +x backend/ml/ml_devops_pipeline.py
+
+ERROR: Models not found in backend/ml/models/
+FIX: Check console output for training errors
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Run the pipeline using OPTION 1 above
+2. Wait for completion (5-15 minutes)
+3. Check ml_reports/ for detailed results
+4. Verify all 8 model files in backend/ml/models/
+5. Review metrics to ensure all pass thresholds
+6. Proceed to PHASE 3 - Inference API
+
+================================================================================
+DOCUMENTATION
+================================================================================
+
+For more details, see:
+- ML_DEVOPS_READY.md - Overview
+- ML_DEVOPS_EXECUTION_GUIDE.md - Detailed guide
+- backend/ml/train/README.md - Training guide
+- PHASE_2_3_FINAL_SUMMARY.md - Model specifications
+
+================================================================================
+READY TO EXECUTE!
+================================================================================
+
+Copy and paste this command to start:
+
+cd C:\Users\Admin\CascadeProjects && python backend/ml/ml_devops_pipeline.py
+
+Good luck!
+
+================================================================================

@@ -1,0 +1,44 @@
+appId: com.sail-bokaro.app
+productName: SAIL Bokaro Logistics Optimizer
+directories:
+  buildResources: assets
+  output: dist_electron
+files:
+  - from: dist
+    to: .
+  - from: backend
+    to: backend
+  - from: electron/main.js
+    to: .
+  - from: electron/preload.js
+    to: .
+win:
+  target:
+    - nsis
+    - portable
+  certificateFile: null
+  certificatePassword: null
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.business
+dmg:
+  contents:
+    - x: 110
+      y: 150
+      type: file
+    - x: 240
+      y: 150
+      type: link
+      path: /Applications
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office

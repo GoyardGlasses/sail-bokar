@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-11-22T00:09:08.046851",
+  "total_models": 7,
+  "passed_models": 0,
+  "failed_models": 7,
+  "success_rate": 0.0,
+  "models": [
+    {
+      "model": "Demand Forecasting",
+      "status": "NOT_FOUND",
+      "metrics": {},
+      "passed": false,
+      "error": "Model file not found"
+    },
+    {
+      "model": "Rake Availability",
+      "status": "ERROR",
+      "metrics": {},
+      "passed": false,
+      "error": "'empty_rakes_available'"
+    },
+    {
+      "model": "Delay Classifier",
+      "status": "ERROR",
+      "metrics": {},
+      "passed": false,
+      "error": "feature_names mismatch: ['tonnes_dispatched', 'delay_lag_1d', 'delay_lag_7d', 'delay_ma_7d', 'delay_std_7d', 'seasonality_factor', 'weather_encoded', 'route_encoded', 'congestion_lag_1d'] ['tonnes_dispatched']\nexpected delay_ma_7d, delay_lag_1d, delay_std_7d, weather_encoded, congestion_lag_1d, delay_lag_7d, route_encoded, seasonality_factor in input data"
+    },
+    {
+      "model": "Delay Regressor",
+      "status": "ERROR",
+      "metrics": {},
+      "passed": false,
+      "error": "feature_names mismatch: ['tonnes_dispatched', 'delay_lag_1d', 'delay_lag_7d', 'delay_ma_7d', 'delay_std_7d', 'seasonality_factor', 'weather_encoded', 'route_encoded', 'congestion_lag_1d'] ['tonnes_dispatched']\nexpected delay_ma_7d, delay_lag_1d, delay_std_7d, weather_encoded, congestion_lag_1d, delay_lag_7d, route_encoded, seasonality_factor in input data"
+    },
+    {
+      "model": "Throughput",
+      "status": "ERROR",
+      "metrics": {},
+      "passed": false,
+      "error": "'throughput_tph'"
+    },
+    {
+      "model": "Cost",
+      "status": "NOT_FOUND",
+      "metrics": {},
+      "passed": false,
+      "error": "Model file not found"
+    },
+    {
+      "model": "Mode Classifier",
+      "status": "ERROR",
+      "metrics": {},
+      "passed": false,
+      "error": "'transport_mode'"
+    }
+  ],
+  "thresholds": {
+    "mae": 5000,
+    "rmse": 8000,
+    "mape": 50,
+    "r2": 0.5,
+    "accuracy": 0.7,
+    "precision": 0.7,
+    "recall": 0.7,
+    "f1": 0.7,
+    "auc": 0.7
+  }
+}

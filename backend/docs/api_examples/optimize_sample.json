@@ -1,0 +1,39 @@
+{
+  "orders": [
+    {
+      "order_id": "ORD001",
+      "material_type": "HR_Coils",
+      "quantity_tonnes": 1000,
+      "destination": "Kolkata",
+      "priority": "HIGH",
+      "due_date": "2025-11-25"
+    },
+    {
+      "order_id": "ORD002",
+      "material_type": "CR_Coils",
+      "quantity_tonnes": 800,
+      "destination": "Patna",
+      "priority": "MEDIUM",
+      "due_date": "2025-11-26"
+    },
+    {
+      "order_id": "ORD003",
+      "material_type": "Plates",
+      "quantity_tonnes": 500,
+      "destination": "Ranchi",
+      "priority": "LOW",
+      "due_date": "2025-11-27"
+    }
+  ],
+  "available_rakes": 5,
+  "available_trucks": 20,
+  "inventory": {
+    "HR_Coils": 5000,
+    "CR_Coils": 3000,
+    "Plates": 2000,
+    "Wire_Rods": 1500,
+    "TMT_Bars": 2000,
+    "Pig_Iron": 1000,
+    "Billets": 1500
+  }
+}

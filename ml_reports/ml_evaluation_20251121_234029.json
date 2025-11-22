@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-11-21T23:40:29.125844",
+  "total_models": 7,
+  "passed_models": 0,
+  "failed_models": 7,
+  "models": {
+    "demand": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "rake_availability": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "delay": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "throughput": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "cost": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "anomaly": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    },
+    "mode_classifier": {
+      "status": "FAILED",
+      "metrics": {},
+      "passed": false
+    }
+  }
+}

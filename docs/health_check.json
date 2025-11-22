@@ -1,0 +1,357 @@
+{
+  "health_check_endpoint": {
+    "path": "/meta/health",
+    "method": "GET",
+    "expected_status": 200,
+    "expected_response": {
+      "status": "healthy",
+      "timestamp": "2025-11-22T10:30:00Z",
+      "version": "1.0.0",
+      "database": "connected",
+      "models_loaded": 7,
+      "uptime_seconds": 3600
+    }
+  },
+  "metrics_endpoint": {
+    "path": "/meta/metrics",
+    "method": "GET",
+    "headers": {
+      "X-API-Token": "sail-bokaro-admin-token-secret"
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "uptime": 3600,
+      "optimizer_runs": 42,
+      "success_rate": 0.952,
+      "avg_optimization_time_seconds": 15.3,
+      "total_orders_processed": 1250,
+      "database_status": "healthy",
+      "models_status": "all_loaded"
+    }
+  },
+  "config_endpoint": {
+    "path": "/meta/config",
+    "method": "GET",
+    "expected_status": 200,
+    "expected_response": {
+      "materials": [
+        "HR_Coils",
+        "CR_Coils",
+        "Plates",
+        "Wire_Rods",
+        "TMT_Bars",
+        "Pig_Iron",
+        "Billets"
+      ],
+      "destinations": [
+        "Kolkata",
+        "Patna",
+        "Ranchi",
+        "Durgapur",
+        "Haldia"
+      ],
+      "loading_points": [
+        "LP1",
+        "LP2",
+        "LP3"
+      ],
+      "transport_modes": [
+        "RAIL",
+        "ROAD"
+      ],
+      "priorities": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    }
+  },
+  "models_endpoint": {
+    "path": "/meta/models",
+    "method": "GET",
+    "expected_status": 200,
+    "expected_response": {
+      "models": [
+        {
+          "name": "demand_model",
+          "type": "XGBoost",
+          "version": "1.0.0",
+          "loaded": true,
+          "mae": 450.5,
+          "rmse": 750.2
+        },
+        {
+          "name": "rake_availability_model",
+          "type": "Random Forest",
+          "version": "1.0.0",
+          "loaded": true,
+          "mae": 1.2
+        },
+        {
+          "name": "delay_classifier",
+          "type": "Logistic Regression",
+          "version": "1.0.0",
+          "loaded": true,
+          "accuracy": 0.78
+        },
+        {
+          "name": "delay_regressor",
+          "type": "Gradient Boosting",
+          "version": "1.0.0",
+          "loaded": true,
+          "mae": 2.1
+        },
+        {
+          "name": "throughput_model",
+          "type": "XGBoost",
+          "version": "1.0.0",
+          "loaded": true,
+          "mae": 120.5
+        },
+        {
+          "name": "cost_model",
+          "type": "Linear Regression",
+          "version": "1.0.0",
+          "loaded": true,
+          "mae": 45000.0
+        },
+        {
+          "name": "mode_classifier",
+          "type": "Logistic Regression",
+          "version": "1.0.0",
+          "loaded": true,
+          "accuracy": 0.89
+        }
+      ],
+      "total_models": 7,
+      "all_loaded": true
+    }
+  },
+  "predict_demand_endpoint": {
+    "path": "/predict/demand",
+    "method": "POST",
+    "request_body": {
+      "destination": "Kolkata",
+      "horizon_days": 7,
+      "historical_data": [
+        {
+          "date": "2025-11-15",
+          "demand": 500
+        },
+        {
+          "date": "2025-11-16",
+          "demand": 520
+        }
+      ]
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "destination": "Kolkata",
+      "forecast": [
+        {
+          "date": "2025-11-22",
+          "predicted_demand": 515,
+          "confidence_interval": {
+            "lower": 480,
+            "upper": 550
+          }
+        }
+      ],
+      "model_version": "1.0.0"
+    }
+  },
+  "predict_delay_endpoint": {
+    "path": "/predict/delay",
+    "method": "POST",
+    "request_body": {
+      "route_id": "Bokaro-Kolkata",
+      "distance_km": 250,
+      "vehicle_type": "TRUCK",
+      "time_of_day": "morning",
+      "weather": "clear"
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "route_id": "Bokaro-Kolkata",
+      "predicted_delay_hours": 2.5,
+      "confidence": 0.78,
+      "factors": {
+        "distance": 0.3,
+        "time_of_day": 0.2,
+        "weather": 0.1
+      }
+    }
+  },
+  "predict_rake_availability_endpoint": {
+    "path": "/predict/rake-availability",
+    "method": "POST",
+    "request_body": {
+      "yard": "Bokaro",
+      "days_ahead": 7,
+      "historical_data": [
+        {
+          "date": "2025-11-15",
+          "available_rakes": 5
+        }
+      ]
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "yard": "Bokaro",
+      "forecast": [
+        {
+          "date": "2025-11-22",
+          "predicted_available_rakes": 6,
+          "confidence": 0.85
+        }
+      ]
+    }
+  },
+  "predict_cost_endpoint": {
+    "path": "/predict/cost",
+    "method": "POST",
+    "request_body": {
+      "tonnes": 500,
+      "distance_km": 250,
+      "transport_mode": "RAIL",
+      "material_type": "HR_Coils"
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "tonnes": 500,
+      "transport_mode": "RAIL",
+      "estimated_cost": 125000,
+      "cost_per_tonne": 250,
+      "breakdown": {
+        "base_cost": 100000,
+        "distance_surcharge": 15000,
+        "material_surcharge": 10000
+      }
+    }
+  },
+  "predict_throughput_endpoint": {
+    "path": "/predict/throughput",
+    "method": "POST",
+    "request_body": {
+      "loading_point": "LP1",
+      "hours_ahead": 24,
+      "historical_data": [
+        {
+          "timestamp": "2025-11-21T10:00:00",
+          "throughput": 100
+        }
+      ]
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "loading_point": "LP1",
+      "forecast": [
+        {
+          "hour": 0,
+          "predicted_throughput": 105,
+          "utilization_percent": 85
+        }
+      ]
+    }
+  },
+  "classify_transport_mode_endpoint": {
+    "path": "/classify/transport-mode",
+    "method": "POST",
+    "request_body": {
+      "tonnes": 500,
+      "distance_km": 250,
+      "urgency": "HIGH",
+      "destination": "Kolkata"
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "recommended_mode": "RAIL",
+      "confidence": 0.89,
+      "alternatives": [
+        {
+          "mode": "ROAD",
+          "confidence": 0.11
+        }
+      ],
+      "reasoning": "Rail is more cost-effective for this distance and tonnage"
+    }
+  },
+  "optimize_dispatch_endpoint": {
+    "path": "/optimize/dispatch",
+    "method": "POST",
+    "request_body": {
+      "orders": [
+        {
+          "order_id": 1,
+          "material_type": "HR_Coils",
+          "quantity_tonnes": 500,
+          "destination": "Kolkata",
+          "priority": "HIGH",
+          "loading_point": "LP1"
+        }
+      ],
+      "available_rakes": 2,
+      "available_trucks": 5,
+      "inventory": [
+        {
+          "stockyard": "Bokaro",
+          "material_type": "HR_Coils",
+          "quantity_tonnes": 1000
+        }
+      ]
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "rakes": [
+        {
+          "rake_id": "RAKE001",
+          "destination": "Kolkata",
+          "wagons": 58,
+          "tonnes_allocated": 500,
+          "estimated_cost": 125000,
+          "estimated_delay_hours": 2.5,
+          "loading_slots": [
+            {
+              "slot_id": 1,
+              "order_id": 1,
+              "tonnes": 500
+            }
+          ]
+        }
+      ],
+      "trucks": [],
+      "summary": {
+        "total_cost": 125000,
+        "total_tonnes": 500,
+        "total_rakes_used": 1,
+        "total_trucks_used": 0,
+        "fulfillment_rate": 1.0,
+        "optimization_time_seconds": 12.5,
+        "solver_status": "OPTIMAL"
+      },
+      "cost_breakdown": {
+        "rail_cost": 125000,
+        "road_cost": 0,
+        "total": 125000
+      },
+      "predicted_delays": {
+        "average_hours": 2.5,
+        "max_hours": 2.5
+      }
+    }
+  },
+  "reload_models_endpoint": {
+    "path": "/meta/reload-models",
+    "method": "POST",
+    "headers": {
+      "X-API-Token": "sail-bokaro-admin-token-secret"
+    },
+    "expected_status": 200,
+    "expected_response": {
+      "status": "success",
+      "message": "All models reloaded successfully",
+      "models_reloaded": 7,
+      "timestamp": "2025-11-22T10:35:00Z"
+    }
+  }
+}

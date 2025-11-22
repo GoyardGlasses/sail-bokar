@@ -1,0 +1,97 @@
+{
+  "scenario_id": "rake_shortage_001",
+  "name": "Critical Rake Shortage (50% Reduction)",
+  "description": "Scenario simulating 50% reduction in rake availability due to maintenance and congestion",
+  "created_at": "2025-11-22T08:30:00+05:30",
+  "parameters": {
+    "time_horizon_days": 5,
+    "rake_availability_reduction": 0.5,
+    "road_transport_increase": 0.4,
+    "cost_increase_tolerance": 0.25
+  },
+  "disruption_details": {
+    "start_time": "2025-11-23T00:00:00+05:30",
+    "end_time": "2025-11-25T23:59:59+05:30",
+    "affected_routes": ["Bokaro-Kolkata", "Bokaro-Chennai", "Bokaro-Mumbai"],
+    "reason": "Scheduled maintenance and unexpected congestion in Eastern Railway zone",
+    "impact": {
+      "rake_availability": -50,
+      "transit_time_increase": 35,
+      "cost_per_ton_km": 15
+    }
+  },
+  "orders": [
+    {
+      "order_id": "RS-3001",
+      "material": "HR Coils",
+      "quantity_tonnes": 1200,
+      "source": "Bokaro",
+      "destination": "Kolkata",
+      "priority": "high",
+      "placement_time": "2025-11-23T08:00:00+05:30",
+      "deadline": "2025-11-24T20:00:00+05:30",
+      "transport_mode": "rail",
+      "flexible_options": {
+        "can_split": true,
+        "max_splits": 3,
+        "mode_switch_allowed": true,
+        "alternative_destinations": ["Kharagpur", "Howrah"]
+      }
+    },
+    {
+      "order_id": "RS-3002",
+      "material": "CR Sheets",
+      "quantity_tonnes": 800,
+      "source": "Bokaro",
+      "destination": "Chennai",
+      "priority": "medium",
+      "placement_time": "2025-11-23T09:00:00+05:30",
+      "deadline": "2025-11-26T18:00:00+05:30",
+      "transport_mode": "rail",
+      "flexible_options": {
+        "can_delay": true,
+        "max_delay_hours": 48,
+        "mode_switch_allowed": true
+      }
+    }
+  ],
+  "resource_constraints": {
+    "available_rakes": 8,
+    "available_trucks": 75,
+    "loading_dock_capacity": 6,
+    "staff_availability": {
+      "normal": 12,
+      "overtime": 8
+    },
+    "maintenance_slots": [
+      {
+        "resource": "crane_1",
+        "start": "2025-11-24T14:00:00+05:30",
+        "end": "2025-11-24T22:00:00+05:30"
+      }
+    ]
+  },
+  "mitigation_strategies": [
+    {
+      "strategy_id": "mode_shift",
+      "description": "Shift up to 40% volume to road transport",
+      "max_shift_percentage": 40,
+      "cost_impact": {
+        "percentage_increase": 20,
+        "additional_cost_per_ton": 350
+      }
+    },
+    {
+      "strategy_id": "priority_fulfillment",
+      "description": "Guarantee high-priority orders first",
+      "priority_levels": ["high", "medium", "low"],
+      "service_level_targets": {
+        "high": 0.98,
+        "medium": 0.85,
+        "low": 0.70
+      }
+    },
+    {
+      "strategy_id": "dynamic_rerouting",
+      "description": "Reroute through alternative rail routes",
+      

@@ -1,0 +1,38 @@
+{
+  "demand_forecast": {
+    "material_type": "HR_Coils",
+    "destination": "Kolkata",
+    "quantity_tonnes": 500,
+    "priority": "HIGH"
+  },
+  "rake_availability": {
+    "date": "2025-11-22",
+    "destination": "Kolkata",
+    "material_type": "HR_Coils"
+  },
+  "delay_prediction": {
+    "route": "Kolkata-Bokaro",
+    "tonnes_dispatched": 1000,
+    "material_type": "HR_Coils",
+    "weather_condition": "Clear"
+  },
+  "throughput_prediction": {
+    "loading_point": "LP1",
+    "material_type": "HR_Coils",
+    "equipment_operational_count": 5,
+    "shift": "Morning"
+  },
+  "cost_prediction": {
+    "route": "Kolkata-Bokaro",
+    "tonnes_dispatched": 1000,
+    "delay_hours": 2.5,
+    "material_type": "HR_Coils"
+  },
+  "mode_classification": {
+    "quantity_tonnes": 500,
+    "distance_km": 250,
+    "priority": "HIGH",
+    "destination": "Kolkata",
+    "material_type": "HR_Coils"
+  }
+}

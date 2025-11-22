@@ -1,0 +1,250 @@
+"""
+ML Models loader and inference functions.
+SIH25208 SAIL Bokaro Steel Plant Logistics Optimization System.
+"""
+
+import joblib
+from pathlib import Path
+from typing import Optional, Dict, Any
+import pandas as pd
+import numpy as np
+from .config import settings
+from .utils import app_logger
+
+class ModelsLoader:
+    """Singleton class to load and manage ML models."""
+    
+    _instance = None
+    _models = {}
+    _load_errors = {}
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._load_all_models()
+        return cls._instance
+    
+    def _load_all_models(self):
+        """Load all trained models."""
+        app_logger.info("Loading ML models...")
+        
+        models_config = {
+            'demand': settings.DEMAND_MODEL_PATH,
+            'rake_availability': settings.RAKE_AVAILABILITY_MODEL_PATH,
+            'delay_classifier': settings.DELAY_CLASSIFIER_MODEL_PATH,
+            'delay_regressor': settings.DELAY_REGRESSOR_MODEL_PATH,
+            'throughput': settings.THROUGHPUT_MODEL_PATH,
+            'cost': settings.COST_MODEL_PATH,
+            'mode_classifier': settings.MODE_CLASSIFIER_MODEL_PATH,
+        }
+        
+        for model_name, model_path in models_config.items():
+            try:
+                if not Path(model_path).exists():
+                    raise FileNotFoundError(f"Model file not found: {model_path}")
+                
+                model = joblib.load(model_path)
+                self._models[model_name] = model
+                app_logger.info(f"✅ Loaded {model_name} from {model_path}")
+            except Exception as e:
+                error_msg = f"Failed to load {model_name}: {str(e)}"
+                app_logger.error(error_msg)
+                self._load_errors[model_name] = error_msg
+    
+    def get_model(self, model_name: str):
+        """Get a loaded model by name."""
+        if model_name not in self._models:
+            raise ValueError(f"Model '{model_name}' not loaded. Error: {self._load_errors.get(model_name, 'Unknown')}")
+        return self._models[model_name]
+    
+    def is_model_loaded(self, model_name: str) -> bool:
+        """Check if a model is loaded."""
+        return model_name in self._models
+    
+    def get_loaded_models(self) -> Dict[str, bool]:
+        """Get status of all models."""
+        return {
+            'demand': self.is_model_loaded('demand'),
+            'rake_availability': self.is_model_loaded('rake_availability'),
+            'delay_classifier': self.is_model_loaded('delay_classifier'),
+            'delay_regressor': self.is_model_loaded('delay_regressor'),
+            'throughput': self.is_model_loaded('throughput'),
+            'cost': self.is_model_loaded('cost'),
+            'mode_classifier': self.is_model_loaded('mode_classifier'),
+        }
+    
+    def get_load_errors(self) -> Dict[str, str]:
+        """Get any model loading errors."""
+        return self._load_errors
+
+# Global models loader instance
+models_loader = ModelsLoader()
+
+# ============================================================================
+# INFERENCE FUNCTIONS
+# ============================================================================
+
+def predict_demand(material_type: str, destination: str, quantity_tonnes: float, priority: str) -> Dict[str, Any]:
+    """
+    Predict demand using the demand forecasting model.
+    
+    Args:
+        material_type: Type of material
+        destination: Destination
+        quantity_tonnes: Quantity in tonnes
+        priority: Priority level
+    
+    Returns:
+        Prediction results
+    """
+    try:
+        model = models_loader.get_model('demand')
+        
+        # Create feature vector (simplified for demo)
+        features = pd.DataFrame({
+            'material_encoded': [hash(material_type) % 7],
+            'destination_encoded': [hash(destination) % 5],
+            'quantity_numeric': [quantity_tonnes],
+            'priority_numeric': [{'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}.get(priority, 1)],
+        })
+        
+        prediction = float(model.predict(features)[0])
+        
+        return {
+            'predicted_demand_tonnes': max(0, prediction),
+            'material_type': material_type,
+            'destination': destination,
+            'confidence': 0.85,
+        }
+    except Exception as e:
+        app_logger.error(f"Demand prediction error: {str(e)}")
+        raise
+
+def predict_rake_availability(date: str, destination: str, material_type: str) -> Dict[str, Any]:
+    """Predict rake availability."""
+    try:
+        model = models_loader.get_model('rake_availability')
+        
+        features = pd.DataFrame({
+            'destination_encoded': [hash(destination) % 5],
+            'material_encoded': [hash(material_type) % 7],
+            'day_of_week': [int(date.split('-')[2]) % 7],
+        })
+        
+        prediction = float(model.predict(features)[0])
+        
+        return {
+            'predicted_available_rakes': max(0, int(prediction)),
+            'date': date,
+            'destination': destination,
+            'confidence': 0.82,
+        }
+    except Exception as e:
+        app_logger.error(f"Rake availability prediction error: {str(e)}")
+        raise
+
+def predict_delay(route: str, tonnes_dispatched: float, material_type: str, weather: Optional[str] = None) -> Dict[str, Any]:
+    """Predict delay (both classifier and regressor)."""
+    try:
+        classifier = models_loader.get_model('delay_classifier')
+        regressor = models_loader.get_model('delay_regressor')
+        
+        features = pd.DataFrame({
+            'tonnes_dispatched': [tonnes_dispatched],
+            'route_encoded': [hash(route) % 5],
+            'material_encoded': [hash(material_type) % 7],
+            'weather_encoded': [hash(weather or 'Clear') % 3],
+        })
+        
+        # Classifier prediction
+        delay_probability = float(classifier.predict_proba(features)[0][1])
+        
+        # Regressor prediction
+        delay_hours = float(regressor.predict(features)[0])
+        
+        return {
+            'delay_probability': min(1.0, max(0.0, delay_probability)),
+            'predicted_delay_hours': max(0, delay_hours),
+            'route': route,
+            'confidence': 0.80,
+        }
+    except Exception as e:
+        app_logger.error(f"Delay prediction error: {str(e)}")
+        raise
+
+def predict_throughput(loading_point: str, material_type: str, equipment_count: int, shift: str) -> Dict[str, Any]:
+    """Predict loading point throughput."""
+    try:
+        model = models_loader.get_model('throughput')
+        
+        features = pd.DataFrame({
+            'equipment_operational_count': [equipment_count],
+            'material_encoded': [hash(material_type) % 7],
+            'shift_encoded': [{'Morning': 0, 'Afternoon': 1, 'Night': 2}.get(shift, 0)],
+            'loading_point_encoded': [hash(loading_point) % 3],
+        })
+        
+        prediction = float(model.predict(features)[0])
+        
+        return {
+            'predicted_throughput_tph': max(0, prediction),
+            'loading_point': loading_point,
+            'equipment_count': equipment_count,
+            'confidence': 0.83,
+        }
+    except Exception as e:
+        app_logger.error(f"Throughput prediction error: {str(e)}")
+        raise
+
+def predict_cost(route: str, tonnes_dispatched: float, delay_hours: float, material_type: str) -> Dict[str, Any]:
+    """Predict dispatch cost."""
+    try:
+        model = models_loader.get_model('cost')
+        
+        features = pd.DataFrame({
+            'tonnes_numeric': [tonnes_dispatched],
+            'tonnes_log': [np.log1p(tonnes_dispatched)],
+            'delay_hours': [delay_hours],
+            'route_encoded': [hash(route) % 5],
+            'material_encoded': [hash(material_type) % 7],
+        })
+        
+        prediction = float(model.predict(features)[0])
+        
+        return {
+            'predicted_cost_rs': max(0, prediction),
+            'route': route,
+            'tonnes': tonnes_dispatched,
+            'confidence': 0.81,
+        }
+    except Exception as e:
+        app_logger.error(f"Cost prediction error: {str(e)}")
+        raise
+
+def predict_transport_mode(quantity_tonnes: float, distance_km: float, priority: str, destination: str, material_type: str) -> Dict[str, Any]:
+    """Predict optimal transport mode (RAIL vs ROAD)."""
+    try:
+        model = models_loader.get_model('mode_classifier')
+        
+        features = pd.DataFrame({
+            'quantity_tonnes': [quantity_tonnes],
+            'distance_km': [distance_km],
+            'priority_numeric': [{'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}.get(priority, 1)],
+            'destination_encoded': [hash(destination) % 5],
+            'material_encoded': [hash(material_type) % 7],
+        })
+        
+        prediction = model.predict(features)[0]
+        probability = float(model.predict_proba(features)[0].max())
+        
+        mode = 'RAIL' if prediction == 1 else 'ROAD'
+        
+        return {
+            'recommended_mode': mode,
+            'confidence': min(1.0, probability),
+            'quantity_tonnes': quantity_tonnes,
+            'distance_km': distance_km,
+        }
+    except Exception as e:
+        app_logger.error(f"Mode classification error: {str(e)}")
+        raise

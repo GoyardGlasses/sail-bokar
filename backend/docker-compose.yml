@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # SAIL Bokaro Logistics API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sail-bokaro-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - LOG_LEVEL=INFO
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-sail-bokaro-admin-token-secret}
+      - OPTIMIZER_TIME_LIMIT=20
+    volumes:
+      - ./logs:/app/logs
+      - ./backend/ml/models:/app/backend/ml/models:ro
+      - ./backend/ml/synthetic:/app/backend/ml/synthetic:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/meta/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - sail-bokaro-network
+
+  # Optional: Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sail-bokaro-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - api
+    networks:
+      - sail-bokaro-network
+    restart: unless-stopped
+
+networks:
+  sail-bokaro-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
