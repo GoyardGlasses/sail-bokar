@@ -1,26 +1,10 @@
 {
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.10@3.10.0"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "CORS_ORIGINS": "https://@vercel_url,http://localhost:5173",
-    "APP_NAME": "SAIL Bokaro",
-    "APP_VERSION": "1.0.0",
-    "DEBUG": "false",
-    "SECRET_TOKEN": "sail_bokaro_2025_secure_key!123"
-  }
+  ]
 }
