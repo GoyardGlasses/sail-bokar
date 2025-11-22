@@ -17,10 +17,10 @@
     }
   ],
   "env": {
-    "CORS_ORIGINS": "@cors_origins",
+    "CORS_ORIGINS": "https://@vercel_url,http://localhost:5173",
     "APP_NAME": "SAIL Bokaro",
     "APP_VERSION": "1.0.0",
     "DEBUG": "false",
-    "SECRET_TOKEN": "@secret_token"
+    "SECRET_TOKEN": "sail_bokaro_2025_secure_key!123"
   }
 }
