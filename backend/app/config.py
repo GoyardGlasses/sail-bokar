@@ -4,12 +4,19 @@ SIH25208 SAIL Bokaro Steel Plant Logistics Optimization System.
 """
 
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 from typing import Optional
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        json_file=None,
+        json_schema_extra=None,
+    )
     
     # App settings
     APP_NAME: str = "SAIL Bokaro Logistics Optimizer"
