@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Lightbulb,
   Layers,
-  Box3d as Cube,
+  Box,
   Map,
   GitBranch,
 } from 'lucide-react'
@@ -30,7 +30,7 @@ const menuItems = [
   { icon: Lightbulb, label: 'AI Forecast', path: '/ai-forecast' },
   { icon: GitBranch, label: 'Blockchain', path: '/blockchain' },
   { icon: Layers, label: 'Advanced Opt', path: '/advanced-optimization' },
-  { icon: Box3d, label: '3D Visualization', path: '/visualization-3d' },
+  { icon: Box, label: '3D Visualization', path: '/visualization-3d' },
   { icon: Map, label: 'Scenario Analysis', path: '/scenario-analysis' },
 ]
 

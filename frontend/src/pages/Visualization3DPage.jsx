@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Cube, Map, Activity } from 'lucide-react'
+import { Box, Map, Activity } from 'lucide-react'
 import axios from 'axios'
 
 const API_BASE = 'http://127.0.0.1:8000'
