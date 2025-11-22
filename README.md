@@ -10,9 +10,10 @@ A comprehensive logistics optimization platform combining React frontend, FastAP
 - **npm** (comes with Node.js)
 - **Windows 10/11** (or Linux/macOS with bash)
 
-### Automatic Launch (Windows)
-Simply double-click one of the launch scripts:
-- **`RUN-WEBSITE.bat`** - Recommended for quick start
+### Automatic Launch (Windows) - RECOMMENDED
+Simply double-click:
+- **`START-UNIFIED.bat`** - ⭐ **BEST OPTION** - Starts both backend and frontend together
+- **`RUN-WEBSITE.bat`** - Frontend only (requires manual backend start)
 - **`LAUNCH-WEBSITE-FULL.bat`** - Full rebuild with dependency installation
 - **`DIAGNOSE-SYSTEM.bat`** - Run diagnostics first
 
