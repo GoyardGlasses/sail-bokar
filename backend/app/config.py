@@ -39,21 +39,14 @@ class Settings(BaseSettings):
     MODE_CLASSIFIER_MODEL_PATH: Path = MODELS_DIR / "mode_classifier.pkl"
     
     # CORS settings
-    CORS_ORIGINS: list = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://localhost:8080",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:5176",
-        "http://127.0.0.1:5177",
-    ]
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,http://127.0.0.1:5177,https://sail-bokaro-frontend.vercel.app"
+    
+    @property
+    def cors_origins_list(self) -> list:
+        """Convert CORS_ORIGINS string to list."""
+        if isinstance(self.CORS_ORIGINS, list):
+            return self.CORS_ORIGINS
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
     CORS_CREDENTIALS: bool = True
     CORS_METHODS: list = ["*"]
     CORS_HEADERS: list = ["*"]
