@@ -3,7 +3,7 @@
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.py": {
-      "runtime": "python3.10"
+      "runtime": "python3.10@3.10.0"
     }
   },
   "rewrites": [
