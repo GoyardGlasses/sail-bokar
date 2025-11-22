@@ -108,10 +108,6 @@ class Settings(BaseSettings):
     THROUGHPUT_MAE_THRESHOLD: float = 150
     COST_MAE_THRESHOLD: float = 50000
     MODE_ACCURACY_THRESHOLD: float = 0.85
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
 
 # Global settings instance
 settings = Settings()
