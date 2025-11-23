@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
-import { AlertCircle, TrendingUp, TrendingDown, Clock, DollarSign, CheckCircle, AlertTriangle, Info } from 'lucide-react'
+import { AlertCircle, TrendingUp, TrendingDown, Clock, DollarSign, CheckCircle, AlertTriangle, Info, Zap, Brain, BarChart3, Activity, Shield, GitBranch, Download, MessageSquare, Eye } from 'lucide-react'
+import {
+  MonteCarloSimulation,
+  SensitivityAnalysis,
+  ScenarioOptimization,
+  ComparativeScenarioAnalysis,
+  MachineLearningPredictions,
+  RealTimeScenarioMonitoring,
+} from '../components/ScenarioAdvancedFeatures'
+import {
+  ScenarioBacktesting,
+  AdvancedRiskAnalysis,
+  ScenarioCollaboration,
+  ExportReporting,
+} from '../components/ScenarioAdvancedFeatures2'
 import axios from 'axios'
 
 const API_BASE = 'http://127.0.0.1:8000'
@@ -16,6 +30,7 @@ export default function ScenarioAnalysisPage() {
   const [loading, setLoading] = useState(false)
   const [analysisResult, setAnalysisResult] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
+  const [advancedTab, setAdvancedTab] = useState('monte-carlo')
   const [materials, setMaterials] = useState([])
   const [scenarioHistory, setScenarioHistory] = useState([])
   const [showHistory, setShowHistory] = useState(false)
@@ -302,22 +317,59 @@ export default function ScenarioAnalysisPage() {
           <div className="lg:col-span-2">
             {analysisResult ? (
               <div className="space-y-6">
-                {/* Tabs */}
-                <div className="flex gap-2 border-b border-slate-700">
-                  {['overview', 'scenarios', 'similar', 'decision'].map(tab => (
+                {/* Main Tabs */}
+                <div className="flex gap-2 border-b border-slate-700 overflow-x-auto pb-2">
+                  {['overview', 'scenarios', 'similar', 'decision', 'advanced'].map(tab => (
                     <button
                       key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 font-medium transition ${
+                      onClick={() => {
+                        setActiveTab(tab)
+                        if (tab === 'advanced') setAdvancedTab('monte-carlo')
+                      }}
+                      className={`px-4 py-2 font-medium transition whitespace-nowrap ${
                         activeTab === tab
                           ? 'text-blue-400 border-b-2 border-blue-400'
                           : 'text-slate-400 hover:text-slate-300'
                       }`}
                     >
-                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {tab === 'advanced' ? '🚀 Advanced' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
                   ))}
                 </div>
+
+                {/* Advanced Sub-Tabs */}
+                {activeTab === 'advanced' && (
+                  <div className="flex gap-2 border-b border-slate-700 overflow-x-auto pb-2 mt-4">
+                    {[
+                      { id: 'monte-carlo', label: 'Monte Carlo', icon: Zap },
+                      { id: 'sensitivity', label: 'Sensitivity', icon: BarChart3 },
+                      { id: 'optimization', label: 'Optimization', icon: TrendingUp },
+                      { id: 'comparative', label: 'Comparative', icon: Activity },
+                      { id: 'ml', label: 'ML Models', icon: Brain },
+                      { id: 'monitoring', label: 'Monitoring', icon: Eye },
+                      { id: 'backtest', label: 'Backtest', icon: GitBranch },
+                      { id: 'risk', label: 'Risk', icon: Shield },
+                      { id: 'collab', label: 'Collab', icon: MessageSquare },
+                      { id: 'export', label: 'Export', icon: Download },
+                    ].map(tab => {
+                      const Icon = tab.icon
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setAdvancedTab(tab.id)}
+                          className={`flex items-center gap-2 px-3 py-2 font-medium transition whitespace-nowrap text-sm ${
+                            advancedTab === tab.id
+                              ? 'text-blue-400 border-b-2 border-blue-400'
+                              : 'text-slate-400 hover:text-slate-300'
+                          }`}
+                        >
+                          <Icon size={16} />
+                          {tab.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
 
                 {/* Overview Tab */}
                 {activeTab === 'overview' && (
@@ -525,6 +577,22 @@ export default function ScenarioAnalysisPage() {
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Advanced Tab */}
+                {activeTab === 'advanced' && (
+                  <div className="space-y-6">
+                    {advancedTab === 'monte-carlo' && <MonteCarloSimulation />}
+                    {advancedTab === 'sensitivity' && <SensitivityAnalysis />}
+                    {advancedTab === 'optimization' && <ScenarioOptimization />}
+                    {advancedTab === 'comparative' && <ComparativeScenarioAnalysis />}
+                    {advancedTab === 'ml' && <MachineLearningPredictions />}
+                    {advancedTab === 'monitoring' && <RealTimeScenarioMonitoring />}
+                    {advancedTab === 'backtest' && <ScenarioBacktesting />}
+                    {advancedTab === 'risk' && <AdvancedRiskAnalysis />}
+                    {advancedTab === 'collab' && <ScenarioCollaboration />}
+                    {advancedTab === 'export' && <ExportReporting />}
                   </div>
                 )}
               </div>
