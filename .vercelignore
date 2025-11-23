@@ -1,0 +1,27 @@
+# Ignore backend FastAPI service (deployed separately)
+backend/
+backend/**
+
+# Ignore Electron desktop application
+electron/
+electron/**
+
+# Ignore Docker-related configs (not needed on Vercel)
+Dockerfile
+backend/Dockerfile
+docker-compose.yml
+backend/docker-compose.yml
+
+# Ignore Python/ML environment markers that can confuse Vercel detection
+requirements.txt
+backend/requirements.txt
+
+# Ignore logs and large ML report artifacts
+logs/
+ml_reports/
+ml_pipeline_execution.log
+
+# Ignore local helper scripts and launchers
+scripts/
+*.bat
+*.ps1
