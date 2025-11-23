@@ -7,10 +7,12 @@ import client from './client'
 
 /**
  * Predict delays for given parameters
- * Uses mock data for testing when backend doesn't have data
+ * Uses mock data for testing
  */
 export const predictDelay = async (data) => {
-  // Mock data for testing
+  console.log('Predicting delays for:', data)
+  
+  // Mock data for testing - based on the input route
   const mockResponse = {
     confidence: 0.81,
     summary: {
@@ -19,7 +21,7 @@ export const predictDelay = async (data) => {
     },
     routes: [
       {
-        route: 'Bokaro->Dhanbad',
+        route: data.route || 'Bokaro->Dhanbad',
         predicted_delay_hours: 12,
         probability: 0.21,
         action: 're-route',
@@ -51,22 +53,13 @@ export const predictDelay = async (data) => {
     ],
   }
 
-  try {
-    // Try to call the real API first
-    const response = await client.post('/predict/delay', data)
-    console.log('API response:', response)
-    // If response is valid, return it
-    if (response && response.routes && response.routes.length > 0) {
-      return response
-    }
-    // Otherwise use mock data
-    console.warn('API returned empty response, using mock data')
-    return mockResponse
-  } catch (error) {
-    console.warn('API call failed, using mock data:', error.message)
-    // If API fails, return mock data
-    return mockResponse
-  }
+  // Return mock data immediately (for testing without backend)
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('Returning mock delay prediction response')
+      resolve(mockResponse)
+    }, 500)
+  })
 }
 
 /**
