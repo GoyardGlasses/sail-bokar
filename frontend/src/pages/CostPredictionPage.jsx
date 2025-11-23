@@ -1,13 +1,25 @@
 import React, { useState } from 'react'
 import CostForm from '../components/CostForm'
 import CostResults from '../components/CostResults'
+import {
+  EnsembleCostModels,
+  ProbabilisticCostForecasting,
+  CostSensitivityAnalysis,
+  CostBiasAnalysis,
+  MonteCarloSimulation,
+  CostDriversAnalysis,
+  CostVersionControl,
+  CostCollaboration,
+  CostExportShare,
+} from '../components/CostEnhancementsV2'
 import { predictCost } from '../api/costApi'
-import { DollarSign, TrendingUp } from 'lucide-react'
+import { DollarSign, TrendingUp, BarChart3, Eye, Zap, Lock, GitBranch, MessageSquare, Share2 } from 'lucide-react'
 
 export default function CostPredictionPage() {
   const [costData, setCostData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('main')
 
   const handlePredictCost = async (formData) => {
     setLoading(true)
@@ -22,6 +34,19 @@ export default function CostPredictionPage() {
       setLoading(false)
     }
   }
+
+  const tabs = [
+    { id: 'main', label: 'Main Analysis', icon: DollarSign },
+    { id: 'ensemble', label: 'Ensemble Models', icon: BarChart3 },
+    { id: 'probabilistic', label: 'Probabilistic', icon: TrendingUp },
+    { id: 'sensitivity', label: 'Sensitivity', icon: Eye },
+    { id: 'bias', label: 'Bias Analysis', icon: Eye },
+    { id: 'monte-carlo', label: 'Monte Carlo', icon: Zap },
+    { id: 'drivers', label: 'Cost Drivers', icon: TrendingUp },
+    { id: 'versions', label: 'Version Control', icon: GitBranch },
+    { id: 'collaboration', label: 'Discussion', icon: MessageSquare },
+    { id: 'export', label: 'Export & Share', icon: Share2 },
+  ]
 
   return (
     <div className="p-8 space-y-8">
@@ -41,25 +66,59 @@ export default function CostPredictionPage() {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Form - Left Side */}
-        <div className="lg:col-span-1">
-          <CostForm onSubmit={handlePredictCost} isLoading={loading} />
-        </div>
-
-        {/* Results - Right Side */}
-        <div className="lg:col-span-2">
-          {loading ? (
-            <div className="card p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-slate-600">Predicting cost...</p>
-            </div>
-          ) : (
-            <CostResults data={costData} />
-          )}
-        </div>
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
+
+      {/* Main Content */}
+      {activeTab === 'main' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Form - Left Side */}
+          <div className="lg:col-span-1">
+            <CostForm onSubmit={handlePredictCost} isLoading={loading} />
+          </div>
+
+          {/* Results - Right Side */}
+          <div className="lg:col-span-2">
+            {loading ? (
+              <div className="card p-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-slate-600">Predicting cost...</p>
+              </div>
+            ) : (
+              <CostResults data={costData} />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Enhancement Tabs */}
+      {activeTab === 'ensemble' && costData && <EnsembleCostModels data={costData} />}
+      {activeTab === 'probabilistic' && costData && <ProbabilisticCostForecasting data={costData} />}
+      {activeTab === 'sensitivity' && <CostSensitivityAnalysis />}
+      {activeTab === 'bias' && costData && <CostBiasAnalysis data={costData} />}
+      {activeTab === 'monte-carlo' && costData && <MonteCarloSimulation data={costData} />}
+      {activeTab === 'drivers' && <CostDriversAnalysis />}
+      {activeTab === 'versions' && <CostVersionControl />}
+      {activeTab === 'collaboration' && <CostCollaboration />}
+      {activeTab === 'export' && <CostExportShare />}
 
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
