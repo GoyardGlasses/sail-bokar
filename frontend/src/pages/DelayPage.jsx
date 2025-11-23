@@ -3,10 +3,13 @@ import DelayForm from '../components/DelayForm'
 import DelayResults from '../components/DelayResults'
 import BatchPredictions from '../components/BatchPredictions'
 import RouteAnalytics from '../components/RouteAnalytics'
+import RouteComparison from '../components/RouteComparison'
+import ScenarioComparison from '../components/ScenarioComparison'
+import MaterialComparison from '../components/MaterialComparison'
 import { predictDelay, batchPredictDelays } from '../api/delayApi'
 
 export default function DelayPage() {
-  const [activeTab, setActiveTab] = useState('single') // 'single', 'batch', 'analytics'
+  const [activeTab, setActiveTab] = useState('single') // 'single', 'batch', 'analytics', 'route-comparison', 'scenario', 'material'
   const [results, setResults] = useState(null)
   const [batchResults, setBatchResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -74,10 +77,10 @@ export default function DelayPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200">
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab('single')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'single'
               ? 'border-blue-500 text-blue-600'
               : 'border-transparent text-slate-600 hover:text-slate-900'
@@ -87,7 +90,7 @@ export default function DelayPage() {
         </button>
         <button
           onClick={() => setActiveTab('batch')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'batch'
               ? 'border-blue-500 text-blue-600'
               : 'border-transparent text-slate-600 hover:text-slate-900'
@@ -98,7 +101,7 @@ export default function DelayPage() {
         {batchResults && (
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'analytics'
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
@@ -107,6 +110,36 @@ export default function DelayPage() {
             Analytics
           </button>
         )}
+        <button
+          onClick={() => setActiveTab('route-comparison')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'route-comparison'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Compare Routes
+        </button>
+        <button
+          onClick={() => setActiveTab('scenario')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'scenario'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          What-If Analysis
+        </button>
+        <button
+          onClick={() => setActiveTab('material')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'material'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Material Comparison
+        </button>
       </div>
 
       {/* Single Route Prediction */}
@@ -154,6 +187,21 @@ export default function DelayPage() {
       {/* Analytics */}
       {activeTab === 'analytics' && batchResults && (
         <RouteAnalytics predictions={batchResults.predictions} />
+      )}
+
+      {/* Route Comparison */}
+      {activeTab === 'route-comparison' && (
+        <RouteComparison onCompare={() => {}} isLoading={isLoading} />
+      )}
+
+      {/* Scenario Comparison */}
+      {activeTab === 'scenario' && (
+        <ScenarioComparison onCompare={() => {}} isLoading={isLoading} />
+      )}
+
+      {/* Material Comparison */}
+      {activeTab === 'material' && (
+        <MaterialComparison onCompare={() => {}} isLoading={isLoading} />
       )}
     </div>
   )
