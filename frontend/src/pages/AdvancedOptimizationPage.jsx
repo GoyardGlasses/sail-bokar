@@ -1,6 +1,22 @@
 import React, { useState } from 'react'
 import { BarChart, Bar, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Zap, TrendingDown, Maximize2 } from 'lucide-react'
+import { Zap, TrendingDown, Maximize2, Lock, Eye, Settings, History, Download, GitBranch, CheckCircle, AlertCircle } from 'lucide-react'
+import {
+  ConstraintManagement,
+  OptimizationSensitivityAnalysis,
+  RealTimeOptimizationMonitoring,
+  SolutionComparison,
+  AdvancedVisualization,
+  GeneticAlgorithmTuning,
+} from '../components/OptimizationAdvancedFeatures'
+import {
+  HistoricalAnalysis,
+  ExportReportingOptimization,
+  MultiAlgorithmComparison,
+  ConstraintVisualization,
+  SolutionValidation,
+  InteractiveParetoFront,
+} from '../components/OptimizationAdvancedFeatures2'
 import axios from 'axios'
 
 const API_BASE = 'http://127.0.0.1:8000'
@@ -13,6 +29,7 @@ export default function AdvancedOptimizationPage() {
   ])
   const [optimizationResult, setOptimizationResult] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('results')
   const [newOrder, setNewOrder] = useState({
     material: 'HR_Coils',
     destination: 'Kolkata',
@@ -158,10 +175,46 @@ export default function AdvancedOptimizationPage() {
         </button>
       </div>
 
-      {/* Optimization Results */}
+      {/* Advanced Features Tabs */}
       {optimizationResult && (
-        <>
-          {/* Best Solution */}
+        <div className="space-y-6">
+          <div className="flex gap-2 border-b border-gray-200 overflow-x-auto pb-2">
+            {[
+              { id: 'results', label: 'Results', icon: TrendingDown },
+              { id: 'constraints', label: 'Constraints', icon: Lock },
+              { id: 'sensitivity', label: 'Sensitivity', icon: Eye },
+              { id: 'monitoring', label: 'Monitoring', icon: Zap },
+              { id: 'comparison', label: 'Comparison', icon: Maximize2 },
+              { id: 'visualization', label: 'Visualization', icon: Maximize2 },
+              { id: 'tuning', label: 'GA Tuning', icon: Settings },
+              { id: 'history', label: 'History', icon: History },
+              { id: 'export', label: 'Export', icon: Download },
+              { id: 'algorithms', label: 'Algorithms', icon: GitBranch },
+              { id: 'validation', label: 'Validation', icon: CheckCircle },
+              { id: 'pareto', label: 'Pareto', icon: AlertCircle },
+            ].map(tab => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-yellow-600 text-yellow-600'
+                      : 'border-transparent text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon size={18} />
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'results' && (
+            <>
+              {/* Best Solution */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <TrendingDown className="w-5 h-5 text-green-600" />
@@ -227,7 +280,22 @@ export default function AdvancedOptimizationPage() {
               </div>
             </div>
           </div>
-        </>
+            </>
+          )}
+
+          {/* Other Tabs */}
+          {activeTab === 'constraints' && <ConstraintManagement />}
+          {activeTab === 'sensitivity' && <OptimizationSensitivityAnalysis />}
+          {activeTab === 'monitoring' && <RealTimeOptimizationMonitoring />}
+          {activeTab === 'comparison' && <SolutionComparison />}
+          {activeTab === 'visualization' && <AdvancedVisualization />}
+          {activeTab === 'tuning' && <GeneticAlgorithmTuning />}
+          {activeTab === 'history' && <HistoricalAnalysis />}
+          {activeTab === 'export' && <ExportReportingOptimization />}
+          {activeTab === 'algorithms' && <MultiAlgorithmComparison />}
+          {activeTab === 'validation' && <SolutionValidation />}
+          {activeTab === 'pareto' && <InteractiveParetoFront />}
+        </div>
       )}
 
       {/* Algorithm Comparison */}
