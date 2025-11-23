@@ -21,8 +21,6 @@ import {
   DollarSign,
   Truck,
   Play,
-  Download,
-  Settings,
 } from 'lucide-react'
 
 export default function MLModels() {
@@ -372,29 +370,19 @@ export default function MLModels() {
           <h2 className="text-xl font-bold text-gray-900 mb-6">Model Integration Across Website (7 Models)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { name: 'Demand Forecasting', page: 'Forecast Page', icon: TrendingUp, color: 'blue' },
-              { name: 'Rake Availability', page: 'Forecast Page', icon: Truck, color: 'cyan' },
-              { name: 'Delay Classifier', page: 'Delay Page', icon: Clock, color: 'red' },
-              { name: 'Delay Regressor', page: 'Delay Page', icon: Clock, color: 'orange' },
-              { name: 'Throughput Optimization', page: 'Throughput Page', icon: BarChart3, color: 'green' },
-              { name: 'Cost Estimation', page: 'Cost Page', icon: DollarSign, color: 'purple' },
-              { name: 'Mode Selection', page: 'Optimization Page', icon: Truck, color: 'indigo' },
+              { name: 'Demand Forecasting', page: 'Forecast Page', icon: TrendingUp, bgColor: 'bg-blue-50', borderColor: 'border-blue-200', textColor: 'text-blue-600' },
+              { name: 'Rake Availability', page: 'Forecast Page', icon: Truck, bgColor: 'bg-cyan-50', borderColor: 'border-cyan-200', textColor: 'text-cyan-600' },
+              { name: 'Delay Classifier', page: 'Delay Page', icon: Clock, bgColor: 'bg-red-50', borderColor: 'border-red-200', textColor: 'text-red-600' },
+              { name: 'Delay Regressor', page: 'Delay Page', icon: Clock, bgColor: 'bg-orange-50', borderColor: 'border-orange-200', textColor: 'text-orange-600' },
+              { name: 'Throughput Optimization', page: 'Throughput Page', icon: BarChart3, bgColor: 'bg-green-50', borderColor: 'border-green-200', textColor: 'text-green-600' },
+              { name: 'Cost Estimation', page: 'Cost Page', icon: DollarSign, bgColor: 'bg-purple-50', borderColor: 'border-purple-200', textColor: 'text-purple-600' },
+              { name: 'Mode Selection', page: 'Optimization Page', icon: Truck, bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', textColor: 'text-indigo-600' },
             ].map((integration, idx) => {
               const Icon = integration.icon
-              const colorClasses = {
-                blue: 'bg-blue-50 border-blue-200 text-blue-600',
-                cyan: 'bg-cyan-50 border-cyan-200 text-cyan-600',
-                red: 'bg-red-50 border-red-200 text-red-600',
-                orange: 'bg-orange-50 border-orange-200 text-orange-600',
-                green: 'bg-green-50 border-green-200 text-green-600',
-                purple: 'bg-purple-50 border-purple-200 text-purple-600',
-                indigo: 'bg-indigo-50 border-indigo-200 text-indigo-600',
-              }
-              const classes = colorClasses[integration.color] || colorClasses.blue
               return (
-                <div key={idx} className={`p-4 ${classes} rounded-lg border`}>
+                <div key={idx} className={`p-4 ${integration.bgColor} border ${integration.borderColor} rounded-lg`}>
                   <div className="flex items-start gap-3">
-                    <Icon className="flex-shrink-0" size={24} />
+                    <Icon className={`flex-shrink-0 ${integration.textColor}`} size={24} />
                     <div>
                       <p className="font-bold text-gray-900">{integration.name}</p>
                       <p className="text-sm text-gray-600">{integration.page}</p>
