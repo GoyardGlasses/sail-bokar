@@ -1,4 +1,4 @@
-# Ignore backend FastAPI service (deployed separately)
+# Ignore backend FastAPI service (deployed separately on Render)
 backend/
 backend/**
 
@@ -15,9 +15,54 @@ backend/docker-compose.yml
 # Ignore Python/ML environment markers that can confuse Vercel detection
 requirements.txt
 backend/requirements.txt
+*.py
+setup.py
+pyproject.toml
 
 # Ignore logs and large ML report artifacts
 logs/
+*.log
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore environment files (use Vercel env vars instead)
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.local
+
+# Ignore temporary and cache files
+*.tmp
+*.temp
+.cache/
+node_modules/.cache/
+
+# Ignore test files
+tests/
+__pycache__/
+*.pyc
+
+# Ignore render.yaml (backend deployment config)
+backend/render.yaml
+.renderignore
+
+# Ignore ML models (optional, can be deployed separately)
+ml/
+backend/ml/models/
+
+# Ignore documentation (optional, can be kept)
+DEPLOYMENT_GUIDE.md
+ML_DEVOPS_EXECUTION_REPORT.md
 ml_reports/
 ml_pipeline_execution.log
 

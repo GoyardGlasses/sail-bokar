@@ -1,0 +1,54 @@
+# Ignore frontend (deployed separately on Vercel)
+../frontend/
+../frontend/**
+
+# Ignore Electron desktop application
+../electron/
+../electron/**
+
+# Ignore Docker files (not needed on Render)
+../Dockerfile
+../docker-compose.yml
+Dockerfile
+docker-compose.yml
+
+# Ignore Node.js/npm files
+../node_modules/
+../package.json
+../package-lock.json
+../yarn.lock
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore documentation (optional, can be kept)
+../README.md
+../DEPLOYMENT_GUIDE.md
+
+# Ignore test files (optional, can be kept for CI/CD)
+tests/
+__pycache__/
+*.pyc
+
+# Ignore environment files (use Render env vars instead)
+.env
+.env.local
+.env.*.local
+
+# Ignore logs (will be created at runtime)
+../logs/
+logs/
+
+# Ignore temporary files
+*.tmp
+*.temp
+.cache/
