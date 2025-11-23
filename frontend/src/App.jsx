@@ -19,6 +19,7 @@ import ScenarioAnalysisPage from './pages/ScenarioAnalysisPage'
 import ModernDashboard from './pages/ModernDashboard'
 import OperationsHub from './pages/OperationsHub'
 import RakePlanner from './pages/RakePlanner'
+import ThroughputOptimizationPage from './pages/ThroughputOptimizationPage'
 import Spinner from './components/UI/Spinner'
 import { useAppStore } from './store/useAppStore'
 
@@ -52,6 +53,7 @@ export default function App() {
               <Route path="/forecast" element={<ForecastPage />} />
               <Route path="/delay" element={<DelayPage />} />
               <Route path="/throughput" element={<ThroughputPage />} />
+              <Route path="/throughput-optimization" element={<ThroughputOptimizationPage />} />
               <Route path="/cost" element={<CostPage />} />
               <Route path="/optimize" element={<OptimizePage />} />
               <Route path="/optimize-result" element={<OptimizeResult />} />

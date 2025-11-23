@@ -22,6 +22,7 @@ const menuItems = [
   { icon: TrendingUp, label: 'Demand Forecast', path: '/forecast' },
   { icon: AlertCircle, label: 'Delay Prediction', path: '/delay' },
   { icon: Zap, label: 'Throughput', path: '/throughput' },
+  { icon: Zap, label: 'Throughput Optimization', path: '/throughput-optimization' },
   { icon: DollarSign, label: 'Cost Analysis', path: '/cost' },
   { icon: Truck, label: 'Optimize', path: '/optimize' },
   { icon: Brain, label: 'ML Models', path: '/models' },
