@@ -63,6 +63,50 @@ export const predictDelay = async (data) => {
 }
 
 /**
+ * Predict delays for multiple routes (batch prediction)
+ */
+export const batchPredictDelays = async (routes) => {
+  console.log('Batch predicting delays for', routes.length, 'routes')
+
+  // Generate mock predictions for each route
+  const predictions = routes.map((route, idx) => {
+    const delayHours = Math.floor(Math.random() * 15) + 1
+    const probability = Math.random() * 0.25 + 0.05
+    const action = probability > 0.15 ? 're-route' : probability > 0.08 ? 'monitor' : 'proceed'
+
+    return {
+      route: route.route,
+      tonnes_dispatched: route.tonnes_dispatched,
+      material_type: route.material_type,
+      weather_condition: route.weather_condition,
+      predicted_delay_hours: delayHours,
+      probability: parseFloat(probability.toFixed(2)),
+      action,
+    }
+  })
+
+  // Calculate summary
+  const avgDelay = (predictions.reduce((sum, p) => sum + p.predicted_delay_hours, 0) / predictions.length).toFixed(1)
+  const avgProbability = (predictions.reduce((sum, p) => sum + p.probability, 0) / predictions.length).toFixed(2)
+  const highRiskCount = predictions.filter((p) => p.probability > 0.15).length
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        total_routes: routes.length,
+        predictions,
+        summary: {
+          average_delay_hours: parseFloat(avgDelay),
+          average_probability: parseFloat(avgProbability),
+          high_risk_routes: highRiskCount,
+        },
+      })
+    }, 1000)
+  })
+}
+
+/**
  * Get available destinations from backend
  */
 export const getDestinations = async () => {

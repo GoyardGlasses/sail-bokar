@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 import DelayForm from '../components/DelayForm'
 import DelayResults from '../components/DelayResults'
-import { predictDelay } from '../api/delayApi'
+import BatchPredictions from '../components/BatchPredictions'
+import RouteAnalytics from '../components/RouteAnalytics'
+import { predictDelay, batchPredictDelays } from '../api/delayApi'
 
 export default function DelayPage() {
+  const [activeTab, setActiveTab] = useState('single') // 'single', 'batch', 'analytics'
   const [results, setResults] = useState(null)
+  const [batchResults, setBatchResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [lastFormData, setLastFormData] = useState(null)
@@ -44,6 +48,24 @@ export default function DelayPage() {
     }
   }
 
+  const handleBatchPrediction = async (csvData) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      console.log('Submitting batch prediction for', csvData.length, 'routes')
+      const response = await batchPredictDelays(csvData)
+      console.log('Batch response:', response)
+      setBatchResults(response)
+      setActiveTab('analytics')
+    } catch (err) {
+      console.error('Batch prediction failed:', err)
+      setError(err?.message || 'Batch prediction failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="p-8 space-y-8">
       <div>
@@ -51,28 +73,87 @@ export default function DelayPage() {
         <p className="text-slate-600 mt-1">Predict transportation delays for your routes</p>
       </div>
 
-      <DelayForm onSubmit={handlePrediction} isLoading={isLoading} />
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('single')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            activeTab === 'single'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Single Route
+        </button>
+        <button
+          onClick={() => setActiveTab('batch')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            activeTab === 'batch'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Batch Predictions
+        </button>
+        {batchResults && (
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Analytics
+          </button>
+        )}
+      </div>
 
-      {results && (
-        <DelayResults 
-          data={results} 
-          isLoading={isLoading} 
-          error={error}
-          onRetry={handleRetry}
-        />
+      {/* Single Route Prediction */}
+      {activeTab === 'single' && (
+        <>
+          <DelayForm onSubmit={handlePrediction} isLoading={isLoading} />
+
+          {results && (
+            <DelayResults 
+              data={results} 
+              isLoading={isLoading} 
+              error={error}
+              onRetry={handleRetry}
+            />
+          )}
+
+          {error && !results && (
+            <div className="card bg-red-50 border border-red-200 p-6">
+              <p className="text-red-900 mb-4">{error}</p>
+              <button
+                onClick={handleRetry}
+                disabled={isLoading}
+                className="btn btn-outline text-red-600 disabled:opacity-50"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+        </>
       )}
 
-      {error && !results && (
-        <div className="card bg-red-50 border border-red-200 p-6">
-          <p className="text-red-900 mb-4">{error}</p>
-          <button
-            onClick={handleRetry}
-            disabled={isLoading}
-            className="btn btn-outline text-red-600 disabled:opacity-50"
-          >
-            Try Again
-          </button>
-        </div>
+      {/* Batch Predictions */}
+      {activeTab === 'batch' && (
+        <>
+          <BatchPredictions onBatchSubmit={handleBatchPrediction} isLoading={isLoading} />
+
+          {error && (
+            <div className="card bg-red-50 border border-red-200 p-6">
+              <p className="text-red-900 mb-4">{error}</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Analytics */}
+      {activeTab === 'analytics' && batchResults && (
+        <RouteAnalytics predictions={batchResults.predictions} />
       )}
     </div>
   )
