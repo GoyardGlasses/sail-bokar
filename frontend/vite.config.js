@@ -16,5 +16,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['recharts', 'framer-motion', 'lucide-react'],
+          'utils': ['axios', 'zustand', 'clsx', 'date-fns'],
+        },
+      },
+    },
   },
 })

@@ -2,6 +2,7 @@
   "name": "sail-bokaro-frontend",
   "version": "1.0.0",
   "description": "SAIL Bokaro Steel Plant Logistics Optimization System - Frontend",
+  "type": "module",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
