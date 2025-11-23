@@ -332,47 +332,91 @@ export function InteractiveParetoFront() {
       <h3 className="text-lg font-bold text-white">Interactive Pareto Front</h3>
 
       <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
-        <p className="text-sm font-medium text-slate-300 mb-3">Click to Select Solution</p>
+        <p className="text-sm font-medium text-slate-300 mb-3">Pareto Front Visualization</p>
         <ResponsiveContainer width="100%" height={300}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="cost" name="Cost" />
-            <YAxis dataKey="time" name="Time" />
+            <XAxis dataKey="cost" name="Cost (₹)" />
+            <YAxis dataKey="time" name="Time (hrs)" />
             <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-            <Scatter name="Solutions" data={solutions} fill="#3b82f6" onClick={(e) => setSelectedSolution(e.id)} />
+            <Scatter name="Solutions" data={solutions} fill="#3b82f6" />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
 
+      <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+        <p className="text-sm font-medium text-slate-300 mb-3">Select Solution</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {solutions.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedSolution(s.id)}
+              className={`p-3 rounded border-2 transition-all text-left ${
+                selectedSolution === s.id
+                  ? 'bg-blue-900 border-blue-500'
+                  : 'bg-slate-600 border-slate-500 hover:border-blue-400'
+              }`}
+            >
+              <p className="font-medium text-white">{s.id}</p>
+              <p className="text-xs text-slate-300">Cost: ₹{s.cost.toLocaleString()} | Time: {s.time}h</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {selectedSolution && (
-        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+        <div className="bg-slate-700 rounded-lg border border-blue-600 p-4">
           <p className="text-sm font-medium text-slate-300 mb-3">Solution Details: {selectedSolution}</p>
           {solutions.filter(s => s.id === selectedSolution).map((s, i) => (
-            <div key={i} className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="p-3 bg-slate-600 rounded">
-                <p className="text-xs text-slate-400">Cost</p>
-                <p className="text-lg font-bold text-white">₹{s.cost.toLocaleString()}</p>
+            <div key={i} className="space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Cost</p>
+                  <p className="text-lg font-bold text-white">₹{s.cost.toLocaleString()}</p>
+                </div>
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Time</p>
+                  <p className="text-lg font-bold text-white">{s.time}h</p>
+                </div>
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Efficiency</p>
+                  <p className="text-lg font-bold text-white">{s.efficiency}%</p>
+                </div>
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Vehicles</p>
+                  <p className="text-lg font-bold text-white">{s.vehicles}</p>
+                </div>
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Routes</p>
+                  <p className="text-lg font-bold text-white">{s.routes}</p>
+                </div>
+                <div className="p-3 bg-slate-600 rounded">
+                  <p className="text-xs text-slate-400">Rank</p>
+                  <p className="text-lg font-bold text-white">{i + 1}</p>
+                </div>
               </div>
-              <div className="p-3 bg-slate-600 rounded">
-                <p className="text-xs text-slate-400">Time</p>
-                <p className="text-lg font-bold text-white">{s.time}h</p>
-              </div>
-              <div className="p-3 bg-slate-600 rounded">
-                <p className="text-xs text-slate-400">Efficiency</p>
-                <p className="text-lg font-bold text-white">{s.efficiency}%</p>
-              </div>
-              <div className="p-3 bg-slate-600 rounded">
-                <p className="text-xs text-slate-400">Vehicles</p>
-                <p className="text-lg font-bold text-white">{s.vehicles}</p>
-              </div>
-              <div className="p-3 bg-slate-600 rounded">
-                <p className="text-xs text-slate-400">Routes</p>
-                <p className="text-lg font-bold text-white">{s.routes}</p>
-              </div>
+              <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                Apply This Solution
+              </button>
             </div>
           ))}
         </div>
       )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Total Solutions</p>
+          <p className="text-3xl font-bold text-white mt-2">{solutions.length}</p>
+        </div>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Cost Range</p>
+          <p className="text-sm font-bold text-white mt-2">₹{Math.min(...solutions.map(s => s.cost)).toLocaleString()} - ₹{Math.max(...solutions.map(s => s.cost)).toLocaleString()}</p>
+        </div>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Time Range</p>
+          <p className="text-sm font-bold text-white mt-2">{Math.min(...solutions.map(s => s.time))}h - {Math.max(...solutions.map(s => s.time))}h</p>
+        </div>
+      </div>
     </div>
   )
 }
