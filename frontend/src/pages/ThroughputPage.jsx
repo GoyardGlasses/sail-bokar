@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import ThroughputTimeline from '../components/ThroughputTimeline'
+import {
+  RealTimeThroughputDashboard,
+  ThroughputTrendsPatterns,
+  DispatchManagement,
+  EquipmentTracking,
+  ManpowerAnalytics,
+  BottleneckDetection,
+  ThroughputForecasting,
+} from '../components/ThroughputAdvancedFeatures'
+import {
+  CostPerUnitThroughput,
+  AlertsNotifications,
+  ExportReporting,
+  HistoricalAnalysis,
+} from '../components/ThroughputAdvancedFeatures2'
 import { fetchThroughputData } from '../api/throughputApi'
-import { TrendingUp, Calendar, MapPin, Truck, AlertCircle } from 'lucide-react'
+import { TrendingUp, Calendar, MapPin, Truck, AlertCircle, Zap, Clock, Gauge, Users, AlertTriangle, TrendingDown, DollarSign, Download, BarChart3 } from 'lucide-react'
 
 export default function ThroughputPage() {
   const [throughputData, setThroughputData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('main')
 
   // Form state
   const [startDate, setStartDate] = useState(() => {
@@ -190,15 +206,66 @@ export default function ThroughputPage() {
         </div>
       )}
 
-      {/* Timeline Chart */}
-      {loading ? (
-        <div className="card p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading throughput data...</p>
-        </div>
-      ) : throughputData ? (
-        <ThroughputTimeline data={throughputData.throughput} loadingPoint={loadingPoint} />
-      ) : null}
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {[
+          { id: 'main', label: 'Main Analysis', icon: TrendingUp },
+          { id: 'realtime', label: 'Real-Time', icon: Zap },
+          { id: 'trends', label: 'Trends', icon: BarChart3 },
+          { id: 'dispatch', label: 'Dispatch', icon: Truck },
+          { id: 'equipment', label: 'Equipment', icon: Gauge },
+          { id: 'manpower', label: 'Manpower', icon: Users },
+          { id: 'bottleneck', label: 'Bottleneck', icon: AlertTriangle },
+          { id: 'forecast', label: 'Forecast', icon: TrendingUp },
+          { id: 'cost', label: 'Cost/Unit', icon: DollarSign },
+          { id: 'alerts', label: 'Alerts', icon: AlertCircle },
+          { id: 'export', label: 'Export', icon: Download },
+          { id: 'history', label: 'History', icon: Clock },
+        ].map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'main' && (
+        <>
+          {/* Timeline Chart */}
+          {loading ? (
+            <div className="card p-8 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-slate-600">Loading throughput data...</p>
+            </div>
+          ) : throughputData ? (
+            <ThroughputTimeline data={throughputData.throughput} loadingPoint={loadingPoint} />
+          ) : null}
+        </>
+      )}
+
+      {activeTab === 'realtime' && <RealTimeThroughputDashboard />}
+      {activeTab === 'trends' && <ThroughputTrendsPatterns />}
+      {activeTab === 'dispatch' && <DispatchManagement />}
+      {activeTab === 'equipment' && <EquipmentTracking />}
+      {activeTab === 'manpower' && <ManpowerAnalytics />}
+      {activeTab === 'bottleneck' && <BottleneckDetection />}
+      {activeTab === 'forecast' && <ThroughputForecasting />}
+      {activeTab === 'cost' && <CostPerUnitThroughput />}
+      {activeTab === 'alerts' && <AlertsNotifications />}
+      {activeTab === 'export' && <ExportReporting />}
+      {activeTab === 'history' && <HistoricalAnalysis />}
 
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
