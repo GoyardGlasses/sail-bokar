@@ -6,10 +6,20 @@ import RouteAnalytics from '../components/RouteAnalytics'
 import RouteComparison from '../components/RouteComparison'
 import ScenarioComparison from '../components/ScenarioComparison'
 import MaterialComparison from '../components/MaterialComparison'
+import RealTimeAlerts from '../components/RealTimeAlerts'
+import RecommendationsEngine from '../components/RecommendationsEngine'
+import AccuracyDashboard from '../components/AccuracyDashboard'
+import RouteOptimization from '../components/RouteOptimizationAdvanced'
+import RiskHeatmap from '../components/RiskHeatmapAdvanced'
+import MaintenanceAlerts from '../components/MaintenanceAlertsAdvanced'
+import ReportGenerator from '../components/ReportGenerator'
+import AnomalyDetection from '../components/AnomalyDetection'
+import AIChatAssistant from '../components/AIChatAssistant'
+import SimulationGame from '../components/SimulationGame'
 import { predictDelay, batchPredictDelays } from '../api/delayApi'
 
 export default function DelayPage() {
-  const [activeTab, setActiveTab] = useState('single') // 'single', 'batch', 'analytics', 'route-comparison', 'scenario', 'material'
+  const [activeTab, setActiveTab] = useState('single')
   const [results, setResults] = useState(null)
   const [batchResults, setBatchResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -77,69 +87,37 @@ export default function DelayPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('single')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'single'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Single Route
-        </button>
-        <button
-          onClick={() => setActiveTab('batch')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'batch'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Batch Predictions
-        </button>
-        {batchResults && (
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {[
+          { id: 'single', label: 'Single Route' },
+          { id: 'batch', label: 'Batch' },
+          { id: 'analytics', label: 'Analytics' },
+          { id: 'route-comparison', label: 'Compare Routes' },
+          { id: 'scenario', label: 'What-If' },
+          { id: 'material', label: 'Materials' },
+          { id: 'alerts', label: 'Alerts' },
+          { id: 'recommendations', label: 'Recommendations' },
+          { id: 'accuracy', label: 'Accuracy' },
+          { id: 'optimization', label: 'Optimize' },
+          { id: 'heatmap', label: 'Heatmap' },
+          { id: 'maintenance', label: 'Maintenance' },
+          { id: 'reports', label: 'Reports' },
+          { id: 'anomalies', label: 'Anomalies' },
+          { id: 'chat', label: 'AI Chat' },
+          { id: 'game', label: 'Game' },
+        ].map((tab) => (
           <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === 'analytics'
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-3 py-2 font-medium border-b-2 transition-colors whitespace-nowrap text-sm ${
+              activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            Analytics
+            {tab.label}
           </button>
-        )}
-        <button
-          onClick={() => setActiveTab('route-comparison')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'route-comparison'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Compare Routes
-        </button>
-        <button
-          onClick={() => setActiveTab('scenario')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'scenario'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          What-If Analysis
-        </button>
-        <button
-          onClick={() => setActiveTab('material')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'material'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Material Comparison
-        </button>
+        ))}
       </div>
 
       {/* Single Route Prediction */}
@@ -203,6 +181,36 @@ export default function DelayPage() {
       {activeTab === 'material' && (
         <MaterialComparison onCompare={() => {}} isLoading={isLoading} />
       )}
+
+      {/* Real-Time Alerts */}
+      {activeTab === 'alerts' && <RealTimeAlerts />}
+
+      {/* Recommendations */}
+      {activeTab === 'recommendations' && <RecommendationsEngine />}
+
+      {/* Accuracy Dashboard */}
+      {activeTab === 'accuracy' && <AccuracyDashboard />}
+
+      {/* Route Optimization */}
+      {activeTab === 'optimization' && <RouteOptimization />}
+
+      {/* Risk Heatmap */}
+      {activeTab === 'heatmap' && <RiskHeatmap />}
+
+      {/* Maintenance Alerts */}
+      {activeTab === 'maintenance' && <MaintenanceAlerts />}
+
+      {/* Report Generator */}
+      {activeTab === 'reports' && <ReportGenerator />}
+
+      {/* Anomaly Detection */}
+      {activeTab === 'anomalies' && <AnomalyDetection />}
+
+      {/* AI Chat */}
+      {activeTab === 'chat' && <AIChatAssistant />}
+
+      {/* Simulation Game */}
+      {activeTab === 'game' && <SimulationGame />}
     </div>
   )
 }
