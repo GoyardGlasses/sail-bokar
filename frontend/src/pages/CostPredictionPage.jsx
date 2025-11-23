@@ -110,11 +110,11 @@ export default function CostPredictionPage() {
       )}
 
       {/* Enhancement Tabs */}
-      {activeTab === 'ensemble' && costData && <EnsembleCostModels data={costData} />}
-      {activeTab === 'probabilistic' && costData && <ProbabilisticCostForecasting data={costData} />}
+      {activeTab === 'ensemble' && <EnsembleCostModels data={costData} />}
+      {activeTab === 'probabilistic' && <ProbabilisticCostForecasting data={costData} />}
       {activeTab === 'sensitivity' && <CostSensitivityAnalysis />}
-      {activeTab === 'bias' && costData && <CostBiasAnalysis data={costData} />}
-      {activeTab === 'monte-carlo' && costData && <MonteCarloSimulation data={costData} />}
+      {activeTab === 'bias' && <CostBiasAnalysis data={costData} />}
+      {activeTab === 'monte-carlo' && <MonteCarloSimulation data={costData} />}
       {activeTab === 'drivers' && <CostDriversAnalysis />}
       {activeTab === 'versions' && <CostVersionControl />}
       {activeTab === 'collaboration' && <CostCollaboration />}
