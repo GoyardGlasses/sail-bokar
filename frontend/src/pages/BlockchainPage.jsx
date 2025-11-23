@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Lock, CheckCircle, AlertCircle, Search, AlertTriangle } from 'lucide-react'
+import { Lock, CheckCircle, AlertCircle, Search, AlertTriangle, Code, Users, Zap, Shield, TrendingUp, Activity, Link2, Layers } from 'lucide-react'
 import AuditTable from '../components/AuditTable'
+import {
+  SmartContractManagement,
+  MultiSignatureAuthorization,
+  RealTimeEventStreaming,
+  ConsensusMechanismVisualization,
+  DataIntegrityVerification,
+  ComplianceRegulatory,
+} from '../components/BlockchainAdvancedFeatures'
+import {
+  AdvancedAnalytics,
+  BlockchainNetworkHealth,
+  HistoricalComparison,
+  IntegrationWebhooks,
+  DisputeResolution,
+} from '../components/BlockchainAdvancedFeatures2'
 import { fetchBlockchainAuditTrail, verifyTransaction, getBlockchainStats } from '../api/blockchainApi'
 
 export default function BlockchainPage() {
@@ -113,29 +128,65 @@ export default function BlockchainPage() {
         </div>
       )}
 
-      {/* Search Rake */}
-      <div className="card p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Search Rake Audit Trail</h2>
-        <div className="flex gap-3">
-          <input
-            type="text"
-            placeholder="Enter Rake ID (e.g., SAIL-R001)"
-            value={searchRakeId}
-            onChange={(e) => setSearchRakeId(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearchRake()}
-            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm"
-          />
-          <button
-            onClick={handleSearchRake}
-            disabled={loading || !searchRakeId.trim()}
-            className="btn btn-primary btn-sm flex items-center gap-2"
-          >
-            <Search size={18} />
-            Search
-          </button>
-        </div>
-        <p className="text-xs text-slate-600 mt-2">Current Rake: <strong>{rakeId}</strong></p>
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {[
+          { id: 'audit', label: 'Audit Trail', icon: Lock },
+          { id: 'contracts', label: 'Smart Contracts', icon: Code },
+          { id: 'multisig', label: 'Multi-Sig', icon: Users },
+          { id: 'streaming', label: 'Real-Time', icon: Zap },
+          { id: 'consensus', label: 'Consensus', icon: Shield },
+          { id: 'integrity', label: 'Integrity', icon: CheckCircle },
+          { id: 'compliance', label: 'Compliance', icon: AlertTriangle },
+          { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+          { id: 'network', label: 'Network', icon: Layers },
+          { id: 'history', label: 'History', icon: Activity },
+          { id: 'webhooks', label: 'Webhooks', icon: Link2 },
+          { id: 'disputes', label: 'Disputes', icon: AlertCircle },
+        ].map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
+
+      {/* Search Rake (only show on audit tab) */}
+      {activeTab === 'audit' && (
+        <div className="card p-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Search Rake Audit Trail</h2>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Enter Rake ID (e.g., SAIL-R001)"
+              value={searchRakeId}
+              onChange={(e) => setSearchRakeId(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearchRake()}
+              className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm"
+            />
+            <button
+              onClick={handleSearchRake}
+              disabled={loading || !searchRakeId.trim()}
+              className="btn btn-primary btn-sm flex items-center gap-2"
+            >
+              <Search size={18} />
+              Search
+            </button>
+          </div>
+          <p className="text-xs text-slate-600 mt-2">Current Rake: <strong>{rakeId}</strong></p>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
@@ -144,19 +195,36 @@ export default function BlockchainPage() {
         </div>
       )}
 
-      {/* Audit Trail Table */}
-      {loading ? (
-        <div className="card p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading audit trail...</p>
-        </div>
-      ) : auditData && auditData.events ? (
-        <AuditTable
-          events={auditData.events}
-          rakeId={auditData.rake_id}
-          onVerifyTx={handleVerifyTx}
-        />
-      ) : null}
+      {/* Tab Content */}
+      {activeTab === 'audit' && (
+        <>
+          {/* Audit Trail Table */}
+          {loading ? (
+            <div className="card p-8 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-slate-600">Loading audit trail...</p>
+            </div>
+          ) : auditData && auditData.events ? (
+            <AuditTable
+              events={auditData.events}
+              rakeId={auditData.rake_id}
+              onVerifyTx={handleVerifyTx}
+            />
+          ) : null}
+        </>
+      )}
+
+      {activeTab === 'contracts' && <SmartContractManagement />}
+      {activeTab === 'multisig' && <MultiSignatureAuthorization />}
+      {activeTab === 'streaming' && <RealTimeEventStreaming />}
+      {activeTab === 'consensus' && <ConsensusMechanismVisualization />}
+      {activeTab === 'integrity' && <DataIntegrityVerification />}
+      {activeTab === 'compliance' && <ComplianceRegulatory />}
+      {activeTab === 'analytics' && <AdvancedAnalytics />}
+      {activeTab === 'network' && <BlockchainNetworkHealth />}
+      {activeTab === 'history' && <HistoricalComparison />}
+      {activeTab === 'webhooks' && <IntegrationWebhooks />}
+      {activeTab === 'disputes' && <DisputeResolution />}
 
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
