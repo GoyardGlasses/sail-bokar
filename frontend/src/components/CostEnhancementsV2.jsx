@@ -5,42 +5,99 @@ import { TrendingUp, AlertCircle, Users, Settings, Download, MessageSquare, Zap,
 // ============ ENSEMBLE COST MODELS ============
 export function EnsembleCostModels({ data }) {
   const [selectedModels, setSelectedModels] = useState(['Linear Regression', 'XGBoost', 'Neural Network'])
+  const [blendingMethod, setBlendingMethod] = useState('weighted')
   
   const models = [
-    { name: 'Linear Regression', accuracy: 88, weight: 0.25, color: '#3b82f6' },
-    { name: 'XGBoost', accuracy: 92, weight: 0.35, color: '#10b981' },
-    { name: 'Neural Network', accuracy: 94, weight: 0.25, color: '#f59e0b' },
-    { name: 'Random Forest', accuracy: 90, weight: 0.15, color: '#ef4444' },
+    { name: 'Linear Regression', accuracy: 88, weight: 0.25, color: '#3b82f6', rmse: 45, mae: 32 },
+    { name: 'XGBoost', accuracy: 92, weight: 0.35, color: '#10b981', rmse: 38, mae: 28 },
+    { name: 'Neural Network', accuracy: 94, weight: 0.25, color: '#f59e0b', rmse: 35, mae: 25 },
+    { name: 'Random Forest', accuracy: 90, weight: 0.15, color: '#ef4444', rmse: 42, mae: 30 },
+    { name: 'SVM', accuracy: 87, weight: 0.1, color: '#8b5cf6', rmse: 48, mae: 35 },
+    { name: 'Gradient Boosting', accuracy: 91, weight: 0.2, color: '#ec4899', rmse: 39, mae: 29 },
   ]
 
   const ensembleAccuracy = models.reduce((sum, m) => sum + (m.accuracy * m.weight), 0)
+  const ensembleRMSE = models.reduce((sum, m) => sum + (m.rmse * m.weight), 0)
+  const ensembleMAE = models.reduce((sum, m) => sum + (m.mae * m.weight), 0)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-bold text-slate-900">Ensemble Cost Models</h3>
+      
+      {/* Blending Method */}
+      <div className="card p-4">
+        <p className="text-sm font-medium text-slate-900 mb-3">Blending Method</p>
+        <div className="flex gap-4">
+          {['weighted', 'voting', 'stacking', 'boosting'].map(method => (
+            <label key={method} className="flex items-center gap-2">
+              <input type="radio" name="blending" value={method} checked={blendingMethod === method} onChange={(e) => setBlendingMethod(e.target.value)} />
+              <span className="text-sm text-slate-600 capitalize">{method}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Model Details */}
         <div className="card p-4">
-          <p className="text-sm text-slate-600 mb-3">Model Weights</p>
-          <div className="space-y-2">
+          <p className="text-sm text-slate-600 mb-3">Model Configuration</p>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
             {models.map((model) => (
-              <div key={model.name} className="flex items-center justify-between">
+              <div key={model.name} className="flex items-center justify-between p-2 bg-slate-50 rounded">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" defaultChecked className="w-4 h-4" />
                   <span className="text-sm font-medium text-slate-900">{model.name}</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-slate-600">{model.accuracy}% accuracy</p>
-                  <p className="text-sm font-bold text-slate-900">{(model.weight * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-slate-600">{model.accuracy}%</p>
+                  <p className="text-xs font-bold text-slate-900">{(model.weight * 100).toFixed(0)}%</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="card p-4 flex flex-col justify-center">
-          <p className="text-sm text-slate-600 mb-2">Ensemble Accuracy</p>
-          <p className="text-4xl font-bold text-green-600">{ensembleAccuracy.toFixed(1)}%</p>
-          <p className="text-xs text-slate-600 mt-2">Weighted average of selected models</p>
+
+        {/* Ensemble Metrics */}
+        <div className="space-y-3">
+          <div className="card p-4 bg-gradient-to-br from-green-50 to-green-100">
+            <p className="text-sm text-slate-600 mb-1">Ensemble Accuracy</p>
+            <p className="text-4xl font-bold text-green-600">{ensembleAccuracy.toFixed(1)}%</p>
+          </div>
+          <div className="card p-4 bg-gradient-to-br from-blue-50 to-blue-100">
+            <p className="text-sm text-slate-600 mb-1">RMSE</p>
+            <p className="text-3xl font-bold text-blue-600">₹{ensembleRMSE.toFixed(0)}</p>
+          </div>
+          <div className="card p-4 bg-gradient-to-br from-purple-50 to-purple-100">
+            <p className="text-sm text-slate-600 mb-1">MAE</p>
+            <p className="text-3xl font-bold text-purple-600">₹{ensembleMAE.toFixed(0)}</p>
+          </div>
         </div>
+      </div>
+
+      {/* Model Comparison Table */}
+      <div className="card p-4 overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-100">
+              <th className="px-3 py-2 text-left font-bold">Model</th>
+              <th className="px-3 py-2 text-right font-bold">Accuracy</th>
+              <th className="px-3 py-2 text-right font-bold">RMSE</th>
+              <th className="px-3 py-2 text-right font-bold">MAE</th>
+              <th className="px-3 py-2 text-right font-bold">Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            {models.map((model) => (
+              <tr key={model.name} className="border-b border-slate-200 hover:bg-slate-50">
+                <td className="px-3 py-2 font-medium text-slate-900">{model.name}</td>
+                <td className="px-3 py-2 text-right text-slate-600">{model.accuracy}%</td>
+                <td className="px-3 py-2 text-right text-slate-600">₹{model.rmse}</td>
+                <td className="px-3 py-2 text-right text-slate-600">₹{model.mae}</td>
+                <td className="px-3 py-2 text-right font-bold text-slate-900">{(model.weight * 100).toFixed(0)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
@@ -48,6 +105,8 @@ export function EnsembleCostModels({ data }) {
 
 // ============ PROBABILISTIC COST FORECASTING ============
 export function ProbabilisticCostForecasting({ data }) {
+  const [confidenceLevel, setConfidenceLevel] = useState(95)
+  
   const costData = (data || []).map(d => ({
     date: d.date,
     p50: d.avg_cost_per_ton || 950,
@@ -55,11 +114,39 @@ export function ProbabilisticCostForecasting({ data }) {
     p75: (d.avg_cost_per_ton || 950) * 1.15,
     p10: (d.avg_cost_per_ton || 950) * 0.70,
     p90: (d.avg_cost_per_ton || 950) * 1.30,
+    p5: (d.avg_cost_per_ton || 950) * 0.65,
+    p95: (d.avg_cost_per_ton || 950) * 1.35,
   }))
 
+  const quantiles = [
+    { label: '5th', value: 'p5', color: '#fee2e2' },
+    { label: '10th', value: 'p10', color: '#fecaca' },
+    { label: '25th', value: 'p25', color: '#fca5a5' },
+    { label: '50th (Median)', value: 'p50', color: '#3b82f6' },
+    { label: '75th', value: 'p75', color: '#fca5a5' },
+    { label: '90th', value: 'p90', color: '#fecaca' },
+    { label: '95th', value: 'p95', color: '#fee2e2' },
+  ]
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-bold text-slate-900">Probabilistic Cost Forecast (Quantiles)</h3>
+      
+      {/* Confidence Level Selector */}
+      <div className="card p-4">
+        <p className="text-sm font-medium text-slate-900 mb-3">Confidence Level: {confidenceLevel}%</p>
+        <input
+          type="range"
+          min="50"
+          max="99"
+          value={confidenceLevel}
+          onChange={(e) => setConfidenceLevel(parseInt(e.target.value))}
+          className="w-full"
+        />
+        <p className="text-xs text-slate-600 mt-2">Adjust confidence interval width</p>
+      </div>
+
+      {/* Main Chart */}
       <ResponsiveContainer width="100%" height={350}>
         <ComposedChart data={costData}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -67,19 +154,43 @@ export function ProbabilisticCostForecasting({ data }) {
           <YAxis />
           <Tooltip formatter={(v) => `₹${Math.round(v)}`} />
           <Legend />
-          <Area type="monotone" dataKey="p10" fill="#fee2e2" stroke="none" opacity={0.2} name="10th percentile" />
-          <Area type="monotone" dataKey="p90" fill="#fee2e2" stroke="none" opacity={0.2} name="90th percentile" />
-          <Area type="monotone" dataKey="p25" fill="#fecaca" stroke="none" opacity={0.3} name="25th percentile" />
-          <Area type="monotone" dataKey="p75" fill="#fecaca" stroke="none" opacity={0.3} name="75th percentile" />
-          <Line type="monotone" dataKey="p50" stroke="#3b82f6" strokeWidth={2} name="Median (50th)" />
+          <Area type="monotone" dataKey="p5" fill="#fee2e2" stroke="none" opacity={0.15} name="5th percentile" />
+          <Area type="monotone" dataKey="p95" fill="#fee2e2" stroke="none" opacity={0.15} name="95th percentile" />
+          <Area type="monotone" dataKey="p10" fill="#fecaca" stroke="none" opacity={0.2} name="10th percentile" />
+          <Area type="monotone" dataKey="p90" fill="#fecaca" stroke="none" opacity={0.2} name="90th percentile" />
+          <Area type="monotone" dataKey="p25" fill="#fca5a5" stroke="none" opacity={0.3} name="25th percentile" />
+          <Area type="monotone" dataKey="p75" fill="#fca5a5" stroke="none" opacity={0.3} name="75th percentile" />
+          <Line type="monotone" dataKey="p50" stroke="#3b82f6" strokeWidth={3} name="Median (50th)" />
         </ComposedChart>
       </ResponsiveContainer>
-      <div className="grid grid-cols-5 gap-2 text-center text-sm">
-        <div className="card p-2"><p className="text-xs text-slate-600">10th</p><p className="font-bold">Low</p></div>
-        <div className="card p-2"><p className="text-xs text-slate-600">25th</p><p className="font-bold">Lower</p></div>
-        <div className="card p-2 bg-blue-50"><p className="text-xs text-slate-600">50th</p><p className="font-bold">Median</p></div>
-        <div className="card p-2"><p className="text-xs text-slate-600">75th</p><p className="font-bold">Upper</p></div>
-        <div className="card p-2"><p className="text-xs text-slate-600">90th</p><p className="font-bold">High</p></div>
+
+      {/* Quantile Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {quantiles.map((q) => (
+          <div key={q.value} className="card p-3 text-center">
+            <p className="text-xs text-slate-600">{q.label}</p>
+            <p className="text-sm font-bold text-slate-900">₹{(costData[0]?.[q.value] || 950).toFixed(0)}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Risk Assessment */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card p-4 bg-red-50">
+          <p className="text-sm font-medium text-slate-900 mb-2">Downside Risk (5th percentile)</p>
+          <p className="text-2xl font-bold text-red-600">₹{(costData[0]?.p5 || 950).toFixed(0)}</p>
+          <p className="text-xs text-slate-600 mt-2">5% chance cost will be lower</p>
+        </div>
+        <div className="card p-4 bg-blue-50">
+          <p className="text-sm font-medium text-slate-900 mb-2">Most Likely (Median)</p>
+          <p className="text-2xl font-bold text-blue-600">₹{(costData[0]?.p50 || 950).toFixed(0)}</p>
+          <p className="text-xs text-slate-600 mt-2">50% probability above/below</p>
+        </div>
+        <div className="card p-4 bg-orange-50">
+          <p className="text-sm font-medium text-slate-900 mb-2">Upside Risk (95th percentile)</p>
+          <p className="text-2xl font-bold text-orange-600">₹{(costData[0]?.p95 || 950).toFixed(0)}</p>
+          <p className="text-xs text-slate-600 mt-2">5% chance cost will be higher</p>
+        </div>
       </div>
     </div>
   )
@@ -166,39 +277,143 @@ export function CostBiasAnalysis({ data }) {
 
 // ============ MONTE CARLO COST SIMULATION ============
 export function MonteCarloSimulation({ data }) {
-  const [runs, setRuns] = useState(1000)
-  const simulations = Array.from({ length: 5 }, (_, i) => ({
-    name: `Run ${i + 1}`,
-    value: Math.random() * 200 + 800,
-  }))
+  const [runs, setRuns] = useState(5000)
+  const [distributionType, setDistributionType] = useState('normal')
+  
+  // Generate simulations based on distribution
+  const simulations = Array.from({ length: 100 }, (_, i) => {
+    let value
+    if (distributionType === 'normal') {
+      value = 950 + (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 100
+    } else if (distributionType === 'uniform') {
+      value = Math.random() * 400 + 750
+    } else {
+      value = 950 * Math.pow(Math.random(), 0.5) + 100
+    }
+    return { name: `Sim ${i + 1}`, value: Math.max(600, Math.min(1300, value)) }
+  })
+
+  const stats = {
+    mean: (simulations.reduce((sum, s) => sum + s.value, 0) / simulations.length).toFixed(0),
+    min: Math.min(...simulations.map(s => s.value)).toFixed(0),
+    max: Math.max(...simulations.map(s => s.value)).toFixed(0),
+    stdDev: (Math.sqrt(simulations.reduce((sum, s) => sum + Math.pow(s.value - 950, 2), 0) / simulations.length)).toFixed(0),
+  }
+
+  // Calculate percentiles
+  const sorted = simulations.map(s => s.value).sort((a, b) => a - b)
+  const p5 = sorted[Math.floor(sorted.length * 0.05)].toFixed(0)
+  const p25 = sorted[Math.floor(sorted.length * 0.25)].toFixed(0)
+  const p50 = sorted[Math.floor(sorted.length * 0.50)].toFixed(0)
+  const p75 = sorted[Math.floor(sorted.length * 0.75)].toFixed(0)
+  const p95 = sorted[Math.floor(sorted.length * 0.95)].toFixed(0)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-bold text-slate-900">Monte Carlo Cost Simulation</h3>
-      <div className="card p-4 mb-4">
-        <label className="block text-sm font-medium text-slate-900 mb-2">
-          Number of Simulations: {runs}
-        </label>
-        <input
-          type="range"
-          min="100"
-          max="10000"
-          step="100"
-          value={runs}
-          onChange={(e) => setRuns(parseInt(e.target.value))}
-          className="w-full"
-        />
+      
+      {/* Simulation Controls */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="card p-4">
+          <label className="block text-sm font-medium text-slate-900 mb-3">
+            Number of Simulations: {runs.toLocaleString()}
+          </label>
+          <input
+            type="range"
+            min="100"
+            max="10000"
+            step="100"
+            value={runs}
+            onChange={(e) => setRuns(parseInt(e.target.value))}
+            className="w-full"
+          />
+        </div>
+        <div className="card p-4">
+          <label className="block text-sm font-medium text-slate-900 mb-3">Distribution Type</label>
+          <select
+            value={distributionType}
+            onChange={(e) => setDistributionType(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded"
+          >
+            <option value="normal">Normal Distribution</option>
+            <option value="uniform">Uniform Distribution</option>
+            <option value="lognormal">Log-Normal Distribution</option>
+          </select>
+        </div>
       </div>
+
+      {/* Scatter Chart */}
       <ResponsiveContainer width="100%" height={300}>
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" name="Simulation" />
+          <XAxis dataKey="name" name="Simulation" tick={false} />
           <YAxis dataKey="value" name="Cost Per Tonne" />
           <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v) => `₹${Math.round(v)}`} />
           <Scatter name="Simulation Results" data={simulations} fill="#3b82f6" />
         </ScatterChart>
       </ResponsiveContainer>
-      <p className="text-sm text-slate-600">Distribution of {runs} simulation runs</p>
+
+      {/* Statistics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="card p-3 text-center">
+          <p className="text-xs text-slate-600">Mean</p>
+          <p className="text-lg font-bold text-slate-900">₹{stats.mean}</p>
+        </div>
+        <div className="card p-3 text-center">
+          <p className="text-xs text-slate-600">Std Dev</p>
+          <p className="text-lg font-bold text-slate-900">₹{stats.stdDev}</p>
+        </div>
+        <div className="card p-3 text-center">
+          <p className="text-xs text-slate-600">Min</p>
+          <p className="text-lg font-bold text-red-600">₹{stats.min}</p>
+        </div>
+        <div className="card p-3 text-center">
+          <p className="text-xs text-slate-600">Max</p>
+          <p className="text-lg font-bold text-orange-600">₹{stats.max}</p>
+        </div>
+        <div className="card p-3 text-center">
+          <p className="text-xs text-slate-600">Range</p>
+          <p className="text-lg font-bold text-slate-900">₹{(stats.max - stats.min)}</p>
+        </div>
+      </div>
+
+      {/* Percentile Distribution */}
+      <div className="card p-4">
+        <p className="text-sm font-medium text-slate-900 mb-4">Percentile Distribution</p>
+        <div className="space-y-3">
+          {[
+            { label: '5th (Worst Case)', value: p5, color: 'bg-red-100' },
+            { label: '25th', value: p25, color: 'bg-orange-100' },
+            { label: '50th (Median)', value: p50, color: 'bg-blue-100' },
+            { label: '75th', value: p75, color: 'bg-green-100' },
+            { label: '95th (Best Case)', value: p95, color: 'bg-emerald-100' },
+          ].map((item, i) => (
+            <div key={i} className={`${item.color} p-3 rounded flex justify-between items-center`}>
+              <p className="text-sm font-medium text-slate-900">{item.label}</p>
+              <p className="text-lg font-bold text-slate-900">₹{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Risk Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card p-4 bg-red-50">
+          <p className="text-sm font-medium text-slate-900">Worst Case Scenario</p>
+          <p className="text-2xl font-bold text-red-600">₹{p5}</p>
+          <p className="text-xs text-slate-600 mt-1">5% probability of lower cost</p>
+        </div>
+        <div className="card p-4 bg-blue-50">
+          <p className="text-sm font-medium text-slate-900">Expected Value</p>
+          <p className="text-2xl font-bold text-blue-600">₹{stats.mean}</p>
+          <p className="text-xs text-slate-600 mt-1">Average across all simulations</p>
+        </div>
+        <div className="card p-4 bg-green-50">
+          <p className="text-sm font-medium text-slate-900">Best Case Scenario</p>
+          <p className="text-2xl font-bold text-green-600">₹{p95}</p>
+          <p className="text-xs text-slate-600 mt-1">5% probability of higher cost</p>
+        </div>
+      </div>
     </div>
   )
 }
