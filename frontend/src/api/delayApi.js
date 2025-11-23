@@ -9,7 +9,7 @@ import client from './client'
  * Predict delays for given parameters
  * Uses mock data for testing when backend doesn't have data
  */
-export const predictDelay = (data) => {
+export const predictDelay = async (data) => {
   // Mock data for testing
   const mockResponse = {
     confidence: 0.81,
@@ -51,13 +51,16 @@ export const predictDelay = (data) => {
     ],
   }
 
-  // Try to call the real API first
-  return client.post('/predict/delay', data)
-    .catch((error) => {
-      console.warn('API call failed, using mock data:', error.message)
-      // If API fails, return mock data
-      return mockResponse
-    })
+  try {
+    // Try to call the real API first
+    const response = await client.post('/predict/delay', data)
+    console.log('API response:', response)
+    return response
+  } catch (error) {
+    console.warn('API call failed, using mock data:', error.message)
+    // If API fails, return mock data
+    return mockResponse
+  }
 }
 
 /**
