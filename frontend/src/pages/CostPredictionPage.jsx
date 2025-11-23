@@ -12,8 +12,20 @@ import {
   CostCollaboration,
   CostExportShare,
 } from '../components/CostEnhancementsV2'
+import {
+  CostOptimization,
+  CostForecastingTrends,
+  ScenarioPlanning,
+  Benchmarking,
+  CostAllocation,
+  AdvancedAnalytics,
+  RealTimeMonitoring,
+  ReportingInsights,
+  AdvancedMLFeatures,
+} from '../components/CostAdvancedAnalytics'
+import { CostAdvancedAnalytics2 } from '../components/CostAdvancedAnalytics2'
 import { predictCost } from '../api/costApi'
-import { DollarSign, TrendingUp, BarChart3, Eye, Zap, Lock, GitBranch, MessageSquare, Share2 } from 'lucide-react'
+import { DollarSign, TrendingUp, BarChart3, Eye, Zap, Lock, GitBranch, MessageSquare, Share2, Target, Lightbulb, Brain, Bell, BarChart4, Layers } from 'lucide-react'
 
 export default function CostPredictionPage() {
   const [costData, setCostData] = useState(null)
@@ -46,6 +58,15 @@ export default function CostPredictionPage() {
     { id: 'versions', label: 'Version Control', icon: GitBranch },
     { id: 'collaboration', label: 'Discussion', icon: MessageSquare },
     { id: 'export', label: 'Export & Share', icon: Share2 },
+    { id: 'optimization', label: 'Optimization', icon: Target },
+    { id: 'forecasting', label: 'Forecasting', icon: TrendingUp },
+    { id: 'scenarios', label: 'Scenarios', icon: Lightbulb },
+    { id: 'benchmarking', label: 'Benchmarking', icon: BarChart3 },
+    { id: 'allocation', label: 'Allocation', icon: Layers },
+    { id: 'advanced', label: 'Advanced', icon: Brain },
+    { id: 'monitoring', label: 'Monitoring', icon: Bell },
+    { id: 'reporting', label: 'Reporting', icon: BarChart4 },
+    { id: 'ml', label: 'ML Features', icon: Brain },
   ]
 
   return (
@@ -109,7 +130,7 @@ export default function CostPredictionPage() {
         </div>
       )}
 
-      {/* Enhancement Tabs */}
+      {/* Enhancement Tabs - Part 1 */}
       {activeTab === 'ensemble' && <EnsembleCostModels data={costData} />}
       {activeTab === 'probabilistic' && <ProbabilisticCostForecasting data={costData} />}
       {activeTab === 'sensitivity' && <CostSensitivityAnalysis />}
@@ -119,6 +140,17 @@ export default function CostPredictionPage() {
       {activeTab === 'versions' && <CostVersionControl />}
       {activeTab === 'collaboration' && <CostCollaboration />}
       {activeTab === 'export' && <CostExportShare />}
+
+      {/* Advanced Analytics Tabs - Part 2 */}
+      {activeTab === 'optimization' && <CostOptimization />}
+      {activeTab === 'forecasting' && <CostForecastingTrends />}
+      {activeTab === 'scenarios' && <ScenarioPlanning />}
+      {activeTab === 'benchmarking' && <Benchmarking />}
+      {activeTab === 'allocation' && <CostAllocation />}
+      {activeTab === 'advanced' && <AdvancedAnalytics />}
+      {activeTab === 'monitoring' && <RealTimeMonitoring />}
+      {activeTab === 'reporting' && <ReportingInsights />}
+      {activeTab === 'ml' && <AdvancedMLFeatures />}
 
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
