@@ -55,7 +55,13 @@ export const predictDelay = async (data) => {
     // Try to call the real API first
     const response = await client.post('/predict/delay', data)
     console.log('API response:', response)
-    return response
+    // If response is valid, return it
+    if (response && response.routes && response.routes.length > 0) {
+      return response
+    }
+    // Otherwise use mock data
+    console.warn('API returned empty response, using mock data')
+    return mockResponse
   } catch (error) {
     console.warn('API call failed, using mock data:', error.message)
     // If API fails, return mock data
