@@ -18,12 +18,13 @@ import {
   ScenarioPlanning,
   Benchmarking,
   CostAllocation,
+} from '../components/CostAdvancedAnalytics'
+import {
   AdvancedAnalytics,
   RealTimeMonitoring,
   ReportingInsights,
   AdvancedMLFeatures,
-} from '../components/CostAdvancedAnalytics'
-import { CostAdvancedAnalytics2 } from '../components/CostAdvancedAnalytics2'
+} from '../components/CostAdvancedAnalytics2'
 import { predictCost } from '../api/costApi'
 import { DollarSign, TrendingUp, BarChart3, Eye, Zap, Lock, GitBranch, MessageSquare, Share2, Target, Lightbulb, Brain, Bell, BarChart4, Layers } from 'lucide-react'
 
