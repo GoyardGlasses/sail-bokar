@@ -151,8 +151,42 @@ export default function ThroughputPage() {
         </div>
       </div>
 
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {[
+          { id: 'main', label: 'Main Analysis', icon: TrendingUp },
+          { id: 'realtime', label: 'Real-Time', icon: Zap },
+          { id: 'trends', label: 'Trends', icon: BarChart3 },
+          { id: 'dispatch', label: 'Dispatch', icon: Truck },
+          { id: 'equipment', label: 'Equipment', icon: Gauge },
+          { id: 'manpower', label: 'Manpower', icon: Users },
+          { id: 'bottleneck', label: 'Bottleneck', icon: AlertTriangle },
+          { id: 'forecast', label: 'Forecast', icon: TrendingUp },
+          { id: 'cost', label: 'Cost/Unit', icon: DollarSign },
+          { id: 'alerts', label: 'Alerts', icon: AlertCircle },
+          { id: 'export', label: 'Export', icon: Download },
+          { id: 'history', label: 'History', icon: Clock },
+        ].map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
       {/* KPI Cards */}
-      {throughputData && (
+      {throughputData && activeTab === 'main' && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="card p-4">
             <div className="flex items-start gap-3">
@@ -205,40 +239,6 @@ export default function ThroughputPage() {
           </div>
         </div>
       )}
-
-      {/* Tabs Navigation */}
-      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
-        {[
-          { id: 'main', label: 'Main Analysis', icon: TrendingUp },
-          { id: 'realtime', label: 'Real-Time', icon: Zap },
-          { id: 'trends', label: 'Trends', icon: BarChart3 },
-          { id: 'dispatch', label: 'Dispatch', icon: Truck },
-          { id: 'equipment', label: 'Equipment', icon: Gauge },
-          { id: 'manpower', label: 'Manpower', icon: Users },
-          { id: 'bottleneck', label: 'Bottleneck', icon: AlertTriangle },
-          { id: 'forecast', label: 'Forecast', icon: TrendingUp },
-          { id: 'cost', label: 'Cost/Unit', icon: DollarSign },
-          { id: 'alerts', label: 'Alerts', icon: AlertCircle },
-          { id: 'export', label: 'Export', icon: Download },
-          { id: 'history', label: 'History', icon: Clock },
-        ].map((tab) => {
-          const Icon = tab.icon
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Icon size={18} />
-              {tab.label}
-            </button>
-          )
-        })}
-      </div>
 
       {/* Tab Content */}
       {activeTab === 'main' && (
