@@ -51,11 +51,13 @@ export default function MLModels() {
     try {
       const data = await getModels()
       const modelsList = data.data?.models || [
-        { name: 'Demand Forecasting', version: '2.1', status: 'loaded', accuracy: 94.2, type: 'regression' },
-        { name: 'Delay Prediction', version: '1.8', status: 'loaded', accuracy: 89.5, type: 'classification' },
-        { name: 'Throughput Optimization', version: '2.0', status: 'loaded', accuracy: 91.3, type: 'regression' },
-        { name: 'Cost Estimation', version: '1.9', status: 'loaded', accuracy: 92.1, type: 'regression' },
-        { name: 'Mode Selection', version: '1.5', status: 'loaded', accuracy: 87.8, type: 'classification' },
+        { name: 'Demand Forecasting', version: '2.1', status: 'loaded', accuracy: 94.2, type: 'regression', key: 'demand' },
+        { name: 'Rake Availability', version: '1.9', status: 'loaded', accuracy: 91.8, type: 'regression', key: 'rake_availability' },
+        { name: 'Delay Classifier', version: '1.8', status: 'loaded', accuracy: 89.5, type: 'classification', key: 'delay_classifier' },
+        { name: 'Delay Regressor', version: '1.8', status: 'loaded', accuracy: 88.9, type: 'regression', key: 'delay_regressor' },
+        { name: 'Throughput Optimization', version: '2.0', status: 'loaded', accuracy: 91.3, type: 'regression', key: 'throughput' },
+        { name: 'Cost Estimation', version: '1.9', status: 'loaded', accuracy: 92.1, type: 'regression', key: 'cost' },
+        { name: 'Mode Selection', version: '1.5', status: 'loaded', accuracy: 87.8, type: 'classification', key: 'mode_classifier' },
       ]
       setModels(modelsList)
       if (modelsList.length > 0) setSelectedModel(modelsList[0])
@@ -367,24 +369,35 @@ export default function MLModels() {
       {/* Integration Tab */}
       {activeTab === 'integration' && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Model Integration Across Website</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Model Integration Across Website (7 Models)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               { name: 'Demand Forecasting', page: 'Forecast Page', icon: TrendingUp, color: 'blue' },
-              { name: 'Delay Prediction', page: 'Delay Page', icon: Clock, color: 'red' },
+              { name: 'Rake Availability', page: 'Forecast Page', icon: Truck, color: 'cyan' },
+              { name: 'Delay Classifier', page: 'Delay Page', icon: Clock, color: 'red' },
+              { name: 'Delay Regressor', page: 'Delay Page', icon: Clock, color: 'orange' },
               { name: 'Throughput Optimization', page: 'Throughput Page', icon: BarChart3, color: 'green' },
               { name: 'Cost Estimation', page: 'Cost Page', icon: DollarSign, color: 'purple' },
-              { name: 'Mode Selection', page: 'Optimization Page', icon: Truck, color: 'orange' },
-              { name: 'Advanced Analytics', page: 'Analytics Dashboard', icon: Brain, color: 'indigo' },
+              { name: 'Mode Selection', page: 'Optimization Page', icon: Truck, color: 'indigo' },
             ].map((integration, idx) => {
               const Icon = integration.icon
+              const colorClasses = {
+                blue: 'bg-blue-50 border-blue-200 text-blue-600',
+                cyan: 'bg-cyan-50 border-cyan-200 text-cyan-600',
+                red: 'bg-red-50 border-red-200 text-red-600',
+                orange: 'bg-orange-50 border-orange-200 text-orange-600',
+                green: 'bg-green-50 border-green-200 text-green-600',
+                purple: 'bg-purple-50 border-purple-200 text-purple-600',
+                indigo: 'bg-indigo-50 border-indigo-200 text-indigo-600',
+              }
+              const classes = colorClasses[integration.color] || colorClasses.blue
               return (
-                <div key={idx} className={`p-4 bg-${integration.color}-50 rounded-lg border border-${integration.color}-200`}>
+                <div key={idx} className={`p-4 ${classes} rounded-lg border`}>
                   <div className="flex items-start gap-3">
-                    <Icon className={`text-${integration.color}-600 flex-shrink-0`} size={24} />
+                    <Icon className="flex-shrink-0" size={24} />
                     <div>
                       <p className="font-bold text-gray-900">{integration.name}</p>
-                      <p className={`text-sm text-${integration.color}-600`}>{integration.page}</p>
+                      <p className="text-sm text-gray-600">{integration.page}</p>
                       <p className="text-xs text-gray-600 mt-2">✓ Connected & Active</p>
                     </div>
                   </div>
