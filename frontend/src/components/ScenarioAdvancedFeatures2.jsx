@@ -27,8 +27,8 @@ export function ScenarioBacktesting() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Scenario Backtesting</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Scenario Backtesting</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card p-4 text-center">
@@ -111,8 +111,8 @@ export function AdvancedRiskAnalysis() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Advanced Risk Analysis</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Advanced Risk Analysis</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card p-4">
@@ -196,8 +196,8 @@ export function ScenarioCollaboration() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Scenario Collaboration</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Scenario Collaboration</h3>
 
       <div className="card p-4">
         <p className="text-sm font-medium text-slate-900 mb-3">Shared Scenarios</p>
@@ -266,8 +266,8 @@ export function ExportReporting() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Export & Reporting</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Export & Reporting</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card p-4">

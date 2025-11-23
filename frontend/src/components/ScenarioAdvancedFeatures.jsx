@@ -29,12 +29,12 @@ export function MonteCarloSimulation() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Monte Carlo Simulation</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Monte Carlo Simulation</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4">
-          <p className="text-sm font-medium text-slate-900 mb-3">Cost Distribution ({simulations.runs.toLocaleString()} runs)</p>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+          <p className="text-sm font-medium text-slate-300 mb-3">Cost Distribution ({simulations.runs.toLocaleString()} runs)</p>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={simulations.costDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -46,8 +46,8 @@ export function MonteCarloSimulation() {
           </ResponsiveContainer>
         </div>
 
-        <div className="card p-4">
-          <p className="text-sm font-medium text-slate-900 mb-3">Time Distribution ({simulations.runs.toLocaleString()} runs)</p>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+          <p className="text-sm font-medium text-slate-300 mb-3">Time Distribution ({simulations.runs.toLocaleString()} runs)</p>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={simulations.timeDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -60,14 +60,14 @@ export function MonteCarloSimulation() {
         </div>
       </div>
 
-      <div className="card p-4">
-        <p className="text-sm font-medium text-slate-900 mb-3">Confidence Intervals</p>
+      <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+        <p className="text-sm font-medium text-slate-300 mb-3">Confidence Intervals</p>
         <div className="space-y-3">
           {confidenceIntervals.map((ci, i) => (
             <div key={i} className="p-3 bg-slate-50 rounded">
               <div className="flex justify-between items-center mb-2">
                 <p className="font-medium text-slate-900">{ci.level} ({ci.label})</p>
-                <p className="text-xs font-bold text-slate-600">{((ci.max - ci.min) / ci.min * 100).toFixed(1)}% range</p>
+                <p className="text-xs font-bold text-slate-400">{((ci.max - ci.min) / ci.min * 100).toFixed(1)}% range</p>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-slate-600">₹{ci.min.toLocaleString()}</span>
@@ -80,17 +80,17 @@ export function MonteCarloSimulation() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card p-4 text-center">
-          <p className="text-sm text-slate-600">Mean Cost</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">₹42,350</p>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Mean Cost</p>
+          <p className="text-2xl font-bold text-white mt-2">₹42,350</p>
         </div>
-        <div className="card p-4 text-center">
-          <p className="text-sm text-slate-600">Std Deviation</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">₹3,850</p>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Std Deviation</p>
+          <p className="text-2xl font-bold text-white mt-2">₹3,850</p>
         </div>
-        <div className="card p-4 text-center">
-          <p className="text-sm text-slate-600">Risk (VaR 95%)</p>
-          <p className="text-2xl font-bold text-orange-600 mt-2">₹48,900</p>
+        <div className="bg-slate-700 rounded-lg border border-slate-600 p-4 text-center">
+          <p className="text-sm text-slate-400">Risk (VaR 95%)</p>
+          <p className="text-2xl font-bold text-orange-400 mt-2">₹48,900</p>
         </div>
       </div>
     </div>
@@ -115,11 +115,11 @@ export function SensitivityAnalysis() {
   }))
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Sensitivity Analysis</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Sensitivity Analysis</h3>
 
-      <div className="card p-4">
-        <p className="text-sm font-medium text-slate-900 mb-3">Tornado Diagram - Parameter Impact</p>
+      <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+        <p className="text-sm font-medium text-slate-300 mb-3">Tornado Diagram - Parameter Impact</p>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={tornadoData}
@@ -136,8 +136,8 @@ export function SensitivityAnalysis() {
         </ResponsiveContainer>
       </div>
 
-      <div className="card p-4">
-        <p className="text-sm font-medium text-slate-900 mb-3">Parameter Elasticity</p>
+      <div className="bg-slate-700 rounded-lg border border-slate-600 p-4">
+        <p className="text-sm font-medium text-slate-300 mb-3">Parameter Elasticity</p>
         <div className="space-y-2">
           {parameters.map((p, i) => (
             <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded">
@@ -167,8 +167,8 @@ export function ScenarioOptimization() {
   ])
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Scenario Optimization</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Scenario Optimization</h3>
 
       <div className="space-y-3">
         {optimizations.map((opt, i) => (
@@ -222,8 +222,8 @@ export function ComparativeScenarioAnalysis() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Comparative Scenario Analysis</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Comparative Scenario Analysis</h3>
 
       <div className="card p-4">
         <p className="text-sm font-medium text-slate-900 mb-3">Scenario Comparison</p>
@@ -291,8 +291,8 @@ export function MachineLearningPredictions() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Machine Learning Predictions</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Machine Learning Predictions</h3>
 
       <div className="card p-4">
         <p className="text-sm font-medium text-slate-900 mb-3">Model Performance</p>
@@ -348,8 +348,8 @@ export function RealTimeScenarioMonitoring() {
   ])
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Real-Time Scenario Monitoring</h3>
+    <div className="space-y-6 bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <h3 className="text-lg font-bold text-white">Real-Time Scenario Monitoring</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {metrics.map((m, i) => (
