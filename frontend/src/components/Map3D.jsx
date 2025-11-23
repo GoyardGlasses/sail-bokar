@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { MapPin, Truck, AlertCircle, CheckCircle } from 'lucide-react'
+import { MapPin, AlertCircle, Zap } from 'lucide-react'
 
 export const Map3D = ({
   locations = [],
@@ -9,14 +7,14 @@ export const Map3D = ({
   onLocationSelect = null,
   enable3D = true,
 }) => {
-  const mapContainer = useRef(null)
-  const map = useRef(null)
+  const canvasRef = useRef(null)
   const [webglSupported, setWebglSupported] = useState(true)
   const [showMarkers, setShowMarkers] = useState(true)
   const [show3D, setShow3D] = useState(enable3D)
   const [timeSlider, setTimeSlider] = useState(0)
-  const markersRef = useRef([])
-  const polyinesRef = useRef([])
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [hoveredLocation, setHoveredLocation] = useState(null)
 
   // Check WebGL support
   useEffect(() => {
@@ -29,91 +27,180 @@ export const Map3D = ({
     }
   }, [])
 
-  // Initialize map
+  // Draw map
   useEffect(() => {
-    if (!mapContainer.current) return
+    if (!canvasRef.current || locations.length === 0) return
 
-    // Create map
-    map.current = L.map(mapContainer.current).setView([23.8, 86.5], 8)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    
+    // Set canvas size
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
 
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(map.current)
+    // Clear canvas
+    ctx.fillStyle = '#1e293b'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    return () => {
-      if (map.current) {
-        map.current.remove()
-      }
+    // Calculate bounds
+    const lats = locations.map(l => l.lat)
+    const lons = locations.map(l => l.lon)
+    const minLat = Math.min(...lats)
+    const maxLat = Math.max(...lats)
+    const minLon = Math.min(...lons)
+    const maxLon = Math.max(...lons)
+
+    // Calculate scale
+    const latRange = maxLat - minLat || 1
+    const lonRange = maxLon - minLon || 1
+    const scale = Math.min(
+      (canvas.width * 0.8) / (lonRange * 111),
+      (canvas.height * 0.8) / (latRange * 111)
+    ) * zoom
+
+    // Center point
+    const centerX = canvas.width / 2
+    const centerY = canvas.height / 2
+    const centerLat = (minLat + maxLat) / 2
+    const centerLon = (minLon + maxLon) / 2
+
+    // Convert lat/lon to canvas coordinates
+    const latLonToCanvas = (lat, lon) => {
+      const x = centerX + (lon - centerLon) * 111 * scale + pan.x
+      const y = centerY - (lat - centerLat) * 111 * scale + pan.y
+      return { x, y }
     }
-  }, [])
 
-  // Add markers
-  useEffect(() => {
-    if (!map.current || !showMarkers) return
+    // Draw grid
+    ctx.strokeStyle = '#334155'
+    ctx.lineWidth = 0.5
+    for (let i = 0; i < canvas.width; i += 50) {
+      ctx.beginPath()
+      ctx.moveTo(i, 0)
+      ctx.lineTo(i, canvas.height)
+      ctx.stroke()
+    }
+    for (let i = 0; i < canvas.height; i += 50) {
+      ctx.beginPath()
+      ctx.moveTo(0, i)
+      ctx.lineTo(canvas.width, i)
+      ctx.stroke()
+    }
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove())
-    markersRef.current = []
-
-    locations.forEach(location => {
-      const icon = getLocationIcon(location.type)
-      const marker = L.marker([location.lat, location.lon], { icon })
-        .bindPopup(`<strong>${location.name || location.id}</strong><br/>Type: ${location.type}`)
-        .addTo(map.current)
-
-      marker.on('click', () => {
-        onLocationSelect?.(location)
-      })
-
-      markersRef.current.push(marker)
-    })
-  }, [locations, showMarkers, onLocationSelect])
-
-  // Add routes
-  useEffect(() => {
-    if (!map.current) return
-
-    // Clear existing polylines
-    polyinesRef.current.forEach(line => line.remove())
-    polyinesRef.current = []
-
+    // Draw routes
     routes.forEach((route, idx) => {
-      const fromLocation = locations.find(l => l.id === route.from)
-      const toLocation = locations.find(l => l.id === route.to)
+      const fromLoc = locations.find(l => l.id === route.from)
+      const toLoc = locations.find(l => l.id === route.to)
 
-      if (fromLocation && toLocation) {
-        const color = getRouteColor(route.status)
-        const weight = show3D ? 3 : 2
-        const opacity = timeSlider > idx * 25 ? 1 : 0.3
+      if (fromLoc && toLoc) {
+        const from = latLonToCanvas(fromLoc.lat, fromLoc.lon)
+        const to = latLonToCanvas(toLoc.lat, toLoc.lon)
 
-        const polyline = L.polyline(
-          [
-            [fromLocation.lat, fromLocation.lon],
-            [toLocation.lat, toLocation.lon],
-          ],
-          {
-            color,
-            weight,
-            opacity,
-            dashArray: route.status === 'delayed' ? '5, 5' : undefined,
-          }
-        ).addTo(map.current)
+        // Route line
+        ctx.strokeStyle = getRouteColor(route.status)
+        ctx.lineWidth = show3D ? 3 : 2
+        ctx.globalAlpha = timeSlider > idx * 25 ? 1 : 0.3
 
-        polyline.bindPopup(
-          `<strong>${route.rake_id}</strong><br/>
-           From: ${route.from}<br/>
-           To: ${route.to}<br/>
-           Status: ${route.status}<br/>
-           Distance: ${route.distance}km<br/>
-           Duration: ${route.duration}h`
-        )
+        if (route.status === 'delayed') {
+          ctx.setLineDash([5, 5])
+        } else {
+          ctx.setLineDash([])
+        }
 
-        polyinesRef.current.push(polyline)
+        ctx.beginPath()
+        ctx.moveTo(from.x, from.y)
+        ctx.lineTo(to.x, to.y)
+        ctx.stroke()
+
+        ctx.globalAlpha = 1
+        ctx.setLineDash([])
+
+        // Route label
+        const midX = (from.x + to.x) / 2
+        const midY = (from.y + to.y) / 2
+        ctx.fillStyle = '#f1f5f9'
+        ctx.font = 'bold 10px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(route.rake_id, midX, midY - 5)
       }
     })
-  }, [locations, routes, show3D, timeSlider])
+
+    // Draw markers
+    if (showMarkers) {
+      locations.forEach(location => {
+        const pos = latLonToCanvas(location.lat, location.lon)
+        const isHovered = hoveredLocation?.id === location.id
+
+        // Marker circle
+        ctx.fillStyle = getMarkerColor(location.type)
+        ctx.beginPath()
+        ctx.arc(pos.x, pos.y, isHovered ? 10 : 8, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Marker border
+        ctx.strokeStyle = '#ffffff'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.arc(pos.x, pos.y, isHovered ? 10 : 8, 0, Math.PI * 2)
+        ctx.stroke()
+
+        // Label
+        if (isHovered) {
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 12px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText(location.name || location.id, pos.x, pos.y - 20)
+        }
+      })
+    }
+
+    // Draw title
+    ctx.fillStyle = '#e2e8f0'
+    ctx.font = 'bold 14px Arial'
+    ctx.textAlign = 'left'
+    ctx.fillText('Supply Chain Route Map', 10, 25)
+  }, [locations, routes, showMarkers, show3D, timeSlider, zoom, pan, hoveredLocation])
+
+  // Handle canvas click
+  const handleCanvasClick = (e) => {
+    if (!canvasRef.current || locations.length === 0) return
+
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const clickY = e.clientY - rect.top
+
+    // Calculate bounds
+    const lats = locations.map(l => l.lat)
+    const lons = locations.map(l => l.lon)
+    const minLat = Math.min(...lats)
+    const maxLat = Math.max(...lats)
+    const minLon = Math.min(...lons)
+    const maxLon = Math.max(...lons)
+
+    const latRange = maxLat - minLat || 1
+    const lonRange = maxLon - minLon || 1
+    const scale = Math.min(
+      (canvas.width * 0.8) / (lonRange * 111),
+      (canvas.height * 0.8) / (latRange * 111)
+    ) * zoom
+
+    const centerX = canvas.width / 2
+    const centerY = canvas.height / 2
+    const centerLat = (minLat + maxLat) / 2
+    const centerLon = (minLon + maxLon) / 2
+
+    // Check which location was clicked
+    locations.forEach(location => {
+      const x = centerX + (location.lon - centerLon) * 111 * scale + pan.x
+      const y = centerY - (location.lat - centerLat) * 111 * scale + pan.y
+
+      const distance = Math.sqrt((clickX - x) ** 2 + (clickY - y) ** 2)
+      if (distance < 15) {
+        onLocationSelect?.(location)
+      }
+    })
+  }
 
   return (
     <div className="flex flex-col h-full bg-slate-900">
@@ -141,21 +228,19 @@ export const Map3D = ({
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
+              <Zap size={16} />
               3D Routes
             </button>
           )}
 
           <button
             onClick={() => {
-              if (map.current) {
-                map.current.fitBounds(
-                  L.latLngBounds(locations.map(l => [l.lat, l.lon]))
-                )
-              }
+              setZoom(1)
+              setPan({ x: 0, y: 0 })
             }}
             className="px-3 py-1 rounded text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
           >
-            Fit Bounds
+            Reset View
           </button>
         </div>
 
@@ -170,6 +255,22 @@ export const Map3D = ({
             max="100"
             value={timeSlider}
             onChange={(e) => setTimeSlider(parseInt(e.target.value))}
+            className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+          />
+        </div>
+
+        {/* Zoom Control */}
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-slate-300">
+            Zoom: {(zoom * 100).toFixed(0)}%
+          </label>
+          <input
+            type="range"
+            min="0.5"
+            max="3"
+            step="0.1"
+            value={zoom}
+            onChange={(e) => setZoom(parseFloat(e.target.value))}
             className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
           />
         </div>
@@ -197,33 +298,72 @@ export const Map3D = ({
         {!webglSupported && (
           <div className="flex items-center gap-2 p-2 bg-yellow-900 border border-yellow-700 rounded text-xs text-yellow-200">
             <AlertCircle size={14} />
-            <span>WebGL not available - using 2D rendering</span>
+            <span>Using 2D canvas rendering</span>
           </div>
         )}
       </div>
 
-      {/* Map Container */}
-      <div ref={mapContainer} className="flex-1 bg-slate-900" />
+      {/* Canvas */}
+      <canvas
+        ref={canvasRef}
+        onClick={handleCanvasClick}
+        onMouseMove={(e) => {
+          if (!canvasRef.current || locations.length === 0) return
+
+          const canvas = canvasRef.current
+          const rect = canvas.getBoundingClientRect()
+          const mouseX = e.clientX - rect.left
+          const mouseY = e.clientY - rect.top
+
+          // Calculate bounds
+          const lats = locations.map(l => l.lat)
+          const lons = locations.map(l => l.lon)
+          const minLat = Math.min(...lats)
+          const maxLat = Math.max(...lats)
+          const minLon = Math.min(...lons)
+          const maxLon = Math.max(...lons)
+
+          const latRange = maxLat - minLat || 1
+          const lonRange = maxLon - minLon || 1
+          const scale = Math.min(
+            (canvas.width * 0.8) / (lonRange * 111),
+            (canvas.height * 0.8) / (latRange * 111)
+          ) * zoom
+
+          const centerX = canvas.width / 2
+          const centerY = canvas.height / 2
+          const centerLat = (minLat + maxLat) / 2
+          const centerLon = (minLon + maxLon) / 2
+
+          // Check which location is hovered
+          let found = null
+          locations.forEach(location => {
+            const x = centerX + (location.lon - centerLon) * 111 * scale + pan.x
+            const y = centerY - (location.lat - centerLat) * 111 * scale + pan.y
+
+            const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2)
+            if (distance < 15) {
+              found = location
+            }
+          })
+
+          setHoveredLocation(found)
+          canvas.style.cursor = found ? 'pointer' : 'default'
+        }}
+        onMouseLeave={() => setHoveredLocation(null)}
+        className="flex-1 bg-slate-900 cursor-default"
+      />
     </div>
   )
 }
 
-function getLocationIcon(type) {
-  const iconUrl = {
-    loading: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-    unloading: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-    yard: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-    port: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  }[type] || 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
-
-  return L.icon({
-    iconUrl,
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  })
+function getMarkerColor(type) {
+  return {
+    loading: '#10b981',
+    unloading: '#3b82f6',
+    yard: '#eab308',
+    port: '#ef4444',
+  }[type] || '#6b7280'
 }
 
 function getRouteColor(status) {
