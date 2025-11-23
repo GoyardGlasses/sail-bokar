@@ -1,226 +1,192 @@
 import React, { useState, useEffect } from 'react'
-import { Link, Lock, CheckCircle, AlertCircle } from 'lucide-react'
-import axios from 'axios'
-
-const API_BASE = 'http://127.0.0.1:8000'
+import { Lock, CheckCircle, AlertCircle, Search, AlertTriangle } from 'lucide-react'
+import AuditTable from '../components/AuditTable'
+import { fetchBlockchainAuditTrail, verifyTransaction, getBlockchainStats } from '../api/blockchainApi'
 
 export default function BlockchainPage() {
-  const [shipments, setShipments] = useState([])
+  const [activeTab, setActiveTab] = useState('audit')
+  const [rakeId, setRakeId] = useState('SAIL-R001')
+  const [searchRakeId, setSearchRakeId] = useState('')
+  const [auditData, setAuditData] = useState(null)
   const [blockchainStats, setBlockchainStats] = useState(null)
-  const [newShipment, setNewShipment] = useState({
-    origin: 'BOKARO',
-    destination: 'Kolkata',
-    material: 'HR_Coils',
-    quantity: 100
-  })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [blockchainConfigured, setBlockchainConfigured] = useState(true)
 
   useEffect(() => {
-    fetchBlockchainStats()
+    loadBlockchainStats()
+    loadAuditTrail(rakeId)
   }, [])
 
-  const fetchBlockchainStats = async () => {
+  const loadBlockchainStats = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/blockchain/stats`)
-      setBlockchainStats(response.data.data)
+      const stats = await getBlockchainStats()
+      setBlockchainStats(stats)
     } catch (error) {
       console.error('Error fetching blockchain stats:', error)
+      setBlockchainConfigured(false)
     }
   }
 
-  const createShipment = async () => {
+  const loadAuditTrail = async (id) => {
     setLoading(true)
+    setError(null)
     try {
-      const response = await axios.post(`${API_BASE}/blockchain/shipment/create`, newShipment)
-      setShipments([...shipments, response.data.data])
-      setNewShipment({
-        origin: 'BOKARO',
-        destination: 'Kolkata',
-        material: 'HR_Coils',
-        quantity: 100
-      })
-      fetchBlockchainStats()
+      const data = await fetchBlockchainAuditTrail(id)
+      setAuditData(data)
     } catch (error) {
-      console.error('Error creating shipment:', error)
+      setError('Failed to load audit trail: ' + error.message)
+      console.error('Error fetching audit trail:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const mineBlock = async () => {
-    setLoading(true)
+  const handleSearchRake = () => {
+    if (searchRakeId.trim()) {
+      setRakeId(searchRakeId)
+      loadAuditTrail(searchRakeId)
+      setSearchRakeId('')
+    }
+  }
+
+  const handleVerifyTx = async (txHash) => {
     try {
-      await axios.post(`${API_BASE}/blockchain/block/mine`)
-      fetchBlockchainStats()
+      return await verifyTransaction(txHash)
     } catch (error) {
-      console.error('Error mining block:', error)
-    } finally {
-      setLoading(false)
+      console.error('Verification error:', error)
+      throw error
     }
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Lock className="w-8 h-8 text-purple-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Blockchain Supply Chain</h1>
+      <div>
+        <div className="flex items-center gap-3 mb-2">
+          <Lock size={32} className="text-blue-600" />
+          <h1 className="text-3xl font-bold text-slate-900">Blockchain Audit Trail</h1>
         </div>
-        <p className="text-gray-600">Transparent & Immutable Tracking</p>
+        <p className="text-slate-600">Immutable record of rake dispatch events</p>
       </div>
 
-      {/* Blockchain Stats */}
-      {blockchainStats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-gray-600 text-sm">Total Blocks</p>
-            <p className="text-3xl font-bold text-gray-900">{blockchainStats.total_blocks}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-gray-600 text-sm">Total Shipments</p>
-            <p className="text-3xl font-bold text-gray-900">{blockchainStats.total_shipments}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-gray-600 text-sm">Pending Shipments</p>
-            <p className="text-3xl font-bold text-orange-600">{blockchainStats.pending_shipments}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-gray-600 text-sm">Chain Integrity</p>
-            <div className="flex items-center gap-2 mt-2">
-              {blockchainStats.chain_integrity ? (
-                <>
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                  <p className="text-lg font-bold text-green-600">Valid</p>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="w-6 h-6 text-red-600" />
-                  <p className="text-lg font-bold text-red-600">Invalid</p>
-                </>
-              )}
+      {/* Blockchain Not Configured */}
+      {!blockchainConfigured && (
+        <div className="card p-6 bg-yellow-50 border-l-4 border-yellow-500">
+          <div className="flex items-start gap-4">
+            <AlertTriangle size={24} className="text-yellow-600 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Blockchain Not Configured</h3>
+              <p className="text-slate-600 mb-3">
+                Blockchain integration is not currently configured. Please contact your administrator to set up blockchain connectivity.
+              </p>
+              <a href="/admin" className="text-blue-600 font-medium hover:underline">
+                View Admin Documentation →
+              </a>
             </div>
           </div>
         </div>
       )}
 
-      {/* Create Shipment */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Create New Shipment</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Origin</label>
-            <input
-              type="text"
-              value={newShipment.origin}
-              onChange={(e) => setNewShipment({...newShipment, origin: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
+      {/* Blockchain Stats */}
+      {blockchainStats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="card p-4">
+            <p className="text-sm text-slate-600">Total Rakes Tracked</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{blockchainStats.total_rakes_tracked?.toLocaleString()}</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Destination</label>
-            <select
-              value={newShipment.destination}
-              onChange={(e) => setNewShipment({...newShipment, destination: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            >
-              <option>Kolkata</option>
-              <option>Patna</option>
-              <option>Ranchi</option>
-              <option>Durgapur</option>
-              <option>Haldia</option>
-            </select>
+          <div className="card p-4">
+            <p className="text-sm text-slate-600">Total Events</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{blockchainStats.total_events?.toLocaleString()}</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Material</label>
-            <select
-              value={newShipment.material}
-              onChange={(e) => setNewShipment({...newShipment, material: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            >
-              <option>HR_Coils</option>
-              <option>CR_Coils</option>
-              <option>Plates</option>
-              <option>Wire_Rods</option>
-              <option>TMT_Bars</option>
-            </select>
+          <div className="card p-4">
+            <p className="text-sm text-slate-600">Network Status</p>
+            <div className="flex items-center gap-2 mt-2">
+              <CheckCircle size={20} className="text-green-600" />
+              <p className="text-lg font-bold text-green-600">{blockchainStats.network_status}</p>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity (tonnes)</label>
-            <input
-              type="number"
-              value={newShipment.quantity}
-              onChange={(e) => setNewShipment({...newShipment, quantity: parseFloat(e.target.value)})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={createShipment}
-              disabled={loading}
-              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
-            >
-              {loading ? 'Creating...' : 'Create'}
-            </button>
+          <div className="card p-4">
+            <p className="text-sm text-slate-600">Avg Confirmation</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{blockchainStats.avg_confirmation_time}</p>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Mine Block */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Mine New Block</h2>
-            <p className="text-gray-600 text-sm mt-1">Commit pending shipments to blockchain</p>
-          </div>
+      {/* Search Rake */}
+      <div className="card p-6">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Search Rake Audit Trail</h2>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="Enter Rake ID (e.g., SAIL-R001)"
+            value={searchRakeId}
+            onChange={(e) => setSearchRakeId(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearchRake()}
+            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm"
+          />
           <button
-            onClick={mineBlock}
-            disabled={loading || !blockchainStats || blockchainStats.pending_shipments === 0}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+            onClick={handleSearchRake}
+            disabled={loading || !searchRakeId.trim()}
+            className="btn btn-primary btn-sm flex items-center gap-2"
           >
-            {loading ? 'Mining...' : 'Mine Block'}
+            <Search size={18} />
+            Search
           </button>
         </div>
+        <p className="text-xs text-slate-600 mt-2">Current Rake: <strong>{rakeId}</strong></p>
       </div>
 
-      {/* Recent Shipments */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Shipments</h2>
-        {shipments.length === 0 ? (
-          <p className="text-gray-600">No shipments created yet</p>
-        ) : (
-          <div className="space-y-2">
-            {shipments.map((shipment, idx) => (
-              <div key={idx} className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-gray-900">{shipment.shipment_id}</p>
-                  <p className="text-sm text-gray-600">{shipment.timestamp}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-mono text-xs text-gray-500">{shipment.hash.substring(0, 16)}...</p>
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-1" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Error Message */}
+      {error && (
+        <div className="card p-4 bg-red-50 border-l-4 border-red-500">
+          <p className="text-sm text-red-800 font-medium">{error}</p>
+        </div>
+      )}
 
-      {/* Blockchain Features */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Blockchain Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="font-bold text-gray-900 mb-2">✓ Immutable Records</h3>
-            <p className="text-sm text-gray-600">Once recorded, shipment data cannot be altered</p>
+      {/* Audit Trail Table */}
+      {loading ? (
+        <div className="card p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading audit trail...</p>
+        </div>
+      ) : auditData && auditData.events ? (
+        <AuditTable
+          events={auditData.events}
+          rakeId={auditData.rake_id}
+          onVerifyTx={handleVerifyTx}
+        />
+      ) : null}
+
+      {/* Info Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card p-4">
+          <div className="flex items-start gap-3">
+            <Lock size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-slate-900 text-sm">Immutable Records</p>
+              <p className="text-xs text-slate-600 mt-1">Once recorded, rake events cannot be altered</p>
+            </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="font-bold text-gray-900 mb-2">✓ Transparent Tracking</h3>
-            <p className="text-sm text-gray-600">Complete visibility of shipment journey</p>
+        </div>
+
+        <div className="card p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle size={20} className="text-green-600 mt-1 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-slate-900 text-sm">Transparent Tracking</p>
+              <p className="text-xs text-slate-600 mt-1">Complete visibility of rake dispatch journey</p>
+            </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="font-bold text-gray-900 mb-2">✓ Cryptographic Verification</h3>
-            <p className="text-sm text-gray-600">SHA256 hashing ensures data integrity</p>
+        </div>
+
+        <div className="card p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-slate-900 text-sm">Cryptographic Verification</p>
+              <p className="text-xs text-slate-600 mt-1">SHA256 hashing ensures data integrity</p>
+            </div>
           </div>
         </div>
       </div>
