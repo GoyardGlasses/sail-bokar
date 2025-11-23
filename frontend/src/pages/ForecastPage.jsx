@@ -1,12 +1,30 @@
 import React, { useState } from 'react'
 import ForecastConfig from '../components/ForecastConfig'
 import ForecastCharts from '../components/ForecastCharts'
+import {
+  AccuracyMetrics,
+  ScenarioComparison,
+  ForecastAlerts,
+  SeasonalDecomposition,
+  HistoricalComparison,
+  WhatIfAnalysis,
+  DemandDrivers,
+  CollaborationPanel,
+  AdvancedFiltering,
+  DrillDown,
+  Benchmarking,
+  NotificationSettings,
+  APIDocumentation,
+  PerformanceOptimization,
+  MobileResponsiveView,
+} from '../components/ForecastEnhancements'
 import { predictForecast } from '../api/forecastApi'
 
 export default function ForecastPage() {
   const [forecastData, setForecastData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('main')
 
   const handleRunForecast = async (config) => {
     setIsLoading(true)
@@ -22,11 +40,30 @@ export default function ForecastPage() {
     }
   }
 
+  const tabs = [
+    { id: 'main', label: 'Main Forecast' },
+    { id: 'accuracy', label: 'Accuracy' },
+    { id: 'scenarios', label: 'Scenarios' },
+    { id: 'alerts', label: 'Alerts' },
+    { id: 'seasonal', label: 'Seasonal' },
+    { id: 'historical', label: 'Historical' },
+    { id: 'whatif', label: 'What-If' },
+    { id: 'drivers', label: 'Drivers' },
+    { id: 'collaboration', label: 'Collaboration' },
+    { id: 'filtering', label: 'Filtering' },
+    { id: 'drilldown', label: 'Drill-Down' },
+    { id: 'benchmarking', label: 'Benchmarking' },
+    { id: 'notifications', label: 'Notifications' },
+    { id: 'api', label: 'API Docs' },
+    { id: 'performance', label: 'Performance' },
+    { id: 'mobile', label: 'Mobile' },
+  ]
+
   return (
     <div className="p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Demand Forecast</h1>
-        <p className="text-slate-600 mt-1">Predict future demand, rake availability, and throughput</p>
+        <p className="text-slate-600 mt-1">Advanced forecasting with 15 features</p>
       </div>
 
       {error && (
@@ -35,9 +72,47 @@ export default function ForecastPage() {
         </div>
       )}
 
-      <ForecastConfig onRun={handleRunForecast} isLoading={isLoading} />
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-3 py-2 font-medium border-b-2 transition-colors whitespace-nowrap text-sm ${
+              activeTab === tab.id
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      {forecastData && <ForecastCharts data={forecastData} isLoading={isLoading} />}
+      {/* Main Forecast Tab */}
+      {activeTab === 'main' && (
+        <>
+          <ForecastConfig onRun={handleRunForecast} isLoading={isLoading} />
+          {forecastData && <ForecastCharts data={forecastData} isLoading={isLoading} />}
+        </>
+      )}
+
+      {/* Enhancement Tabs */}
+      {activeTab === 'accuracy' && forecastData && <AccuracyMetrics data={forecastData} />}
+      {activeTab === 'scenarios' && forecastData && <ScenarioComparison data={forecastData.predictions} />}
+      {activeTab === 'alerts' && <ForecastAlerts />}
+      {activeTab === 'seasonal' && forecastData && <SeasonalDecomposition data={forecastData.predictions} />}
+      {activeTab === 'historical' && forecastData && <HistoricalComparison data={forecastData.predictions} />}
+      {activeTab === 'whatif' && <WhatIfAnalysis />}
+      {activeTab === 'drivers' && <DemandDrivers />}
+      {activeTab === 'collaboration' && <CollaborationPanel />}
+      {activeTab === 'filtering' && <AdvancedFiltering />}
+      {activeTab === 'drilldown' && <DrillDown />}
+      {activeTab === 'benchmarking' && <Benchmarking />}
+      {activeTab === 'notifications' && <NotificationSettings />}
+      {activeTab === 'api' && <APIDocumentation />}
+      {activeTab === 'performance' && <PerformanceOptimization />}
+      {activeTab === 'mobile' && <MobileResponsiveView />}
     </div>
   )
 }
