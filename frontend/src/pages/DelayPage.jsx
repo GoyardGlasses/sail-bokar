@@ -15,21 +15,25 @@ export default function DelayPage() {
     setLastFormData(formData)
 
     try {
+      console.log('Calling predictDelay with:', formData)
       const response = await predictDelay(formData)
+      console.log('Received response:', response)
       
       // Handle empty response
       if (!response || !response.routes || response.routes.length === 0) {
         setError('No data for selected range. Try expanding date range.')
         setResults(null)
+        setIsLoading(false)
         return
       }
 
       setResults(response)
+      setIsLoading(false)
     } catch (err) {
       console.error('Prediction failed:', err)
-      setError(err.response?.data?.message || 'Prediction failed. Please try again.')
+      const errorMessage = err?.response?.data?.message || err?.message || 'Prediction failed. Please try again.'
+      setError(errorMessage)
       setResults(null)
-    } finally {
       setIsLoading(false)
     }
   }
