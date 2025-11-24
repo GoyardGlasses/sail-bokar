@@ -103,21 +103,6 @@ export default function ForecastPage() {
             models={[
               { name: 'Demand Forecasting', version: '2.1', status: 'active', accuracy: 94.2, type: 'regression' },
               { name: 'Rake Availability', version: '1.9', status: 'active', accuracy: 91.8, type: 'regression' },
-              { name: 'Anomaly Detection', version: '1.5', status: 'active', accuracy: 89.3, type: 'classification' },
-              { name: 'Route Optimization', version: '2.0', status: 'active', accuracy: 92.1, type: 'optimization' },
-              { name: 'Weather Impact', version: '1.8', status: 'active', accuracy: 87.5, type: 'regression' },
-              { name: 'Demand Clustering', version: '1.6', status: 'active', accuracy: 90.2, type: 'clustering' },
-              { name: 'Inventory Prediction', version: '2.2', status: 'active', accuracy: 93.7, type: 'regression' },
-              { name: 'Delay Classifier', version: '1.8', status: 'active', accuracy: 89.5, type: 'classification' },
-              { name: 'Delay Regressor', version: '1.8', status: 'active', accuracy: 88.9, type: 'regression' },
-              { name: 'Throughput Optimization', version: '2.0', status: 'active', accuracy: 91.3, type: 'regression' },
-              { name: 'Cost Estimation', version: '1.9', status: 'active', accuracy: 92.1, type: 'regression' },
-              { name: 'Mode Selection', version: '1.5', status: 'active', accuracy: 87.8, type: 'classification' },
-              { name: 'Supplier Performance', version: '1.7', status: 'active', accuracy: 88.4, type: 'classification' },
-              { name: 'Demand Seasonality', version: '1.9', status: 'active', accuracy: 90.6, type: 'regression' },
-              { name: 'Risk Assessment', version: '1.4', status: 'active', accuracy: 86.2, type: 'classification' },
-              { name: 'Network Flow', version: '2.1', status: 'active', accuracy: 93.5, type: 'optimization' },
-              { name: 'Capacity Planning', version: '1.6', status: 'active', accuracy: 89.8, type: 'regression' },
             ]}
           />
 
