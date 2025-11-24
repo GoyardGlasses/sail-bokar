@@ -50,7 +50,7 @@ export default function ProductionRecommendationDashboard() {
   ]
 
   const demandAnalysis = { totalDemand: 13500, averageDemand: 6750, maxDemand: 8000, minDemand: 5000 }
-  const productionAnalysis = { totalProduction: 14000, averageProduction: 7000, maxProduction: 8500, minProduction: 5500 }
+  const productionAnalysis = { totalProduction: 14000, averageProduction: 7000, maxProduction: 8500, minProduction: 5500, utilizationRate: 85.5 }
   const gaps = { totalGap: 500, averageGap: 250, criticalGaps: 0 }
 
   return (
