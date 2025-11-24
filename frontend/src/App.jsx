@@ -24,8 +24,8 @@ import Spinner from './components/UI/Spinner'
 import { useAppStore } from './store/useAppStore'
 
 // New Feature Imports (10 Features)
-import InventoryManagementDashboard from './features/inventoryManagement/components/InventoryManagementDashboard'
-import OrderManagementDashboard from './features/orderManagement/components/OrderManagementDashboard'
+import InventoryManagementDashboard from './features/inventory/components/InventoryManagementDashboard'
+import OrderManagementDashboard from './features/orders/components/OrderManagementDashboard'
 import RakeFormationDashboard from './features/rakeFormation/components/RakeFormationDashboard'
 import ProductWagonMatrixDashboard from './features/productWagonMatrix/components/ProductWagonMatrixDashboard'
 import RailRoadOptimizationDashboard from './features/railRoadOptimization/components/RailRoadOptimizationDashboard'
