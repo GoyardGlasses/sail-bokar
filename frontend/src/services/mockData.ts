@@ -42,6 +42,21 @@ export const inventoryMockData = {
 }
 
 // ============================================================================
+// CMO STOCKYARDS MOCK DATA
+// ============================================================================
+
+export const cmoStockyardsMockData = {
+  stockyards: [
+    { id: 'cmo-001', code: 'DANKUNI', name: 'Dankuni Stockyard', location: 'Dankuni', distance: 350, expectedDemand: 2000, status: 'operational', capacity: 5000, utilization: 68, lastUpdated: '2025-11-24 14:30' },
+    { id: 'cmo-002', code: 'FATUHA', name: 'Fatuha Stockyard', location: 'Patna (Fatuha)', distance: 420, expectedDemand: 1500, status: 'operational', capacity: 4500, utilization: 72, lastUpdated: '2025-11-24 15:00' },
+    { id: 'cmo-003', code: 'RANCHI', name: 'Ranchi Yard', location: 'Ranchi Yard', distance: 120, expectedDemand: 900, status: 'operational', capacity: 3000, utilization: 55, lastUpdated: '2025-11-24 14:15' },
+    { id: 'cmo-004', code: 'TATANAGAR', name: 'Tatanagar Yard', location: 'Tatanagar Yard', distance: 180, expectedDemand: 1400, status: 'operational', capacity: 4000, utilization: 78, lastUpdated: '2025-11-24 15:30' },
+    { id: 'cmo-005', code: 'VARANASI', name: 'Varanasi Yard', location: 'Varanasi Yard', distance: 530, expectedDemand: 1100, status: 'operational', capacity: 3500, utilization: 62, lastUpdated: '2025-11-24 14:45' },
+    { id: 'cmo-006', code: 'LUCKNOW', name: 'Lucknow Yard', location: 'Lucknow Yard', distance: 650, expectedDemand: 800, status: 'operational', capacity: 3000, utilization: 58, lastUpdated: '2025-11-24 15:15' },
+  ],
+}
+
+// ============================================================================
 // ORDER MANAGEMENT MOCK DATA
 // ============================================================================
 
@@ -235,6 +250,7 @@ export const monitoringMockData = {
 
 export default {
   inventoryMockData,
+  cmoStockyardsMockData,
   orderMockData,
   rakeFormationMockData,
   productWagonMockData,
