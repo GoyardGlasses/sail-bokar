@@ -37,15 +37,14 @@ export default function MLModels() {
     const fetchModels = async () => {
       try {
         const data = await getModels()
-        setModels(data.data?.models || mockModels)
-        if (data.data?.models?.length > 0) {
+        if (data?.data?.models && data.data.models.length > 0) {
+          setModels(data.data.models)
           setSelectedModel(data.data.models[0])
         } else {
-          setModels(mockModels)
-          setSelectedModel(mockModels[0])
+          throw new Error('No models from API')
         }
       } catch (error) {
-        console.warn('Failed to fetch models, using mock data:', error)
+        console.warn('Failed to fetch models from API, using mock data:', error)
         setModels(mockModels)
         setSelectedModel(mockModels[0])
       } finally {
