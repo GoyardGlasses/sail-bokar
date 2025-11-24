@@ -23,6 +23,19 @@ import ThroughputOptimizationPage from './pages/ThroughputOptimizationPage'
 import Spinner from './components/UI/Spinner'
 import { useAppStore } from './store/useAppStore'
 
+// New Feature Imports (10 Features)
+import InventoryManagementDashboard from './features/inventoryManagement/components/InventoryManagementDashboard'
+import OrderManagementDashboard from './features/orderManagement/components/OrderManagementDashboard'
+import RakeFormationDashboard from './features/rakeFormation/components/RakeFormationDashboard'
+import ProductWagonMatrixDashboard from './features/productWagonMatrix/components/ProductWagonMatrixDashboard'
+import RailRoadOptimizationDashboard from './features/railRoadOptimization/components/RailRoadOptimizationDashboard'
+import CostAnalysisDashboard from './features/costAnalysis/components/CostAnalysisDashboard'
+import ProductionRecommendationDashboard from './features/productionRecommendation/components/ProductionRecommendationDashboard'
+import ConstraintsManagementDashboard from './features/constraintsManagement/components/ConstraintsManagementDashboard'
+import ScenarioAnalysisDashboard from './features/scenarioAnalysis/components/ScenarioAnalysisDashboard'
+import ReportingDashboard from './features/reporting/components/ReportingDashboard'
+import MonitoringDashboard from './features/monitoring/components/MonitoringDashboard'
+
 /**
  * Main App component with routing
  */
@@ -64,6 +77,19 @@ export default function App() {
               <Route path="/advanced-optimization" element={<AdvancedOptimizationPage />} />
               <Route path="/visualization-3d" element={<Visualization3DPage />} />
               <Route path="/scenario-analysis" element={<ScenarioAnalysisPage />} />
+              
+              {/* New 10 Features */}
+              <Route path="/inventory-management" element={<InventoryManagementDashboard />} />
+              <Route path="/order-management" element={<OrderManagementDashboard />} />
+              <Route path="/rake-formation" element={<RakeFormationDashboard />} />
+              <Route path="/product-wagon-matrix" element={<ProductWagonMatrixDashboard />} />
+              <Route path="/rail-road-optimization" element={<RailRoadOptimizationDashboard />} />
+              <Route path="/cost-analysis" element={<CostAnalysisDashboard />} />
+              <Route path="/production-recommendation" element={<ProductionRecommendationDashboard />} />
+              <Route path="/constraints-management" element={<ConstraintsManagementDashboard />} />
+              <Route path="/scenario-analysis-advanced" element={<ScenarioAnalysisDashboard />} />
+              <Route path="/reporting" element={<ReportingDashboard />} />
+              <Route path="/monitoring" element={<MonitoringDashboard />} />
             </Routes>
           </main>
         </div>

@@ -15,6 +15,17 @@ import {
   Box,
   Map,
   GitBranch,
+  Package,
+  ShoppingCart,
+  Train,
+  Grid3x3,
+  Route,
+  BarChart3,
+  Lightbulb as Recommendation,
+  Lock,
+  Activity,
+  FileText,
+  Monitor,
 } from 'lucide-react'
 
 const menuItems = [
@@ -33,6 +44,20 @@ const menuItems = [
   { icon: Layers, label: 'Advanced Opt', path: '/advanced-optimization' },
   { icon: Box, label: '3D Visualization', path: '/visualization-3d' },
   { icon: Map, label: 'Scenario Analysis', path: '/scenario-analysis' },
+  
+  // NEW 10 FEATURES SECTION
+  { type: 'divider', label: '🆕 NEW FEATURES' },
+  { icon: Package, label: 'Inventory Management', path: '/inventory-management' },
+  { icon: ShoppingCart, label: 'Order Management', path: '/order-management' },
+  { icon: Train, label: 'Rake Formation', path: '/rake-formation' },
+  { icon: Grid3x3, label: 'Product-Wagon Matrix', path: '/product-wagon-matrix' },
+  { icon: Route, label: 'Rail vs Road', path: '/rail-road-optimization' },
+  { icon: BarChart3, label: 'Cost Analysis Pro', path: '/cost-analysis' },
+  { icon: Recommendation, label: 'Production Rec', path: '/production-recommendation' },
+  { icon: Lock, label: 'Constraints Mgmt', path: '/constraints-management' },
+  { icon: Activity, label: 'Scenario Analysis', path: '/scenario-analysis-advanced' },
+  { icon: FileText, label: 'Reporting', path: '/reporting' },
+  { icon: Monitor, label: 'Monitoring', path: '/monitoring' },
 ]
 
 /**
@@ -52,6 +77,15 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
+          // Handle dividers
+          if (item.type === 'divider') {
+            return (
+              <div key={item.label} className="py-3 px-4 mt-4 border-t border-slate-700">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.label}</p>
+              </div>
+            )
+          }
+          
           const Icon = item.icon
           const isActive = location.pathname === item.path
           return (
