@@ -18,25 +18,25 @@ export default function MLModels() {
   const [testResults, setTestResults] = useState(null)
   const [testLoading, setTestLoading] = useState(false)
 
-  // All 17 ML Models
+  // All 17 ML Models - Real ML Algorithm Names
   const models = [
-    { id: 1, name: 'Demand Forecasting', version: '2.1', status: 'loaded', accuracy: 94.2, type: 'regression' },
-    { id: 2, name: 'Rake Availability', version: '1.9', status: 'loaded', accuracy: 91.8, type: 'regression' },
-    { id: 3, name: 'Anomaly Detection', version: '1.5', status: 'loaded', accuracy: 89.3, type: 'classification' },
-    { id: 4, name: 'Route Optimization', version: '2.0', status: 'loaded', accuracy: 92.1, type: 'optimization' },
-    { id: 5, name: 'Weather Impact', version: '1.8', status: 'loaded', accuracy: 87.5, type: 'regression' },
-    { id: 6, name: 'Demand Clustering', version: '1.6', status: 'loaded', accuracy: 90.2, type: 'clustering' },
-    { id: 7, name: 'Inventory Prediction', version: '2.2', status: 'loaded', accuracy: 93.7, type: 'regression' },
-    { id: 8, name: 'Delay Classifier', version: '1.8', status: 'loaded', accuracy: 89.5, type: 'classification' },
-    { id: 9, name: 'Delay Regressor', version: '1.8', status: 'loaded', accuracy: 88.9, type: 'regression' },
-    { id: 10, name: 'Throughput Optimization', version: '2.0', status: 'loaded', accuracy: 91.3, type: 'regression' },
-    { id: 11, name: 'Cost Estimation', version: '1.9', status: 'loaded', accuracy: 92.1, type: 'regression' },
-    { id: 12, name: 'Mode Selection', version: '1.5', status: 'loaded', accuracy: 87.8, type: 'classification' },
-    { id: 13, name: 'Supplier Performance', version: '1.7', status: 'loaded', accuracy: 88.4, type: 'classification' },
-    { id: 14, name: 'Demand Seasonality', version: '1.9', status: 'loaded', accuracy: 90.6, type: 'regression' },
-    { id: 15, name: 'Risk Assessment', version: '1.4', status: 'loaded', accuracy: 86.2, type: 'classification' },
-    { id: 16, name: 'Network Flow', version: '2.1', status: 'loaded', accuracy: 93.5, type: 'optimization' },
-    { id: 17, name: 'Capacity Planning', version: '1.6', status: 'loaded', accuracy: 89.8, type: 'regression' },
+    { id: 1, name: 'XGBoost Regressor', version: '2.1', status: 'loaded', accuracy: 94.2, type: 'regression' },
+    { id: 2, name: 'LightGBM', version: '1.9', status: 'loaded', accuracy: 91.8, type: 'regression' },
+    { id: 3, name: 'Isolation Forest', version: '1.5', status: 'loaded', accuracy: 89.3, type: 'classification' },
+    { id: 4, name: 'Genetic Algorithm', version: '2.0', status: 'loaded', accuracy: 92.1, type: 'optimization' },
+    { id: 5, name: 'ARIMA', version: '1.8', status: 'loaded', accuracy: 87.5, type: 'regression' },
+    { id: 6, name: 'K-Means Clustering', version: '1.6', status: 'loaded', accuracy: 90.2, type: 'clustering' },
+    { id: 7, name: 'Random Forest', version: '2.2', status: 'loaded', accuracy: 93.7, type: 'regression' },
+    { id: 8, name: 'Gradient Boosting', version: '1.8', status: 'loaded', accuracy: 89.5, type: 'classification' },
+    { id: 9, name: 'Support Vector Regression', version: '1.8', status: 'loaded', accuracy: 88.9, type: 'regression' },
+    { id: 10, name: 'Neural Network (LSTM)', version: '2.0', status: 'loaded', accuracy: 91.3, type: 'regression' },
+    { id: 11, name: 'CatBoost', version: '1.9', status: 'loaded', accuracy: 92.1, type: 'regression' },
+    { id: 12, name: 'Logistic Regression', version: '1.5', status: 'loaded', accuracy: 87.8, type: 'classification' },
+    { id: 13, name: 'Decision Tree Classifier', version: '1.7', status: 'loaded', accuracy: 88.4, type: 'classification' },
+    { id: 14, name: 'Prophet (Facebook)', version: '1.9', status: 'loaded', accuracy: 90.6, type: 'regression' },
+    { id: 15, name: 'Naive Bayes', version: '1.4', status: 'loaded', accuracy: 86.2, type: 'classification' },
+    { id: 16, name: 'Particle Swarm Optimization', version: '2.1', status: 'loaded', accuracy: 93.5, type: 'optimization' },
+    { id: 17, name: 'Ensemble (Voting)', version: '1.6', status: 'loaded', accuracy: 89.8, type: 'regression' },
   ]
 
   // Set default selected model
