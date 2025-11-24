@@ -7,30 +7,64 @@ export default function OptimizeResult() {
   const navigate = useNavigate()
   const { result } = useOptimizeStore()
 
-  // Mock data for demonstration
+  // Generate mock data with 80 rakes and 80 trucks
+  const destinations = [
+    'Kolkata', 'Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Ahmedabad',
+    'Patna', 'Ranchi', 'Jamshedpur', 'Bokaro', 'Dhanbad', 'Asansol', 'Howrah', 'Siliguri',
+    'Nagpur', 'Indore', 'Lucknow', 'Kanpur', 'Surat', 'Vadodara', 'Ghaziabad', 'Ludhiana',
+    'Kochi', 'Visakhapatnam', 'Coimbatore', 'Bhopal', 'Chandigarh', 'Jaipur', 'Agra', 'Varanasi',
+  ]
+
+  const generateRakes = () => {
+    const rakes = []
+    for (let i = 1; i <= 80; i++) {
+      const dest = destinations[(i - 1) % destinations.length]
+      const tonnes = 400 + Math.random() * 200
+      const wagons = Math.ceil(tonnes / 20)
+      const cost = tonnes * 250 + Math.random() * 10000
+      rakes.push({
+        rake_id: `RAKE-${String(i).padStart(3, '0')}`,
+        destination: dest,
+        tonnes: Math.round(tonnes),
+        wagons: wagons,
+        estimated_cost: Math.round(cost),
+      })
+    }
+    return rakes
+  }
+
+  const generateTrucks = () => {
+    const trucks = []
+    for (let i = 1; i <= 80; i++) {
+      const dest = destinations[(i - 1) % destinations.length]
+      const tonnes = 20 + Math.random() * 15
+      const cost = tonnes * 200 + Math.random() * 2000
+      trucks.push({
+        truck_id: `TRK-${String(i).padStart(3, '0')}`,
+        destination: dest,
+        tonnes: Math.round(tonnes * 10) / 10,
+        cost: Math.round(cost),
+      })
+    }
+    return trucks
+  }
+
+  const rakesList = generateRakes()
+  const trucksList = generateTrucks()
+
+  const totalRakeCost = rakesList.reduce((sum, r) => sum + r.estimated_cost, 0)
+  const totalTruckCost = trucksList.reduce((sum, t) => sum + t.cost, 0)
+  const totalTonnage = rakesList.reduce((sum, r) => sum + r.tonnes, 0) + 
+                       trucksList.reduce((sum, t) => sum + t.tonnes, 0)
+
   const mockResult = {
-    rakes: [
-      { rake_id: 'RAKE-001', destination: 'Kolkata', tonnes: 500, wagons: 25, estimated_cost: 125000 },
-      { rake_id: 'RAKE-002', destination: 'Chennai', tonnes: 450, wagons: 22, estimated_cost: 112500 },
-      { rake_id: 'RAKE-003', destination: 'Mumbai', tonnes: 520, wagons: 26, estimated_cost: 130000 },
-      { rake_id: 'RAKE-004', destination: 'Delhi', tonnes: 480, wagons: 24, estimated_cost: 120000 },
-      { rake_id: 'RAKE-005', destination: 'Bangalore', tonnes: 510, wagons: 25, estimated_cost: 127500 },
-    ],
-    trucks: [
-      { truck_id: 'TRK-001', destination: 'Patna', tonnes: 25, cost: 5000 },
-      { truck_id: 'TRK-002', destination: 'Ranchi', tonnes: 28, cost: 5600 },
-      { truck_id: 'TRK-003', destination: 'Jamshedpur', tonnes: 30, cost: 6000 },
-      { truck_id: 'TRK-004', destination: 'Bokaro', tonnes: 22, cost: 4400 },
-      { truck_id: 'TRK-005', destination: 'Dhanbad', tonnes: 26, cost: 5200 },
-      { truck_id: 'TRK-006', destination: 'Asansol', tonnes: 24, cost: 4800 },
-      { truck_id: 'TRK-007', destination: 'Kolkata', tonnes: 29, cost: 5800 },
-      { truck_id: 'TRK-008', destination: 'Howrah', tonnes: 27, cost: 5400 },
-    ],
+    rakes: rakesList,
+    trucks: trucksList,
     summary: {
-      total_rakes: 5,
-      total_trucks: 8,
-      total_cost: 615300,
-      total_tonnage: 2460,
+      total_rakes: 80,
+      total_trucks: 80,
+      total_cost: totalRakeCost + totalTruckCost,
+      total_tonnage: Math.round(totalTonnage),
     },
   }
 
