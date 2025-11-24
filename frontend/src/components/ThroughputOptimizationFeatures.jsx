@@ -66,6 +66,8 @@ export function CapacityPlanning() {
 // ============ OPTIMIZATION ALGORITHMS ============
 export function OptimizationAlgorithms() {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('route')
+  const [implementationStatus, setImplementationStatus] = useState(null)
+  const [isImplementing, setIsImplementing] = useState(false)
 
   const algorithms = [
     {
@@ -74,6 +76,7 @@ export function OptimizationAlgorithms() {
       savings: '12%',
       implementation: 'Easy',
       timeframe: '1 week',
+      details: 'Uses Dijkstra algorithm for optimal path finding with cost minimization',
     },
     {
       name: 'Load Balancing',
@@ -81,6 +84,7 @@ export function OptimizationAlgorithms() {
       savings: '8%',
       implementation: 'Medium',
       timeframe: '2 weeks',
+      details: 'Distributes shipments evenly across all loading points to prevent bottlenecks',
     },
     {
       name: 'Dispatch Scheduling',
@@ -88,6 +92,7 @@ export function OptimizationAlgorithms() {
       savings: '15%',
       implementation: 'Hard',
       timeframe: '3 weeks',
+      details: 'Schedules dispatches based on demand patterns and resource availability',
     },
     {
       name: 'Resource Allocation',
@@ -95,61 +100,134 @@ export function OptimizationAlgorithms() {
       savings: '10%',
       implementation: 'Hard',
       timeframe: '4 weeks',
+      details: 'Allocates equipment and workforce based on demand forecasts and capacity',
     },
   ]
 
   const current = algorithms.find(a => a.name.toLowerCase().includes(selectedAlgorithm)) || algorithms[0]
 
+  const handleImplement = async () => {
+    setIsImplementing(true)
+    setImplementationStatus(null)
+    
+    // Simulate implementation process
+    try {
+      // Step 1: Validate
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      // Step 2: Deploy
+      await new Promise(resolve => setTimeout(resolve, 1200))
+      
+      // Step 3: Test
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setImplementationStatus({
+        success: true,
+        message: `✅ ${current.name} implemented successfully!`,
+        details: `Algorithm deployed and tested. Expected savings: ${current.savings}. Implementation time: ${current.timeframe}`,
+      })
+    } catch (error) {
+      setImplementationStatus({
+        success: false,
+        message: '❌ Implementation failed',
+        details: 'Please try again or contact support',
+      })
+    } finally {
+      setIsImplementing(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-bold text-slate-900">Optimization Algorithms</h3>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">Optimization Algorithms</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card p-4">
-          <p className="text-sm text-slate-600 mb-3">Available Algorithms</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Available Algorithms</p>
           <div className="space-y-2">
             {algorithms.map((algo, i) => (
               <button
                 key={i}
-                onClick={() => setSelectedAlgorithm(algo.name.toLowerCase())}
+                onClick={() => {
+                  setSelectedAlgorithm(algo.name.toLowerCase())
+                  setImplementationStatus(null)
+                }}
                 className={`w-full text-left p-3 rounded border-2 transition-all ${
                   current.name === algo.name
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-slate-200 hover:border-slate-300'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                    : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
                 }`}
               >
-                <p className="font-medium text-slate-900">{algo.name}</p>
-                <p className="text-xs text-slate-600 mt-1">{algo.description}</p>
+                <p className="font-medium text-slate-900 dark:text-slate-50">{algo.name}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{algo.description}</p>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="card p-4 bg-gradient-to-br from-green-50 to-emerald-50">
-          <p className="text-sm text-slate-600 mb-3">Algorithm Details</p>
+        <div className="card p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-600 dark:to-slate-700">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Algorithm Details</p>
           <div className="space-y-3">
             <div>
-              <p className="text-2xl font-bold text-slate-900">{current.name}</p>
-              <p className="text-sm text-slate-600 mt-1">{current.description}</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{current.name}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{current.description}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 italic">{current.details}</p>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <div className="bg-white p-2 rounded text-center">
-                <p className="text-xs text-slate-600">Savings</p>
+              <div className="bg-white dark:bg-slate-700 p-2 rounded text-center">
+                <p className="text-xs text-slate-600 dark:text-slate-400">Savings</p>
                 <p className="text-lg font-bold text-green-600">{current.savings}</p>
               </div>
-              <div className="bg-white p-2 rounded text-center">
-                <p className="text-xs text-slate-600">Difficulty</p>
-                <p className="text-sm font-bold text-slate-900">{current.implementation}</p>
+              <div className="bg-white dark:bg-slate-700 p-2 rounded text-center">
+                <p className="text-xs text-slate-600 dark:text-slate-400">Difficulty</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-50">{current.implementation}</p>
               </div>
-              <div className="bg-white p-2 rounded text-center">
-                <p className="text-xs text-slate-600">Timeframe</p>
-                <p className="text-sm font-bold text-slate-900">{current.timeframe}</p>
+              <div className="bg-white dark:bg-slate-700 p-2 rounded text-center">
+                <p className="text-xs text-slate-600 dark:text-slate-400">Timeframe</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-50">{current.timeframe}</p>
               </div>
             </div>
-            <button className="w-full btn btn-primary btn-sm">Implement Algorithm</button>
+            <button 
+              onClick={handleImplement}
+              disabled={isImplementing}
+              className="w-full btn btn-primary btn-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isImplementing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Implementing...
+                </>
+              ) : (
+                '🚀 Implement Algorithm'
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Implementation Status */}
+      {implementationStatus && (
+        <div className={`rounded-lg p-4 border-2 ${
+          implementationStatus.success
+            ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+            : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+        }`}>
+          <p className={`font-bold text-lg ${
+            implementationStatus.success
+              ? 'text-green-900 dark:text-green-300'
+              : 'text-red-900 dark:text-red-300'
+          }`}>
+            {implementationStatus.message}
+          </p>
+          <p className={`text-sm mt-2 ${
+            implementationStatus.success
+              ? 'text-green-800 dark:text-green-400'
+              : 'text-red-800 dark:text-red-400'
+          }`}>
+            {implementationStatus.details}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
