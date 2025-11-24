@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ForecastConfig from '../components/ForecastConfig'
 import ForecastCharts from '../components/ForecastCharts'
+import MLModelsStatus from '../components/MLModelsStatus'
 import {
   AccuracyMetrics,
   ScenarioComparison,
@@ -98,23 +99,12 @@ export default function ForecastPage() {
       {/* Main Forecast Tab */}
       {activeTab === 'main' && (
         <>
-          {/* ML Models Status */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {Object.values(mlModels).map((model, idx) => (
-              <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Brain className="text-blue-600" size={24} />
-                    <div>
-                      <p className="font-bold text-gray-900">{model.name}</p>
-                      <p className="text-sm text-gray-600">Accuracy: {model.accuracy}%</p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{model.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <MLModelsStatus
+            models={[
+              { name: 'Demand Forecasting', version: '2.1', status: 'active', accuracy: 94.2, type: 'regression' },
+              { name: 'Rake Availability', version: '1.9', status: 'active', accuracy: 91.8, type: 'regression' },
+            ]}
+          />
 
           <ForecastConfig onRun={handleRunForecast} isLoading={isLoading} />
           {forecastData && <ForecastCharts data={forecastData} isLoading={isLoading} />}

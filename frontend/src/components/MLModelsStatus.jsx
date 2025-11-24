@@ -1,4 +1,4 @@
-import React from 'lucide-react'
+import React from 'react'
 import { Brain, CheckCircle, AlertCircle, Zap } from 'lucide-react'
 
 export default function MLModelsStatus({ models = [] }) {
