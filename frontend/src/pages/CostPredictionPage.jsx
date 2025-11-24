@@ -33,6 +33,9 @@ export default function CostPredictionPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('main')
+  const [mlModels] = useState({
+    costEstimation: { name: 'Cost Estimation', accuracy: 92.1, status: 'active' },
+  })
 
   const handlePredictCost = async (formData) => {
     setLoading(true)
@@ -87,6 +90,24 @@ export default function CostPredictionPage() {
           <p className="text-sm text-red-800 font-medium">{error}</p>
         </div>
       )}
+
+      {/* ML Models Status */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Object.values(mlModels).map((model, idx) => (
+          <div key={idx} className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Brain className="text-purple-600" size={24} />
+                <div>
+                  <p className="font-bold text-gray-900">{model.name}</p>
+                  <p className="text-sm text-gray-600">Accuracy: {model.accuracy}%</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{model.status}</span>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">

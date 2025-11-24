@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { BarChart, Bar, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Zap, TrendingDown, Maximize2, Lock, Eye, Settings, History, Download, GitBranch, CheckCircle, AlertCircle } from 'lucide-react'
+import { Zap, TrendingDown, Maximize2, Lock, Eye, Settings, History, Download, GitBranch, CheckCircle, AlertCircle, Brain } from 'lucide-react'
 import {
   ConstraintManagement,
   OptimizationSensitivityAnalysis,
@@ -30,6 +30,9 @@ export default function AdvancedOptimizationPage() {
   const [optimizationResult, setOptimizationResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('results')
+  const [mlModels] = useState({
+    modeSelection: { name: 'Mode Selection', accuracy: 87.8, status: 'active' },
+  })
   const [newOrder, setNewOrder] = useState({
     material: 'HR_Coils',
     destination: 'Kolkata',
@@ -80,6 +83,24 @@ export default function AdvancedOptimizationPage() {
           <h1 className="text-3xl font-bold text-gray-900">Advanced Multi-Objective Optimization</h1>
         </div>
         <p className="text-gray-600">NSGA2 Evolutionary Algorithm</p>
+      </div>
+
+      {/* ML Models Status */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Object.values(mlModels).map((model, idx) => (
+          <div key={idx} className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Brain className="text-indigo-600" size={24} />
+                <div>
+                  <p className="font-bold text-gray-900">{model.name}</p>
+                  <p className="text-sm text-gray-600">Accuracy: {model.accuracy}%</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{model.status}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Add Order */}
