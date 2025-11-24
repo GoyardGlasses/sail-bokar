@@ -147,7 +147,17 @@ export default function ProductWagonMatrixDashboard() {
     },
   ]
 
-  const analysis = { totalCompatibilities: 9, compatiblePairs: 8, incompatibilities: 1, utilizationScore: 88.9 }
+  const analysis = { 
+    totalCompatibilities: 9, 
+    compatiblePairs: 8, 
+    incompatibilities: 1, 
+    utilizationScore: 88.9,
+    totalProducts: mockProducts.length,
+    totalWagons: mockWagons.length,
+    compatibilityPercentage: 88.9,
+    averageEfficiency: 91.5,
+    criticalConstraints: 1
+  }
 
   return (
     <div className="space-y-6 p-8">
