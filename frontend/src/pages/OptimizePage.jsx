@@ -81,16 +81,18 @@ export default function OptimizePage() {
           {/* Rakes Input */}
           <div>
             <label className="block text-sm font-medium text-slate-900 mb-2">
-              Available Rakes
+              Available Rakes (Max: 80)
             </label>
             <input
               type="number"
               min="0"
+              max="80"
               value={formData.available_rakes}
-              onChange={(e) =>
-                setFormData({ ...formData, available_rakes: parseInt(e.target.value) || 0 })
-              }
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => {
+                const val = e.target.value === '' ? 0 : Math.min(80, Math.max(0, parseInt(e.target.value, 10)))
+                setFormData({ ...formData, available_rakes: val })
+              }}
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50"
               disabled={isLoading}
             />
           </div>
@@ -98,16 +100,18 @@ export default function OptimizePage() {
           {/* Trucks Input */}
           <div>
             <label className="block text-sm font-medium text-slate-900 mb-2">
-              Available Trucks
+              Available Trucks (Max: 80)
             </label>
             <input
               type="number"
               min="0"
+              max="80"
               value={formData.available_trucks}
-              onChange={(e) =>
-                setFormData({ ...formData, available_trucks: parseInt(e.target.value) || 0 })
-              }
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => {
+                const val = e.target.value === '' ? 0 : Math.min(80, Math.max(0, parseInt(e.target.value, 10)))
+                setFormData({ ...formData, available_trucks: val })
+              }}
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50"
               disabled={isLoading}
             />
           </div>
