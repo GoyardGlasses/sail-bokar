@@ -36,6 +36,7 @@ import ScenarioAnalysisDashboard from './features/scenarioAnalysis/components/Sc
 import ReportingDashboard from './features/reporting/components/ReportingDashboard'
 import MonitoringDashboard from './features/monitoring/components/MonitoringDashboard'
 import CMOStockyardDashboard from './features/cmoStockyard/components/CMOStockyardDashboard'
+import DataImportDashboard from './features/dataImport/components/DataImportDashboard'
 
 /**
  * Main App component with routing
@@ -78,6 +79,9 @@ export default function App() {
               <Route path="/advanced-optimization" element={<AdvancedOptimizationPage />} />
               <Route path="/visualization-3d" element={<Visualization3DPage />} />
               <Route path="/scenario-analysis" element={<ScenarioAnalysisPage />} />
+              
+              {/* Data Import */}
+              <Route path="/data-import" element={<DataImportDashboard />} />
               
               {/* New 10 Features */}
               <Route path="/inventory-management" element={<InventoryManagementDashboard />} />

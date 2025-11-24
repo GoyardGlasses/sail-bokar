@@ -27,6 +27,7 @@ import {
   FileText,
   Monitor,
   Warehouse,
+  Upload,
 } from 'lucide-react'
 
 const menuItems = [
@@ -45,6 +46,10 @@ const menuItems = [
   { icon: Layers, label: 'Advanced Opt', path: '/advanced-optimization' },
   { icon: Box, label: '3D Visualization', path: '/visualization-3d' },
   { icon: Map, label: 'Scenario Analysis', path: '/scenario-analysis' },
+  
+  // DATA IMPORT SECTION
+  { type: 'divider', label: '📥 DATA MANAGEMENT' },
+  { icon: Upload, label: 'Data Import Center', path: '/data-import' },
   
   // NEW 10 FEATURES SECTION
   { type: 'divider', label: '🆕 NEW FEATURES' },
