@@ -3,23 +3,65 @@
  * Complete inventory system with material, rake, loading point, and siding management
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Package,
   Truck,
   Zap,
   Clock,
+  Plus,
+  Trash2,
+  Edit2,
+  X,
+  Check,
 } from 'lucide-react'
 import { inventoryMockData } from '../../../services/mockData'
 
 export default function InventoryDashboard() {
   const [activeTab, setActiveTab] = useState('materials')
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [formData, setFormData] = useState<any>({})
 
-  // Use mock data directly
-  const materials = inventoryMockData.materials
-  const rakes = inventoryMockData.rakes
-  const loadingPoints = inventoryMockData.loadingPoints
-  const sidings = inventoryMockData.sidings
+  // Use mock data with dynamic capabilities
+  const [materials, setMaterials] = useState(inventoryMockData.materials)
+  const [rakes, setRakes] = useState(inventoryMockData.rakes)
+  const [loadingPoints, setLoadingPoints] = useState(inventoryMockData.loadingPoints)
+  const [sidings, setSidings] = useState(inventoryMockData.sidings)
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedMaterials = localStorage.getItem('dynamic_materials')
+      const storedRakes = localStorage.getItem('dynamic_rakes')
+      const storedLoadingPoints = localStorage.getItem('dynamic_loadingPoints')
+      const storedSidings = localStorage.getItem('dynamic_sidings')
+
+      if (storedMaterials) setMaterials(JSON.parse(storedMaterials))
+      if (storedRakes) setRakes(JSON.parse(storedRakes))
+      if (storedLoadingPoints) setLoadingPoints(JSON.parse(storedLoadingPoints))
+      if (storedSidings) setSidings(JSON.parse(storedSidings))
+    } catch (error) {
+      console.error('Failed to load from localStorage:', error)
+    }
+  }, [])
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem('dynamic_materials', JSON.stringify(materials))
+  }, [materials])
+
+  useEffect(() => {
+    localStorage.setItem('dynamic_rakes', JSON.stringify(rakes))
+  }, [rakes])
+
+  useEffect(() => {
+    localStorage.setItem('dynamic_loadingPoints', JSON.stringify(loadingPoints))
+  }, [loadingPoints])
+
+  useEffect(() => {
+    localStorage.setItem('dynamic_sidings', JSON.stringify(sidings))
+  }, [sidings])
 
   const totalMaterials = materials.length
   const totalRakes = rakes.length
