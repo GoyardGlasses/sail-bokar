@@ -61,11 +61,11 @@ export default function AllMLModelsStatus() {
           return (
             <div
               key={model.id}
-              className={`bg-gradient-to-br ${model.color} border-2 ${model.borderColor} rounded-lg p-4 hover:shadow-lg transition-all`}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-4 hover:shadow-lg transition-all"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Icon size={20} className={model.textColor} />
+                  <Icon size={20} className="text-blue-600" />
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{model.name}</p>
                     <p className="text-xs text-gray-600">v{model.version}</p>
@@ -85,7 +85,7 @@ export default function AllMLModelsStatus() {
                 </div>
                 <div className="w-full bg-gray-300 rounded-full h-1.5">
                   <div
-                    className={`h-1.5 rounded-full bg-gradient-to-r ${model.color.split(' ')[1]}`}
+                    className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-600"
                     style={{ width: `${model.accuracy}%` }}
                   />
                 </div>
