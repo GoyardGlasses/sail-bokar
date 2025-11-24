@@ -48,13 +48,19 @@ export default function ConstraintsManagementDashboard() {
   return (
     <div className="space-y-6 p-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">
-          Constraints Management
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Manage operational and business constraints
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">
+            Constraints Management
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
+            Manage operational and business constraints
+          </p>
+        </div>
+        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Lock size={18} />
+          Add Constraint
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -64,18 +70,22 @@ export default function ConstraintsManagementDashboard() {
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
             {mockConstraints.length}
           </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">All critical</p>
         </div>
         <div className="card">
           <p className="text-sm text-slate-600 dark:text-slate-400">Violations</p>
           <p className="text-2xl font-bold text-red-600">{mockViolations.length}</p>
+          <p className="text-xs text-red-600 mt-1">1 warning</p>
         </div>
         <div className="card">
           <p className="text-sm text-slate-600 dark:text-slate-400">Compliance Rate</p>
           <p className="text-2xl font-bold text-green-600">98.5%</p>
+          <p className="text-xs text-green-600 mt-1">↑ +0.5%</p>
         </div>
         <div className="card">
           <p className="text-sm text-slate-600 dark:text-slate-400">Critical Issues</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">0</p>
+          <p className="text-xs text-green-600 mt-1">All resolved</p>
         </div>
       </div>
 
