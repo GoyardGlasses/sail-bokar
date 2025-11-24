@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ForecastConfig from '../components/ForecastConfig'
 import ForecastCharts from '../components/ForecastCharts'
+import MLModelsStatus from '../components/MLModelsStatus'
 import {
   AccuracyMetrics,
   ScenarioComparison,
@@ -48,6 +49,7 @@ export default function ForecastPage() {
 
   const tabs = [
     { id: 'main', label: 'Main Forecast' },
+    { id: 'ml-models', label: 'ML Models' },
     { id: 'accuracy', label: 'Accuracy' },
     { id: 'scenarios', label: 'Scenarios' },
     { id: 'alerts', label: 'Alerts' },
@@ -119,6 +121,16 @@ export default function ForecastPage() {
           <ForecastConfig onRun={handleRunForecast} isLoading={isLoading} />
           {forecastData && <ForecastCharts data={forecastData} isLoading={isLoading} />}
         </>
+      )}
+
+      {/* ML Models Tab */}
+      {activeTab === 'ml-models' && (
+        <MLModelsStatus
+          models={[
+            { name: 'Demand Forecasting', version: '2.1', status: 'active', accuracy: 94.2, type: 'regression' },
+            { name: 'Rake Availability', version: '1.9', status: 'active', accuracy: 91.8, type: 'regression' },
+          ]}
+        />
       )}
 
       {/* Enhancement Tabs */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ThroughputTimeline from '../components/ThroughputTimeline'
+import MLModelsStatus from '../components/MLModelsStatus'
 import {
   RealTimeThroughputDashboard,
   ThroughputTrendsPatterns,
@@ -91,22 +92,11 @@ export default function ThroughputPage() {
       )}
 
       {/* ML Models Status */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Object.values(mlModels).map((model, idx) => (
-          <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Brain className="text-green-600" size={24} />
-                <div>
-                  <p className="font-bold text-gray-900">{model.name}</p>
-                  <p className="text-sm text-gray-600">Accuracy: {model.accuracy}%</p>
-                </div>
-              </div>
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{model.status}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <MLModelsStatus
+        models={[
+          { name: 'Throughput Optimization', version: '2.0', status: 'active', accuracy: 91.3, type: 'regression' },
+        ]}
+      />
 
       {/* Form Section */}
       <div className="card p-6">

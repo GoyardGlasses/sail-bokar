@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import DelayForm from '../components/DelayForm'
 import DelayResults from '../components/DelayResults'
 import BatchPredictions from '../components/BatchPredictions'
+import MLModelsStatus from '../components/MLModelsStatus'
 import RouteAnalytics from '../components/RouteAnalytics'
 import RouteComparison from '../components/RouteComparison'
 import ScenarioComparison from '../components/ScenarioComparison'
@@ -95,6 +96,7 @@ export default function DelayPage() {
       <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
         {[
           { id: 'single', label: 'Single Route' },
+          { id: 'ml-models', label: 'ML Models' },
           { id: 'batch', label: 'Batch' },
           { id: 'analytics', label: 'Analytics' },
           { id: 'route-comparison', label: 'Compare Routes' },
@@ -125,27 +127,19 @@ export default function DelayPage() {
         ))}
       </div>
 
+      {/* ML Models Tab */}
+      {activeTab === 'ml-models' && (
+        <MLModelsStatus
+          models={[
+            { name: 'Delay Classifier', version: '1.8', status: 'active', accuracy: 89.5, type: 'classification' },
+            { name: 'Delay Regressor', version: '1.8', status: 'active', accuracy: 88.9, type: 'regression' },
+          ]}
+        />
+      )}
+
       {/* Single Route Prediction */}
       {activeTab === 'single' && (
         <>
-          {/* ML Models Status */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {Object.values(mlModels).map((model, idx) => (
-              <div key={idx} className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Brain className="text-red-600" size={24} />
-                    <div>
-                      <p className="font-bold text-gray-900">{model.name}</p>
-                      <p className="text-sm text-gray-600">Accuracy: {model.accuracy}%</p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{model.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <DelayForm onSubmit={handlePrediction} isLoading={isLoading} />
 
           {results && (
