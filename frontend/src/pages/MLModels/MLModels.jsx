@@ -34,21 +34,21 @@ export default function MLModels() {
   ]
 
   useEffect(() => {
+    // Set mock models immediately
+    setModels(mockModels)
+    setSelectedModel(mockModels[0])
+    setLoading(false)
+
+    // Try to fetch from API in background
     const fetchModels = async () => {
       try {
         const data = await getModels()
         if (data?.data?.models && data.data.models.length > 0) {
           setModels(data.data.models)
           setSelectedModel(data.data.models[0])
-        } else {
-          throw new Error('No models from API')
         }
       } catch (error) {
-        console.warn('Failed to fetch models from API, using mock data:', error)
-        setModels(mockModels)
-        setSelectedModel(mockModels[0])
-      } finally {
-        setLoading(false)
+        console.warn('Failed to fetch models from API, keeping mock data:', error)
       }
     }
 
@@ -126,7 +126,7 @@ export default function MLModels() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
               <p className="text-gray-500 col-span-full text-center py-8">Loading models...</p>
-            ) : (
+            ) : models && models.length > 0 ? (
               models.map((model, idx) => (
                 <div
                   key={idx}
@@ -167,6 +167,8 @@ export default function MLModels() {
                   </div>
                 </div>
               ))
+            ) : (
+              <p className="text-gray-500 col-span-full text-center py-8">No models available</p>
             )}
           </div>
 
