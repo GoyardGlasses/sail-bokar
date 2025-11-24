@@ -15,29 +15,11 @@ import {
   Trash2,
   Edit2,
 } from 'lucide-react'
-import { useProductWagonMatrixStore } from '../store'
-import { Product, WagonType, Compatibility } from '../types'
 
 export default function ProductWagonMatrixDashboard() {
   const [activeTab, setActiveTab] = useState<'matrix' | 'products' | 'wagons' | 'constraints'>('matrix')
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [showAddWagon, setShowAddWagon] = useState(false)
-
-  const {
-    products,
-    wagonTypes,
-    compatibilities,
-    constraints,
-    selectedProduct,
-    selectedWagon,
-    setSelectedProduct,
-    setSelectedWagon,
-    addProduct,
-    addWagonType,
-    analyzeMatrix,
-    analyzeProduct,
-    analyzeWagon,
-  } = useProductWagonMatrixStore()
 
   // Mock data
   const mockProducts: Product[] = [
