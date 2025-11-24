@@ -14,37 +14,61 @@ import {
   Edit2,
   X,
   Check,
+  AlertCircle,
 } from 'lucide-react'
 import { inventoryMockData } from '../../../services/mockData'
+import { useImportedData } from '../../../hooks/useImportedData'
 
 export default function InventoryDashboard() {
   const [activeTab, setActiveTab] = useState('materials')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [formData, setFormData] = useState<any>({})
+  const { data: importedData, isLoaded } = useImportedData()
 
-  // Use mock data with dynamic capabilities
+  // Use imported data if available, otherwise use mock data
   const [materials, setMaterials] = useState(inventoryMockData.materials)
   const [rakes, setRakes] = useState(inventoryMockData.rakes)
   const [loadingPoints, setLoadingPoints] = useState(inventoryMockData.loadingPoints)
   const [sidings, setSidings] = useState(inventoryMockData.sidings)
 
-  // Load from localStorage on mount
+  // Load from imported data or localStorage on mount
   useEffect(() => {
-    try {
-      const storedMaterials = localStorage.getItem('dynamic_materials')
-      const storedRakes = localStorage.getItem('dynamic_rakes')
-      const storedLoadingPoints = localStorage.getItem('dynamic_loadingPoints')
-      const storedSidings = localStorage.getItem('dynamic_sidings')
+    if (!isLoaded) return
 
-      if (storedMaterials) setMaterials(JSON.parse(storedMaterials))
-      if (storedRakes) setRakes(JSON.parse(storedRakes))
-      if (storedLoadingPoints) setLoadingPoints(JSON.parse(storedLoadingPoints))
-      if (storedSidings) setSidings(JSON.parse(storedSidings))
+    try {
+      // Priority: Imported data > Stored data > Mock data
+      if (importedData?.materials) {
+        setMaterials(importedData.materials)
+      } else {
+        const storedMaterials = localStorage.getItem('dynamic_materials')
+        if (storedMaterials) setMaterials(JSON.parse(storedMaterials))
+      }
+
+      if (importedData?.rakes) {
+        setRakes(importedData.rakes)
+      } else {
+        const storedRakes = localStorage.getItem('dynamic_rakes')
+        if (storedRakes) setRakes(JSON.parse(storedRakes))
+      }
+
+      if (importedData?.loadingPoints) {
+        setLoadingPoints(importedData.loadingPoints)
+      } else {
+        const storedLoadingPoints = localStorage.getItem('dynamic_loadingPoints')
+        if (storedLoadingPoints) setLoadingPoints(JSON.parse(storedLoadingPoints))
+      }
+
+      if (importedData?.sidings) {
+        setSidings(importedData.sidings)
+      } else {
+        const storedSidings = localStorage.getItem('dynamic_sidings')
+        if (storedSidings) setSidings(JSON.parse(storedSidings))
+      }
     } catch (error) {
-      console.error('Failed to load from localStorage:', error)
+      console.error('Failed to load data:', error)
     }
-  }, [])
+  }, [isLoaded, importedData])
 
   // Save to localStorage whenever data changes
   useEffect(() => {
