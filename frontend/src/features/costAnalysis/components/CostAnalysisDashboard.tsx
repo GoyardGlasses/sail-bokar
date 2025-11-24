@@ -10,6 +10,7 @@ import { DetailedCostBreakdown } from '../types'
 
 export default function CostAnalysisDashboard() {
   const [activeTab, setActiveTab] = useState<'breakdown' | 'analysis' | 'optimization'>('breakdown')
+  const [selectedOrder, setSelectedOrder] = useState<string>('ORD-001')
 
   const { breakdowns, optimizations, getMetrics, getCostByCategory, getTotalSavings } = useCostAnalysisStore()
 
