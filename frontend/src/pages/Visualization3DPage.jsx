@@ -5,6 +5,7 @@ import { Map3D } from '../components/Map3D'
 import { Warehouse3D } from '../components/Warehouse3D'
 import { Network3D } from '../components/Network3D'
 import { Heatmap3D } from '../components/Heatmap3D'
+import IndiaMap from '../components/IndiaMap'
 import { getRouteData, getAssistantSuggestion, getMockRouteData } from '../api/mapApi'
 
 const API_BASE = 'http://127.0.0.1:8000'
@@ -76,7 +77,8 @@ export default function Visualization3DPage() {
             { id: 'network', label: 'Network Map', icon: '🌐' },
             { id: 'heatmap', label: 'Demand Heatmap', icon: '🔥' },
             { id: 'tracking', label: 'Shipment Tracking', icon: '📍' },
-            { id: 'routes', label: 'Route Visualization', icon: '🗺️' }
+            { id: 'routes', label: 'Route Visualization', icon: '🗺️' },
+            { id: 'india', label: 'India Logistics Map', icon: '🇮🇳' }
           ].map(view => (
             <button
               key={view.id}
@@ -299,6 +301,11 @@ export default function Visualization3DPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* India Logistics Map */}
+      {selectedView === 'india' && (
+        <IndiaMap />
       )}
 
       {/* 3D Technology Info */}
