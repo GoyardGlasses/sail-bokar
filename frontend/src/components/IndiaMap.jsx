@@ -1,7 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { MapPin, Phone, Mail, Navigation } from 'lucide-react'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+// Fix Leaflet icon issue
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
 
 export default function IndiaMap() {
+  const mapContainer = useRef(null)
+  const map = useRef(null)
   const [selectedLocation, setSelectedLocation] = useState(null)
 
   // Actual coordinates for key locations
@@ -16,7 +28,7 @@ export default function IndiaMap() {
       description: 'SAIL Bokaro Steel Plant - Primary production facility',
       phone: '+91-6542-223000',
       email: 'info@bokarosteel.com',
-      color: 'bg-red-500',
+      color: '#ef4444',
       icon: '🏭',
     },
     {
@@ -29,7 +41,7 @@ export default function IndiaMap() {
       description: 'Central Marketing Organization Stockyard - Distribution hub',
       phone: '+91-33-2248-5000',
       email: 'cmo@sailsteel.com',
-      color: 'bg-blue-500',
+      color: '#3b82f6',
       icon: '📦',
     },
     {
@@ -42,7 +54,7 @@ export default function IndiaMap() {
       description: 'Regional distribution center',
       phone: '+91-612-2200-100',
       email: 'patna@sailsteel.com',
-      color: 'bg-green-500',
+      color: '#10b981',
       icon: '🚚',
     },
     {
@@ -55,23 +67,62 @@ export default function IndiaMap() {
       description: 'Regional storage and dispatch depot',
       phone: '+91-651-2200-200',
       email: 'ranchi@sailsteel.com',
-      color: 'bg-purple-500',
+      color: '#a855f7',
       icon: '📍',
     },
   ]
 
-  // SVG Map of India with approximate location markers
-  const mapWidth = 400
-  const mapHeight = 500
+  useEffect(() => {
+    if (map.current) return
 
-  // Convert lat/lon to SVG coordinates (rough approximation for India)
-  const latToY = (lat) => {
-    return ((35.5 - lat) / 30) * mapHeight
-  }
+    // Initialize map
+    map.current = L.map(mapContainer.current).setView([23.5, 86], 6)
 
-  const lonToX = (lon) => {
-    return ((lon - 68) / 32) * mapWidth
-  }
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map.current)
+
+    // Add markers for each location
+    locations.forEach((location) => {
+      const marker = L.circleMarker([location.lat, location.lon], {
+        radius: 10,
+        fillColor: location.color,
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8,
+      })
+        .bindPopup(
+          `<div class="font-bold">${location.name}</div><div class="text-sm">${location.city}</div>`
+        )
+        .addTo(map.current)
+
+      marker.on('click', () => setSelectedLocation(location))
+    })
+
+    // Draw lines connecting locations
+    const polyline = L.polyline(
+      locations.map((loc) => [loc.lat, loc.lon]),
+      {
+        color: '#3b82f6',
+        weight: 2,
+        opacity: 0.5,
+        dashArray: '5, 5',
+      }
+    ).addTo(map.current)
+
+    // Fit bounds to show all markers
+    const group = new L.featureGroup(
+      locations.map((loc) => L.latLng(loc.lat, loc.lon))
+    )
+    map.current.fitBounds(group.getBounds().pad(0.1))
+
+    return () => {
+      // Cleanup
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -87,130 +138,11 @@ export default function IndiaMap() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map Section */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-blue-100 to-blue-50 dark:from-slate-600 dark:to-slate-700 rounded-xl p-4 border-2 border-blue-200 dark:border-slate-600">
-              <svg
-                viewBox={`0 0 ${mapWidth} ${mapHeight}`}
-                className="w-full h-auto"
-                style={{ maxHeight: '500px' }}
-              >
-                {/* India outline (simplified) */}
-                <defs>
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path
-                      d="M 40 0 L 0 0 0 40"
-                      fill="none"
-                      stroke="rgba(100,116,139,0.1)"
-                      strokeWidth="0.5"
-                    />
-                  </pattern>
-                </defs>
-
-                {/* Grid background */}
-                <rect width={mapWidth} height={mapHeight} fill="url(#grid)" />
-
-                {/* Simplified India border */}
-                <path
-                  d="M 80 50 L 120 40 L 150 60 L 160 100 L 150 150 L 140 180 L 120 200 L 100 190 L 80 160 L 70 120 L 75 80 Z"
-                  fill="rgba(59,130,246,0.1)"
-                  stroke="rgba(59,130,246,0.5)"
-                  strokeWidth="2"
-                />
-
-                {/* Location markers */}
-                {locations.map((location) => {
-                  const x = lonToX(location.lon)
-                  const y = latToY(location.lat)
-                  const isSelected = selectedLocation?.id === location.id
-
-                  return (
-                    <g key={location.id}>
-                      {/* Pulse circle */}
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={isSelected ? 20 : 15}
-                        fill="none"
-                        stroke={isSelected ? '#3b82f6' : '#6b7280'}
-                        strokeWidth="2"
-                        opacity="0.3"
-                        className="animate-pulse"
-                      />
-
-                      {/* Main marker */}
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={isSelected ? 12 : 8}
-                        fill={
-                          location.id === 1
-                            ? '#ef4444'
-                            : location.id === 2
-                            ? '#3b82f6'
-                            : location.id === 3
-                            ? '#10b981'
-                            : '#a855f7'
-                        }
-                        stroke="white"
-                        strokeWidth="2"
-                        className="cursor-pointer hover:opacity-80 transition-all"
-                        onClick={() => setSelectedLocation(location)}
-                      />
-
-                      {/* Label */}
-                      <text
-                        x={x}
-                        y={y - 20}
-                        textAnchor="middle"
-                        className="text-xs font-bold fill-slate-900 dark:fill-slate-50 pointer-events-none"
-                        style={{ fontSize: '10px' }}
-                      >
-                        {location.name.split(' ')[0]}
-                      </text>
-                    </g>
-                  )
-                })}
-
-                {/* Connection lines */}
-                <line
-                  x1={lonToX(locations[0].lon)}
-                  y1={latToY(locations[0].lat)}
-                  x2={lonToX(locations[1].lon)}
-                  y2={latToY(locations[1].lat)}
-                  stroke="rgba(59,130,246,0.3)"
-                  strokeWidth="2"
-                  strokeDasharray="5,5"
-                />
-                <line
-                  x1={lonToX(locations[1].lon)}
-                  y1={latToY(locations[1].lat)}
-                  x2={lonToX(locations[2].lon)}
-                  y2={latToY(locations[2].lat)}
-                  stroke="rgba(59,130,246,0.3)"
-                  strokeWidth="2"
-                  strokeDasharray="5,5"
-                />
-              </svg>
-
-              {/* Legend */}
-              <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                {locations.map((loc) => (
-                  <div key={loc.id} className="flex items-center gap-2">
-                    <div
-                      className={`w-3 h-3 rounded-full ${
-                        loc.id === 1
-                          ? 'bg-red-500'
-                          : loc.id === 2
-                          ? 'bg-blue-500'
-                          : loc.id === 3
-                          ? 'bg-green-500'
-                          : 'bg-purple-500'
-                      }`}
-                    ></div>
-                    <span className="text-slate-700 dark:text-slate-300">{loc.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div
+              ref={mapContainer}
+              className="rounded-xl border-2 border-blue-200 dark:border-slate-600 overflow-hidden"
+              style={{ height: '500px', width: '100%' }}
+            />
           </div>
 
           {/* Location Details Section */}
