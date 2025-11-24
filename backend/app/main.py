@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
 from app.utils import app_logger
 from app.routers import forecast, delay, throughput, cost, mode, optimize, meta
-from app.routers import blockchain, ai_forecast, advanced_optimization, visualization, scenario_analysis
+from app.routers import blockchain, ai_forecast, advanced_optimization, visualization, scenario_analysis, advanced_models
 from app.schemas import BaseResponse
 
 # Create FastAPI app
@@ -60,6 +60,7 @@ app.include_router(ai_forecast.router)
 app.include_router(advanced_optimization.router)
 app.include_router(visualization.router)
 app.include_router(scenario_analysis.router)
+app.include_router(advanced_models.router)
 
 # ============================================================================
 # ROOT ENDPOINTS
