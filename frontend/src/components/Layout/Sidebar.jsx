@@ -96,7 +96,7 @@ export default function Sidebar() {
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
                   ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-700'
+                  : 'text-white hover:bg-slate-700'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
