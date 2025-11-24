@@ -55,7 +55,6 @@ const menuItems = [
   { icon: BarChart3, label: 'Cost Analysis Pro', path: '/cost-analysis' },
   { icon: Recommendation, label: 'Production Rec', path: '/production-recommendation' },
   { icon: Lock, label: 'Constraints Mgmt', path: '/constraints-management' },
-  { icon: Activity, label: 'Scenario Analysis', path: '/scenario-analysis-advanced' },
   { icon: FileText, label: 'Reporting', path: '/reporting' },
   { icon: Monitor, label: 'Monitoring', path: '/monitoring' },
 ]
