@@ -26,6 +26,7 @@ import {
   Activity,
   FileText,
   Monitor,
+  Warehouse,
 } from 'lucide-react'
 
 const menuItems = [
@@ -48,6 +49,7 @@ const menuItems = [
   // NEW 10 FEATURES SECTION
   { type: 'divider', label: '🆕 NEW FEATURES' },
   { icon: Package, label: 'Inventory Management', path: '/inventory-management' },
+  { icon: Warehouse, label: 'CMO Stockyards', path: '/cmo-stockyards' },
   { icon: ShoppingCart, label: 'Order Management', path: '/order-management' },
   { icon: Train, label: 'Rake Formation', path: '/rake-formation' },
   { icon: Grid3x3, label: 'Product-Wagon Matrix', path: '/product-wagon-matrix' },

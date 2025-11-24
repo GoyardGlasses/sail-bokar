@@ -35,6 +35,7 @@ import ConstraintsManagementDashboard from './features/constraintsManagement/com
 import ScenarioAnalysisDashboard from './features/scenarioAnalysis/components/ScenarioAnalysisDashboard'
 import ReportingDashboard from './features/reporting/components/ReportingDashboard'
 import MonitoringDashboard from './features/monitoring/components/MonitoringDashboard'
+import CMOStockyardDashboard from './features/cmoStockyard/components/CMOStockyardDashboard'
 
 /**
  * Main App component with routing
@@ -80,6 +81,7 @@ export default function App() {
               
               {/* New 10 Features */}
               <Route path="/inventory-management" element={<InventoryManagementDashboard />} />
+              <Route path="/cmo-stockyards" element={<CMOStockyardDashboard />} />
               <Route path="/order-management" element={<OrderManagementDashboard />} />
               <Route path="/rake-formation" element={<RakeFormationDashboard />} />
               <Route path="/product-wagon-matrix" element={<ProductWagonMatrixDashboard />} />
