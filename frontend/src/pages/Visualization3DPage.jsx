@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Map, Activity, Zap, Brain, AlertCircle } from 'lucide-react'
+import { Box, Map, Activity, Zap, Brain, AlertCircle, MapPin } from 'lucide-react'
 import axios from 'axios'
 import { Map3D } from '../components/Map3D'
 import { getRouteData, getAssistantSuggestion, getMockRouteData } from '../api/mapApi'
