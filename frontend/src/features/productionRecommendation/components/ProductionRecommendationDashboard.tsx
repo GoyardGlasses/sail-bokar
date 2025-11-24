@@ -5,18 +5,9 @@
 
 import React, { useState } from 'react'
 import { TrendingUp, AlertCircle, Zap, BarChart3, Target } from 'lucide-react'
-import { useProductionRecommendationStore } from '../store'
 
 export default function ProductionRecommendationDashboard() {
   const [activeTab, setActiveTab] = useState<'recommendations' | 'analysis' | 'scenarios'>('recommendations')
-
-  const {
-    recommendations,
-    getDemandAnalysis,
-    getProductionAnalysis,
-    getSupplyDemandGaps,
-    getTotalRecommendedProduction,
-  } = useProductionRecommendationStore()
 
   // Mock data
   const mockRecommendations = [
@@ -58,9 +49,9 @@ export default function ProductionRecommendationDashboard() {
     },
   ]
 
-  const demandAnalysis = getDemandAnalysis()
-  const productionAnalysis = getProductionAnalysis()
-  const gaps = getSupplyDemandGaps()
+  const demandAnalysis = { totalDemand: 13500, averageDemand: 6750, maxDemand: 8000, minDemand: 5000 }
+  const productionAnalysis = { totalProduction: 14000, averageProduction: 7000, maxProduction: 8500, minProduction: 5500 }
+  const gaps = { totalGap: 500, averageGap: 250, criticalGaps: 0 }
 
   return (
     <div className="space-y-6 p-8">

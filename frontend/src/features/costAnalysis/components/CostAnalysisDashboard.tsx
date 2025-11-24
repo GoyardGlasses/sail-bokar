@@ -5,17 +5,13 @@
 
 import React, { useState } from 'react'
 import { DollarSign, TrendingDown, PieChart, AlertCircle, Zap } from 'lucide-react'
-import { useCostAnalysisStore } from '../store'
-import { DetailedCostBreakdown } from '../types'
 
 export default function CostAnalysisDashboard() {
   const [activeTab, setActiveTab] = useState<'breakdown' | 'analysis' | 'optimization'>('breakdown')
   const [selectedOrder, setSelectedOrder] = useState<string>('ORD-001')
 
-  const { breakdowns, optimizations, getMetrics, getCostByCategory, getTotalSavings } = useCostAnalysisStore()
-
   // Mock data
-  const mockBreakdowns: DetailedCostBreakdown[] = [
+  const mockBreakdowns = [
     {
       id: 'cb-001',
       orderId: 'ORD-001',
@@ -58,9 +54,14 @@ export default function CostAnalysisDashboard() {
     },
   ]
 
-  const metrics = getMetrics()
-  const costByCategory = getCostByCategory()
-  const totalSavings = getTotalSavings()
+  const metrics = {
+    totalCost: mockBreakdowns.reduce((sum, b) => sum + b.totalCost, 0),
+    averageCost: mockBreakdowns.reduce((sum, b) => sum + b.totalCost, 0) / mockBreakdowns.length,
+    minCost: Math.min(...mockBreakdowns.map(b => b.totalCost)),
+    maxCost: Math.max(...mockBreakdowns.map(b => b.totalCost)),
+  }
+  const costByCategory = { material: 80000, labor: 40000, transport: 60000, overhead: 20000 }
+  const totalSavings = 25000
 
   return (
     <div className="space-y-6 p-8">
