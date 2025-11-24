@@ -1,38 +1,43 @@
 /**
  * Mock Data Service - SAIL Bokaro Logistics System
- * Realistic mock data based on actual steel plant operations
+ * Comprehensive realistic mock data with all combinations and scenarios
  */
 
 // ============================================================================
-// INVENTORY MANAGEMENT MOCK DATA
+// INVENTORY MANAGEMENT MOCK DATA - COMPLETE WITH ALL COMBINATIONS
 // ============================================================================
 
 export const inventoryMockData = {
   materials: [
-    { id: 'm-001', name: 'Iron Ore (Pellets)', quantity: 12500, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Premium', price: 3200, lastUpdated: '2025-11-24 14:30' },
-    { id: 'm-002', name: 'Coking Coal', quantity: 8400, unit: 'tonnes', stockyard: 'Bokaro-Coal', grade: 'Grade-A', price: 4800, lastUpdated: '2025-11-24 13:45' },
-    { id: 'm-003', name: 'Limestone', quantity: 5600, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Industrial', price: 950, lastUpdated: '2025-11-24 15:00' },
-    { id: 'm-004', name: 'Manganese Ore', quantity: 3200, unit: 'tonnes', stockyard: 'Bokaro-Ore', grade: 'High-Grade', price: 5200, lastUpdated: '2025-11-24 14:15' },
-    { id: 'm-005', name: 'Dolomite', quantity: 4100, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Refractory', price: 1100, lastUpdated: '2025-11-24 15:30' },
-    { id: 'm-006', name: 'Coke Breeze', quantity: 2800, unit: 'tonnes', stockyard: 'Bokaro-Coal', grade: 'Standard', price: 2400, lastUpdated: '2025-11-24 14:00' },
+    { id: 'm-001', name: 'Iron Ore (Pellets)', quantity: 12500, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Premium', price: 3200, lastUpdated: '2025-11-24 14:30', status: 'available' },
+    { id: 'm-002', name: 'Coking Coal', quantity: 8400, unit: 'tonnes', stockyard: 'Bokaro-Coal', grade: 'Grade-A', price: 4800, lastUpdated: '2025-11-24 13:45', status: 'available' },
+    { id: 'm-003', name: 'Limestone', quantity: 5600, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Industrial', price: 950, lastUpdated: '2025-11-24 15:00', status: 'available' },
+    { id: 'm-004', name: 'Manganese Ore', quantity: 3200, unit: 'tonnes', stockyard: 'Bokaro-Ore', grade: 'High-Grade', price: 5200, lastUpdated: '2025-11-24 14:15', status: 'available' },
+    { id: 'm-005', name: 'Dolomite', quantity: 4100, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Refractory', price: 1100, lastUpdated: '2025-11-24 15:30', status: 'available' },
+    { id: 'm-006', name: 'Coke Breeze', quantity: 2800, unit: 'tonnes', stockyard: 'Bokaro-Coal', grade: 'Standard', price: 2400, lastUpdated: '2025-11-24 14:00', status: 'available' },
+    { id: 'm-007', name: 'Sinter Ore', quantity: 6200, unit: 'tonnes', stockyard: 'Bokaro-Main', grade: 'Grade-B', price: 2800, lastUpdated: '2025-11-24 14:45', status: 'available' },
+    { id: 'm-008', name: 'Flux Stone', quantity: 3800, unit: 'tonnes', stockyard: 'Bokaro-Ore', grade: 'Industrial', price: 1200, lastUpdated: '2025-11-24 15:15', status: 'available' },
   ],
   rakes: [
-    { id: 'rk-001', name: 'BOKARO-001', capacity: 1200, status: 'available', location: 'Bokaro Siding-1', wagons: 48, lastMaintenance: '2025-11-20' },
-    { id: 'rk-002', name: 'BOKARO-002', capacity: 1200, status: 'in-transit', location: 'En-route to Mumbai', wagons: 48, lastMaintenance: '2025-11-18' },
-    { id: 'rk-003', name: 'BOKARO-003', capacity: 1100, status: 'loading', location: 'Bokaro Siding-2', wagons: 44, lastMaintenance: '2025-11-22' },
-    { id: 'rk-004', name: 'BOKARO-004', capacity: 1200, status: 'available', location: 'Bokaro Siding-3', wagons: 48, lastMaintenance: '2025-11-21' },
-    { id: 'rk-005', name: 'BOKARO-005', capacity: 1100, status: 'unloading', location: 'Delhi Port', wagons: 44, lastMaintenance: '2025-11-19' },
+    { id: 'rk-001', name: 'BOKARO-001', capacity: 1200, status: 'available', location: 'Bokaro Siding-1', wagons: 48, lastMaintenance: '2025-11-20', utilization: 0 },
+    { id: 'rk-002', name: 'BOKARO-002', capacity: 1200, status: 'in-transit', location: 'En-route to Mumbai', wagons: 48, lastMaintenance: '2025-11-18', utilization: 95 },
+    { id: 'rk-003', name: 'BOKARO-003', capacity: 1100, status: 'loading', location: 'Bokaro Siding-2', wagons: 44, lastMaintenance: '2025-11-22', utilization: 75 },
+    { id: 'rk-004', name: 'BOKARO-004', capacity: 1200, status: 'available', location: 'Bokaro Siding-3', wagons: 48, lastMaintenance: '2025-11-21', utilization: 0 },
+    { id: 'rk-005', name: 'BOKARO-005', capacity: 1100, status: 'unloading', location: 'Delhi Port', wagons: 44, lastMaintenance: '2025-11-19', utilization: 88 },
+    { id: 'rk-006', name: 'BOKARO-006', capacity: 1200, status: 'available', location: 'Bokaro Siding-1', wagons: 48, lastMaintenance: '2025-11-23', utilization: 0 },
   ],
   loadingPoints: [
-    { id: 'lp-001', name: 'Bokaro Siding-1', capacity: 1200, utilization: 92, status: 'active', material: 'Iron Ore' },
-    { id: 'lp-002', name: 'Bokaro Siding-2', capacity: 1100, utilization: 78, status: 'active', material: 'Coking Coal' },
-    { id: 'lp-003', name: 'Bokaro Siding-3', capacity: 1200, utilization: 65, status: 'active', material: 'Limestone' },
-    { id: 'lp-004', name: 'Bokaro Siding-4', capacity: 900, utilization: 88, status: 'maintenance', material: 'Manganese Ore' },
+    { id: 'lp-001', name: 'Bokaro Siding-1', capacity: 1200, utilization: 92, status: 'active', material: 'Iron Ore', throughput: 1104 },
+    { id: 'lp-002', name: 'Bokaro Siding-2', capacity: 1100, utilization: 78, status: 'active', material: 'Coking Coal', throughput: 858 },
+    { id: 'lp-003', name: 'Bokaro Siding-3', capacity: 1200, utilization: 65, status: 'active', material: 'Limestone', throughput: 780 },
+    { id: 'lp-004', name: 'Bokaro Siding-4', capacity: 900, utilization: 88, status: 'maintenance', material: 'Manganese Ore', throughput: 792 },
+    { id: 'lp-005', name: 'Bokaro Siding-5', capacity: 1000, utilization: 72, status: 'active', material: 'Dolomite', throughput: 720 },
   ],
   sidings: [
-    { id: 'sd-001', name: 'Bokaro Main Siding', capacity: 5, available: 2, status: 'operational', rakes: 3 },
-    { id: 'sd-002', name: 'Bokaro Coal Siding', capacity: 4, available: 1, status: 'operational', rakes: 3 },
-    { id: 'sd-003', name: 'Bokaro Ore Siding', capacity: 3, available: 1, status: 'operational', rakes: 2 },
+    { id: 'sd-001', name: 'Bokaro Main Siding', capacity: 5, available: 2, status: 'operational', rakes: 3, occupancy: 60 },
+    { id: 'sd-002', name: 'Bokaro Coal Siding', capacity: 4, available: 1, status: 'operational', rakes: 3, occupancy: 75 },
+    { id: 'sd-003', name: 'Bokaro Ore Siding', capacity: 3, available: 1, status: 'operational', rakes: 2, occupancy: 67 },
+    { id: 'sd-004', name: 'Bokaro Secondary Siding', capacity: 6, available: 3, status: 'operational', rakes: 3, occupancy: 50 },
   ],
 }
 
@@ -42,12 +47,14 @@ export const inventoryMockData = {
 
 export const orderMockData = {
   orders: [
-    { id: 'ORD-2025-001', product: 'Iron Ore (Pellets)', quantity: 1200, destination: 'Tata Steel - Jamshedpur', priority: 'high', status: 'in-progress', deadline: '2025-11-26', customer: 'Tata Steel', rakeAssigned: 'BOKARO-002' },
-    { id: 'ORD-2025-002', product: 'Coking Coal', quantity: 800, destination: 'JSW Steel - Bellary', priority: 'high', status: 'confirmed', deadline: '2025-11-27', customer: 'JSW Steel', rakeAssigned: null },
-    { id: 'ORD-2025-003', product: 'Limestone', quantity: 600, destination: 'SAIL - Durgapur', priority: 'medium', status: 'confirmed', deadline: '2025-11-29', customer: 'SAIL Durgapur', rakeAssigned: 'BOKARO-003' },
-    { id: 'ORD-2025-004', product: 'Manganese Ore', quantity: 400, destination: 'Vedanta - Lanjigarh', priority: 'high', status: 'pending', deadline: '2025-11-28', customer: 'Vedanta', rakeAssigned: null },
-    { id: 'ORD-2025-005', product: 'Dolomite', quantity: 500, destination: 'ArcelorMittal - Hazira', priority: 'medium', status: 'confirmed', deadline: '2025-11-30', customer: 'ArcelorMittal', rakeAssigned: 'BOKARO-004' },
-    { id: 'ORD-2025-006', product: 'Coke Breeze', quantity: 350, destination: 'RINL - Vizag', priority: 'low', status: 'confirmed', deadline: '2025-12-02', customer: 'RINL', rakeAssigned: null },
+    { id: 'ORD-2025-001', product: 'Iron Ore (Pellets)', quantity: 1200, destination: 'Tata Steel - Jamshedpur', priority: 'high', status: 'in-progress', deadline: '2025-11-26', customer: 'Tata Steel', rakeAssigned: 'BOKARO-002', value: 3840000 },
+    { id: 'ORD-2025-002', product: 'Coking Coal', quantity: 800, destination: 'JSW Steel - Bellary', priority: 'high', status: 'confirmed', deadline: '2025-11-27', customer: 'JSW Steel', rakeAssigned: null, value: 3840000 },
+    { id: 'ORD-2025-003', product: 'Limestone', quantity: 600, destination: 'SAIL - Durgapur', priority: 'medium', status: 'confirmed', deadline: '2025-11-29', customer: 'SAIL Durgapur', rakeAssigned: 'BOKARO-003', value: 570000 },
+    { id: 'ORD-2025-004', product: 'Manganese Ore', quantity: 400, destination: 'Vedanta - Lanjigarh', priority: 'high', status: 'pending', deadline: '2025-11-28', customer: 'Vedanta', rakeAssigned: null, value: 2080000 },
+    { id: 'ORD-2025-005', product: 'Dolomite', quantity: 500, destination: 'ArcelorMittal - Hazira', priority: 'medium', status: 'confirmed', deadline: '2025-11-30', customer: 'ArcelorMittal', rakeAssigned: 'BOKARO-004', value: 550000 },
+    { id: 'ORD-2025-006', product: 'Coke Breeze', quantity: 350, destination: 'RINL - Vizag', priority: 'low', status: 'confirmed', deadline: '2025-12-02', customer: 'RINL', rakeAssigned: null, value: 840000 },
+    { id: 'ORD-2025-007', product: 'Sinter Ore', quantity: 900, destination: 'NMDC - Hyderabad', priority: 'medium', status: 'confirmed', deadline: '2025-11-28', customer: 'NMDC', rakeAssigned: 'BOKARO-005', value: 2520000 },
+    { id: 'ORD-2025-008', product: 'Flux Stone', quantity: 450, destination: 'Essar Steel - Hazira', priority: 'low', status: 'pending', deadline: '2025-12-01', customer: 'Essar Steel', rakeAssigned: null, value: 540000 },
   ],
 }
 

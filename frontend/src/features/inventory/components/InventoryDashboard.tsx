@@ -17,44 +17,25 @@ import {
   AlertCircle,
   Zap,
 } from 'lucide-react'
-import { useInventoryStore } from '../store'
-import {
-  MaterialInventory,
-  Rake,
-  LoadingPoint,
-  Siding,
-  InventorySummary,
-} from '../types'
+import { inventoryMockData } from '../../../services/mockData'
 
 export default function InventoryDashboard() {
   const [activeTab, setActiveTab] = useState<
-    'materials' | 'rakes' | 'loading' | 'sidings' | 'alerts'
+    'materials' | 'rakes' | 'loading' | 'sidings'
   >('materials')
   const [showAddForm, setShowAddForm] = useState(false)
-  const [selectedStockyard, setSelectedStockyard] = useState<string>('all')
 
-  // Get data from store
-  const {
-    materialInventories,
-    rakes,
-    loadingPoints,
-    sidings,
-    materialAlerts,
-    rakeAlerts,
-    loadingPointAlerts,
-    sidingAlerts,
-    getInventorySummary,
-    getTotalAlerts,
-    getCriticalAlerts,
-    addMaterialInventory,
-    addRake,
-    addLoadingPoint,
-    addSiding,
-  } = useInventoryStore()
+  // Use mock data directly
+  const materials = inventoryMockData.materials
+  const rakes = inventoryMockData.rakes
+  const loadingPoints = inventoryMockData.loadingPoints
+  const sidings = inventoryMockData.sidings
 
-  const summary = getInventorySummary()
-  const totalAlerts = getTotalAlerts()
-  const criticalAlerts = getCriticalAlerts()
+  const totalMaterials = materials.length
+  const totalRakes = rakes.length
+  const totalLoadingPoints = loadingPoints.length
+  const totalSidings = sidings.length
+  const totalQuantity = materials.reduce((sum, m) => sum + m.quantity, 0)
 
   // Mock data for demonstration
   const mockMaterials: MaterialInventory[] = [
