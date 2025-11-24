@@ -1,16 +1,237 @@
-import React from 'react'
-import { FileText } from 'lucide-react'
+import React, { useState } from 'react'
+import { FileText, Download, Eye, Trash2, Plus, Calendar, Filter } from 'lucide-react'
 
 export default function ReportingDashboard() {
+  const [activeTab, setActiveTab] = useState<'reports' | 'analytics' | 'export'>('reports')
+
+  const mockReports = [
+    {
+      id: 'r-001',
+      name: 'Weekly Operations Summary',
+      type: 'summary',
+      format: 'pdf',
+      generatedAt: '2025-11-24T10:30:00Z',
+      generatedBy: 'System',
+      size: '2.4 MB',
+      status: 'completed',
+    },
+    {
+      id: 'r-002',
+      name: 'Rake Utilization Report',
+      type: 'detailed',
+      format: 'excel',
+      generatedAt: '2025-11-23T15:45:00Z',
+      generatedBy: 'Admin',
+      size: '1.8 MB',
+      status: 'completed',
+    },
+    {
+      id: 'r-003',
+      name: 'Cost Analysis Deep Dive',
+      type: 'technical',
+      format: 'html',
+      generatedAt: '2025-11-22T09:15:00Z',
+      generatedBy: 'Analytics',
+      size: '3.2 MB',
+      status: 'completed',
+    },
+  ]
+
+  const mockAnalytics = [
+    { metric: 'Total Reports Generated', value: '247', change: '+12%' },
+    { metric: 'Avg Report Size', value: '2.1 MB', change: '-5%' },
+    { metric: 'Most Used Format', value: 'PDF', change: '62%' },
+    { metric: 'Export Success Rate', value: '99.8%', change: '+0.2%' },
+  ]
+
   return (
     <div className="space-y-6 p-8">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Reporting & Analytics</h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">Comprehensive reporting and analytics</p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">
+            Reporting & Analytics
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
+            Generate and manage comprehensive reports
+          </p>
+        </div>
+        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Plus size={18} />
+          New Report
+        </button>
       </div>
-      <div className="card text-center py-12">
-        <FileText className="mx-auto text-slate-400 mb-4" size={48} />
-        <p className="text-slate-600 dark:text-slate-400">Reporting dashboard loaded</p>
+
+      {/* Analytics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {mockAnalytics.map((item, idx) => (
+          <div key={idx} className="card">
+            <p className="text-sm text-slate-600 dark:text-slate-400">{item.metric}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-50 mt-2">{item.value}</p>
+            <p className="text-xs text-green-600 mt-1">{item.change}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
+        {[
+          { id: 'reports', label: 'Reports', icon: FileText },
+          { id: 'analytics', label: 'Analytics', icon: Filter },
+          { id: 'export', label: 'Export', icon: Download },
+        ].map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id as any)}
+            className={`px-4 py-2 font-medium flex items-center gap-2 border-b-2 transition ${
+              activeTab === id
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <Icon size={18} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="space-y-4">
+        {activeTab === 'reports' && (
+          <div className="space-y-3">
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Search reports..."
+                className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50"
+              />
+              <button className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                <Calendar size={18} />
+              </button>
+            </div>
+            {mockReports.map((report) => (
+              <div key={report.id} className="card border-l-4 border-blue-500">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-bold text-slate-900 dark:text-slate-50">{report.name}</p>
+                    <div className="flex gap-4 mt-2 text-sm text-slate-600 dark:text-slate-400">
+                      <span>Type: {report.type}</span>
+                      <span>Format: {report.format.toUpperCase()}</span>
+                      <span>Size: {report.size}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Generated by {report.generatedBy} on{' '}
+                      {new Date(report.generatedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded">
+                      <Eye size={18} className="text-blue-600" />
+                    </button>
+                    <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded">
+                      <Download size={18} className="text-green-600" />
+                    </button>
+                    <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded">
+                      <Trash2 size={18} className="text-red-600" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="card">
+                <h3 className="font-bold text-slate-900 dark:text-slate-50 mb-4">Report Generation Trend</h3>
+                <div className="h-40 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/20 dark:to-blue-800/20 rounded flex items-center justify-center">
+                  <p className="text-slate-600 dark:text-slate-400">Chart placeholder</p>
+                </div>
+              </div>
+              <div className="card">
+                <h3 className="font-bold text-slate-900 dark:text-slate-50 mb-4">Format Distribution</h3>
+                <div className="space-y-3">
+                  {[
+                    { format: 'PDF', percentage: 62 },
+                    { format: 'Excel', percentage: 25 },
+                    { format: 'HTML', percentage: 10 },
+                    { format: 'JSON', percentage: 3 },
+                  ].map((item) => (
+                    <div key={item.format}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-slate-600 dark:text-slate-400">{item.format}</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-50">{item.percentage}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full"
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'export' && (
+          <div className="space-y-4">
+            <div className="card">
+              <h3 className="font-bold text-slate-900 dark:text-slate-50 mb-4">Export Options</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { format: 'PDF', desc: 'Professional formatted reports' },
+                  { format: 'Excel', desc: 'Spreadsheet with data tables' },
+                  { format: 'HTML', desc: 'Interactive web reports' },
+                  { format: 'JSON', desc: 'Raw data export' },
+                ].map((item) => (
+                  <button
+                    key={item.format}
+                    className="p-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-left transition"
+                  >
+                    <p className="font-bold text-slate-900 dark:text-slate-50">{item.format}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{item.desc}</p>
+                    <button className="mt-3 flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      <Download size={16} />
+                      Export
+                    </button>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="card">
+              <h3 className="font-bold text-slate-900 dark:text-slate-50 mb-4">Scheduled Exports</h3>
+              <div className="space-y-3">
+                {[
+                  { name: 'Weekly Summary', schedule: 'Every Monday 9:00 AM', status: 'active' },
+                  { name: 'Monthly Report', schedule: 'First day of month', status: 'active' },
+                  { name: 'Daily Metrics', schedule: 'Every day 6:00 PM', status: 'inactive' },
+                ].map((item) => (
+                  <div key={item.name} className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-slate-50">{item.name}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{item.schedule}</p>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        item.status === 'active'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
