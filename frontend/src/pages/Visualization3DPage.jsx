@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Box, Map, Activity, Zap, Brain, AlertCircle, MapPin } from 'lucide-react'
 import axios from 'axios'
 import { Map3D } from '../components/Map3D'
+import { Warehouse3D } from '../components/Warehouse3D'
+import { Network3D } from '../components/Network3D'
+import { Heatmap3D } from '../components/Heatmap3D'
 import { getRouteData, getAssistantSuggestion, getMockRouteData } from '../api/mapApi'
 
 const API_BASE = 'http://127.0.0.1:8000'
@@ -112,10 +115,8 @@ export default function Visualization3DPage() {
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-lg shadow p-12 text-center">
-            <Box className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">3D Warehouse Visualization</p>
-            <p className="text-gray-500 text-sm mt-2">Interactive 3D view</p>
+          <div className="bg-gray-900 rounded-lg shadow overflow-hidden" style={{ height: '600px' }}>
+            <Warehouse3D />
           </div>
         </div>
       )}
@@ -126,11 +127,11 @@ export default function Visualization3DPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-gray-600 text-sm">Total Nodes</p>
-              <p className="text-3xl font-bold text-gray-900">12</p>
+              <p className="text-3xl font-bold text-gray-900">7</p>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-gray-600 text-sm">Total Edges</p>
-              <p className="text-3xl font-bold text-gray-900">28</p>
+              <p className="text-3xl font-bold text-gray-900">8</p>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-gray-600 text-sm">Total Distance</p>
@@ -142,10 +143,8 @@ export default function Visualization3DPage() {
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-lg shadow p-12 text-center">
-            <Map className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">Supply Chain Network Map</p>
-            <p className="text-gray-500 text-sm mt-2">Interactive network graph</p>
+          <div className="bg-gray-900 rounded-lg shadow overflow-hidden" style={{ height: '600px' }}>
+            <Network3D />
           </div>
         </div>
       )}
@@ -163,10 +162,8 @@ export default function Visualization3DPage() {
             ))}
           </div>
 
-          <div className="bg-gray-900 rounded-lg shadow p-12 text-center">
-            <Activity className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">Demand Heatmap Visualization</p>
-            <p className="text-gray-500 text-sm mt-2">Geographic distribution of demand</p>
+          <div className="bg-gray-900 rounded-lg shadow overflow-hidden" style={{ height: '600px' }}>
+            <Heatmap3D />
           </div>
         </div>
       )}
