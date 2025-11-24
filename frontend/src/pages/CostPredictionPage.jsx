@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import CostForm from '../components/CostForm'
 import CostResults from '../components/CostResults'
-import MLModelsStatus from '../components/MLModelsStatus'
 import {
   EnsembleCostModels,
   ProbabilisticCostForecasting,
@@ -91,13 +90,6 @@ export default function CostPredictionPage() {
           <p className="text-sm text-red-800 font-medium">{error}</p>
         </div>
       )}
-
-      {/* ML Models Status */}
-      <MLModelsStatus
-        models={[
-          { name: 'Cost Estimation', version: '1.9', status: 'active', accuracy: 92.1, type: 'regression' },
-        ]}
-      />
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import ThroughputTimeline from '../components/ThroughputTimeline'
-import MLModelsStatus from '../components/MLModelsStatus'
 import {
   RealTimeThroughputDashboard,
   ThroughputTrendsPatterns,
@@ -90,13 +89,6 @@ export default function ThroughputPage() {
           </div>
         </div>
       )}
-
-      {/* ML Models Status */}
-      <MLModelsStatus
-        models={[
-          { name: 'Throughput Optimization', version: '2.0', status: 'active', accuracy: 91.3, type: 'regression' },
-        ]}
-      />
 
       {/* Form Section */}
       <div className="card p-6">

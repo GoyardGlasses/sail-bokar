@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import DelayForm from '../components/DelayForm'
 import DelayResults from '../components/DelayResults'
 import BatchPredictions from '../components/BatchPredictions'
-import MLModelsStatus from '../components/MLModelsStatus'
 import RouteAnalytics from '../components/RouteAnalytics'
 import RouteComparison from '../components/RouteComparison'
 import ScenarioComparison from '../components/ScenarioComparison'
@@ -96,7 +95,6 @@ export default function DelayPage() {
       <div className="flex gap-2 border-b border-slate-200 overflow-x-auto pb-2">
         {[
           { id: 'single', label: 'Single Route' },
-          { id: 'ml-models', label: 'ML Models' },
           { id: 'batch', label: 'Batch' },
           { id: 'analytics', label: 'Analytics' },
           { id: 'route-comparison', label: 'Compare Routes' },
@@ -126,16 +124,6 @@ export default function DelayPage() {
           </button>
         ))}
       </div>
-
-      {/* ML Models Tab */}
-      {activeTab === 'ml-models' && (
-        <MLModelsStatus
-          models={[
-            { name: 'Delay Classifier', version: '1.8', status: 'active', accuracy: 89.5, type: 'classification' },
-            { name: 'Delay Regressor', version: '1.8', status: 'active', accuracy: 88.9, type: 'regression' },
-          ]}
-        />
-      )}
 
       {/* Single Route Prediction */}
       {activeTab === 'single' && (

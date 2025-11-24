@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { BarChart, Bar, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Zap, TrendingDown, Maximize2, Lock, Eye, Settings, History, Download, GitBranch, CheckCircle, AlertCircle, Brain } from 'lucide-react'
-import MLModelsStatus from '../components/MLModelsStatus'
 import {
   ConstraintManagement,
   OptimizationSensitivityAnalysis,
@@ -85,13 +84,6 @@ export default function AdvancedOptimizationPage() {
         </div>
         <p className="text-gray-600">NSGA2 Evolutionary Algorithm</p>
       </div>
-
-      {/* ML Models Status */}
-      <MLModelsStatus
-        models={[
-          { name: 'Mode Selection', version: '1.5', status: 'active', accuracy: 87.8, type: 'classification' },
-        ]}
-      />
 
       {/* Add Order */}
       <div className="bg-white rounded-lg shadow p-6">
