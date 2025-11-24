@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { getModels } from '../../api/endpoints'
-import AllMLModelsStatus from '../../components/AllMLModelsStatus'
 import {
   Brain,
   CheckCircle,
@@ -106,7 +105,7 @@ export default function MLModels() {
 
       {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200 bg-white px-6 py-4 rounded-t-lg overflow-x-auto">
-        {['all-models', 'overview', 'testing', 'integration', 'performance'].map(tab => (
+        {['overview', 'testing', 'integration', 'performance'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -116,15 +115,10 @@ export default function MLModels() {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            {tab === 'all-models' ? 'All Models (17)' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
-
-      {/* All Models Tab */}
-      {activeTab === 'all-models' && (
-        <AllMLModelsStatus />
-      )}
 
       {/* Overview Tab */}
       {activeTab === 'overview' && (
