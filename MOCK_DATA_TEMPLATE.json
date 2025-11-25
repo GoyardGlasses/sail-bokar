@@ -1,0 +1,222 @@
+{
+  "stockyards": [
+    {
+      "id": "sy-001",
+      "name": "Bokaro Main",
+      "location": "Bokaro",
+      "capacity": 10000,
+      "currentStock": 7500,
+      "materials": ["Iron Ore", "Coking Coal"]
+    },
+    {
+      "id": "sy-002",
+      "name": "Dankuni",
+      "location": "Dankuni",
+      "capacity": 5000,
+      "currentStock": 3200,
+      "materials": ["Iron Ore", "Limestone"]
+    },
+    {
+      "id": "sy-003",
+      "name": "Ranchi",
+      "location": "Ranchi",
+      "capacity": 3000,
+      "currentStock": 1800,
+      "materials": ["Manganese Ore"]
+    }
+  ],
+  "materials": [
+    {
+      "id": "m-001",
+      "name": "Iron Ore",
+      "quantity": 8500,
+      "unit": "tonnes",
+      "price": 3200,
+      "grade": "Premium",
+      "stockyard": "Bokaro Main"
+    },
+    {
+      "id": "m-002",
+      "name": "Coking Coal",
+      "quantity": 5200,
+      "unit": "tonnes",
+      "price": 4800,
+      "grade": "Grade-A",
+      "stockyard": "Bokaro Main"
+    },
+    {
+      "id": "m-003",
+      "name": "Limestone",
+      "quantity": 3100,
+      "unit": "tonnes",
+      "price": 950,
+      "grade": "Industrial",
+      "stockyard": "Dankuni"
+    },
+    {
+      "id": "m-004",
+      "name": "Manganese Ore",
+      "quantity": 1800,
+      "unit": "tonnes",
+      "price": 5200,
+      "grade": "High-Grade",
+      "stockyard": "Ranchi"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord-001",
+      "product": "Iron Ore",
+      "quantity": 1200,
+      "destination": "Tata Steel - Jamshedpur",
+      "priority": "high",
+      "deadline": "2025-11-26",
+      "customer": "Tata Steel",
+      "status": "pending",
+      "value": 3840000
+    },
+    {
+      "id": "ord-002",
+      "product": "Coking Coal",
+      "quantity": 800,
+      "destination": "JSW Steel - Bellary",
+      "priority": "high",
+      "deadline": "2025-11-27",
+      "customer": "JSW Steel",
+      "status": "pending",
+      "value": 3840000
+    },
+    {
+      "id": "ord-003",
+      "product": "Limestone",
+      "quantity": 600,
+      "destination": "SAIL - Durgapur",
+      "priority": "medium",
+      "deadline": "2025-11-29",
+      "customer": "SAIL Durgapur",
+      "status": "pending",
+      "value": 570000
+    },
+    {
+      "id": "ord-004",
+      "product": "Manganese Ore",
+      "quantity": 400,
+      "destination": "Vedanta - Lanjigarh",
+      "priority": "high",
+      "deadline": "2025-11-28",
+      "customer": "Vedanta",
+      "status": "pending",
+      "value": 2080000
+    }
+  ],
+  "rakes": [
+    {
+      "id": "rk-001",
+      "name": "BOKARO-001",
+      "capacity": 1200,
+      "status": "available",
+      "location": "Bokaro Siding-1",
+      "wagons": 48,
+      "lastMaintenance": "2025-11-20"
+    },
+    {
+      "id": "rk-002",
+      "name": "BOKARO-002",
+      "capacity": 1200,
+      "status": "available",
+      "location": "Bokaro Siding-2",
+      "wagons": 48,
+      "lastMaintenance": "2025-11-18"
+    },
+    {
+      "id": "rk-003",
+      "name": "BOKARO-003",
+      "capacity": 1100,
+      "status": "available",
+      "location": "Bokaro Siding-3",
+      "wagons": 44,
+      "lastMaintenance": "2025-11-22"
+    }
+  ],
+  "routes": [
+    {
+      "id": "rt-001",
+      "origin": "Bokaro",
+      "destination": "Tata Steel - Jamshedpur",
+      "distance": 320,
+      "railCost": 48000,
+      "roadCost": 72000,
+      "railTime": 48,
+      "roadTime": 24
+    },
+    {
+      "id": "rt-002",
+      "origin": "Bokaro",
+      "destination": "SAIL - Durgapur",
+      "distance": 280,
+      "railCost": 42000,
+      "roadCost": 68000,
+      "railTime": 36,
+      "roadTime": 20
+    },
+    {
+      "id": "rt-003",
+      "origin": "Bokaro",
+      "destination": "JSW Steel - Bellary",
+      "distance": 850,
+      "railCost": 125000,
+      "roadCost": 185000,
+      "railTime": 96,
+      "roadTime": 48
+    }
+  ],
+  "loadingPoints": [
+    {
+      "id": "lp-001",
+      "name": "Bokaro Siding-1",
+      "capacity": 1200,
+      "utilization": 92,
+      "material": "Iron Ore",
+      "throughput": 1104
+    },
+    {
+      "id": "lp-002",
+      "name": "Bokaro Siding-2",
+      "capacity": 1100,
+      "utilization": 78,
+      "material": "Coking Coal",
+      "throughput": 858
+    },
+    {
+      "id": "lp-003",
+      "name": "Bokaro Siding-3",
+      "capacity": 1200,
+      "utilization": 65,
+      "material": "Limestone",
+      "throughput": 780
+    }
+  ],
+  "constraints": [
+    {
+      "id": "c-001",
+      "name": "Minimum Rake Size",
+      "rule": "Min 300 tonnes per rake",
+      "severity": "critical",
+      "status": "active"
+    },
+    {
+      "id": "c-002",
+      "name": "Loading Point Capacity",
+      "rule": "Max 1200 tonnes per loading point",
+      "severity": "high",
+      "status": "active"
+    },
+    {
+      "id": "c-003",
+      "name": "Siding Availability",
+      "rule": "5 sidings available for operations",
+      "severity": "high",
+      "status": "active"
+    }
+  ]
+}
