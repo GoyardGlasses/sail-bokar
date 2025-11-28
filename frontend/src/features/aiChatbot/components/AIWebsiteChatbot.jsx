@@ -12,21 +12,6 @@ import {
   HelpCircle,
 } from 'lucide-react'
 
-interface Message {
-  id: number
-  sender: 'user' | 'assistant'
-  text: string
-  timestamp: Date
-}
-
-interface ConversationContext {
-  lastRoute: string | null
-  lastMaterial: string | null
-  lastFeature: string | null
-  questionsAsked: string[]
-  conversationHistory: string[]
-}
-
 // Comprehensive website knowledge base
 const WEBSITE_KNOWLEDGE = {
   features: {
@@ -180,7 +165,7 @@ const WEBSITE_KNOWLEDGE = {
 }
 
 export default function AIWebsiteChatbot() {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'assistant',
@@ -190,14 +175,14 @@ export default function AIWebsiteChatbot() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [context, setContext] = useState<ConversationContext>({
+  const [context, setContext] = useState({
     lastRoute: null,
     lastMaterial: null,
     lastFeature: null,
     questionsAsked: [],
     conversationHistory: [],
   })
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -208,7 +193,7 @@ export default function AIWebsiteChatbot() {
   }, [messages])
 
   // Extract entities from user input
-  const extractEntities = useCallback((text: string) => {
+  const extractEntities = useCallback((text) => {
     const lower = text.toLowerCase()
     const entities = { features: [], routes: [], materials: [], topics: [] }
 
@@ -255,7 +240,7 @@ export default function AIWebsiteChatbot() {
   }, [])
 
   // Generate dynamic response based on website knowledge
-  const generateResponse = useCallback((userQuestion: string) => {
+  const generateResponse = useCallback((userQuestion) => {
     const lower = userQuestion.toLowerCase()
     const entities = extractEntities(userQuestion)
 
@@ -379,7 +364,7 @@ export default function AIWebsiteChatbot() {
     setInput('')
   }
 
-  const handleSuggestion = (text: string) => {
+  const handleSuggestion = (text) => {
     setInput(text)
   }
 
