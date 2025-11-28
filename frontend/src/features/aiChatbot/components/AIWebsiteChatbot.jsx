@@ -338,7 +338,7 @@ export default function AIWebsiteChatbot() {
   const handleSend = () => {
     if (!input.trim()) return
 
-    const userMessage: Message = {
+    const userMessage = {
       id: messages.length + 1,
       sender: 'user',
       text: input,
@@ -351,7 +351,7 @@ export default function AIWebsiteChatbot() {
     // Simulate AI thinking time
     setTimeout(() => {
       const response = generateResponse(input)
-      const assistantMessage: Message = {
+      const assistantMessage = {
         id: messages.length + 2,
         sender: 'assistant',
         text: response,
