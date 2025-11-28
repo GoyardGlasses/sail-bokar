@@ -38,6 +38,8 @@ import MonitoringDashboard from './features/monitoring/components/MonitoringDash
 import CMOStockyardDashboard from './features/cmoStockyard/components/CMOStockyardDashboard'
 import DataImportDashboard from './features/dataImport/components/DataImportDashboard'
 import MaterialAvailabilityDashboard from './features/materialAvailability/components/MaterialAvailabilityDashboard'
+import RakeDispatchOptimization from './features/rakeDispatch/components/RakeDispatchOptimization'
+import DecisionSupportDashboard from './features/decisionSupport/components/DecisionSupportDashboard'
 
 /**
  * Main App component with routing
@@ -98,6 +100,10 @@ export default function App() {
               <Route path="/scenario-analysis-advanced" element={<ScenarioAnalysisDashboard />} />
               <Route path="/reporting" element={<ReportingDashboard />} />
               <Route path="/monitoring" element={<MonitoringDashboard />} />
+              
+              {/* Advanced Features */}
+              <Route path="/rake-dispatch" element={<RakeDispatchOptimization />} />
+              <Route path="/decision-support" element={<DecisionSupportDashboard />} />
             </Routes>
           </main>
         </div>

@@ -65,6 +65,11 @@ const menuItems = [
   { icon: Lock, label: 'Constraints Mgmt', path: '/constraints-management' },
   { icon: FileText, label: 'Reporting', path: '/reporting' },
   { icon: Monitor, label: 'Monitoring', path: '/monitoring' },
+  
+  // ADVANCED FEATURES SECTION
+  { type: 'divider', label: '🚀 ADVANCED FEATURES' },
+  { icon: Truck, label: 'Rake Dispatch', path: '/rake-dispatch' },
+  { icon: Brain, label: 'Decision Support', path: '/decision-support' },
 ]
 
 /**
