@@ -50,6 +50,7 @@ const menuItems = [
   // DATA IMPORT SECTION
   { type: 'divider', label: '📥 DATA MANAGEMENT' },
   { icon: Upload, label: 'Data Import Center', path: '/data-import' },
+  { icon: Package, label: 'Material Availability', path: '/material-availability' },
   
   // NEW 10 FEATURES SECTION
   { type: 'divider', label: '🆕 NEW FEATURES' },

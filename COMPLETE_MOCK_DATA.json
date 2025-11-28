@@ -1,0 +1,547 @@
+{
+  "stockyards": [
+    {
+      "id": "sy-001",
+      "name": "Bokaro Main",
+      "location": "Bokaro",
+      "capacity": 10000,
+      "currentStock": 7500,
+      "utilization": 75,
+      "materials": ["Iron Ore", "Coking Coal", "Pig Iron"],
+      "lastUpdated": "2025-11-27T11:30:00Z"
+    },
+    {
+      "id": "sy-002",
+      "name": "Dankuni",
+      "location": "Dankuni",
+      "capacity": 5000,
+      "currentStock": 3200,
+      "utilization": 64,
+      "materials": ["Iron Ore", "Limestone"],
+      "lastUpdated": "2025-11-27T11:25:00Z"
+    },
+    {
+      "id": "sy-003",
+      "name": "Ranchi",
+      "location": "Ranchi",
+      "capacity": 3000,
+      "currentStock": 1800,
+      "utilization": 60,
+      "materials": ["Manganese Ore"],
+      "lastUpdated": "2025-11-27T11:20:00Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "m-001",
+      "name": "Iron Ore",
+      "quantity": 8500,
+      "unit": "tonnes",
+      "price": 3200,
+      "grade": "Premium",
+      "stockyard": "Bokaro Main",
+      "location": "Bokaro Siding-1",
+      "lastUpdated": "2025-11-27T10:30:00Z",
+      "trend": 5.2,
+      "reorderPoint": 2000,
+      "safetyStock": 1500,
+      "leadTime": 7,
+      "supplier": "Supplier A",
+      "quality": 4.8,
+      "ageInDays": 14,
+      "expiryDate": "2025-12-27"
+    },
+    {
+      "id": "m-002",
+      "name": "Coking Coal",
+      "quantity": 5200,
+      "unit": "tonnes",
+      "price": 4800,
+      "grade": "Grade-A",
+      "stockyard": "Bokaro Main",
+      "location": "Bokaro Siding-2",
+      "lastUpdated": "2025-11-27T09:15:00Z",
+      "trend": -2.1,
+      "reorderPoint": 1500,
+      "safetyStock": 1000,
+      "leadTime": 10,
+      "supplier": "Supplier B",
+      "quality": 4.5,
+      "ageInDays": 21,
+      "expiryDate": "2025-12-20"
+    },
+    {
+      "id": "m-003",
+      "name": "Limestone",
+      "quantity": 3100,
+      "unit": "tonnes",
+      "price": 950,
+      "grade": "Industrial",
+      "stockyard": "Dankuni",
+      "location": "Dankuni Siding-1",
+      "lastUpdated": "2025-11-27T08:45:00Z",
+      "trend": 1.8,
+      "reorderPoint": 800,
+      "safetyStock": 500,
+      "leadTime": 5,
+      "supplier": "Supplier C",
+      "quality": 4.2,
+      "ageInDays": 7,
+      "expiryDate": "2026-01-15"
+    },
+    {
+      "id": "m-004",
+      "name": "Manganese Ore",
+      "quantity": 1800,
+      "unit": "tonnes",
+      "price": 5200,
+      "grade": "High-Grade",
+      "stockyard": "Ranchi",
+      "location": "Ranchi Siding-1",
+      "lastUpdated": "2025-11-27T11:00:00Z",
+      "trend": 8.5,
+      "reorderPoint": 500,
+      "safetyStock": 300,
+      "leadTime": 8,
+      "supplier": "Supplier D",
+      "quality": 4.9,
+      "ageInDays": 3,
+      "expiryDate": "2026-02-28"
+    },
+    {
+      "id": "m-005",
+      "name": "Pig Iron",
+      "quantity": 2500,
+      "unit": "tonnes",
+      "price": 6500,
+      "grade": "Premium",
+      "stockyard": "Bokaro Main",
+      "location": "Bokaro Siding-3",
+      "lastUpdated": "2025-11-27T10:00:00Z",
+      "trend": 3.2,
+      "reorderPoint": 600,
+      "safetyStock": 400,
+      "leadTime": 6,
+      "supplier": "Supplier A",
+      "quality": 4.7,
+      "ageInDays": 10,
+      "expiryDate": "2026-01-10"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "sup-001",
+      "name": "Supplier A",
+      "location": "Delhi",
+      "contact": "+91-9876543210",
+      "email": "supplier.a@company.com",
+      "onTimeDelivery": 95.2,
+      "qualityScore": 4.8,
+      "priceCompetitiveness": 3.9,
+      "riskLevel": "low",
+      "certifications": ["ISO 9001", "ISO 14001"],
+      "totalOrders": 45,
+      "totalValue": 2500000,
+      "rating": 4.8
+    },
+    {
+      "id": "sup-002",
+      "name": "Supplier B",
+      "location": "Mumbai",
+      "contact": "+91-9876543211",
+      "email": "supplier.b@company.com",
+      "onTimeDelivery": 88.5,
+      "qualityScore": 4.5,
+      "priceCompetitiveness": 4.2,
+      "riskLevel": "medium",
+      "certifications": ["ISO 9001"],
+      "totalOrders": 32,
+      "totalValue": 1800000,
+      "rating": 4.5
+    },
+    {
+      "id": "sup-003",
+      "name": "Supplier C",
+      "location": "Kolkata",
+      "contact": "+91-9876543212",
+      "email": "supplier.c@company.com",
+      "onTimeDelivery": 92.1,
+      "qualityScore": 4.2,
+      "priceCompetitiveness": 3.5,
+      "riskLevel": "low",
+      "certifications": ["ISO 9001", "ISO 14001", "ISO 45001"],
+      "totalOrders": 28,
+      "totalValue": 1200000,
+      "rating": 4.2
+    },
+    {
+      "id": "sup-004",
+      "name": "Supplier D",
+      "location": "Bangalore",
+      "contact": "+91-9876543213",
+      "email": "supplier.d@company.com",
+      "onTimeDelivery": 96.8,
+      "qualityScore": 4.9,
+      "priceCompetitiveness": 4.1,
+      "riskLevel": "low",
+      "certifications": ["ISO 9001", "ISO 14001", "ISO 45001", "ISO 50001"],
+      "totalOrders": 52,
+      "totalValue": 3200000,
+      "rating": 4.9
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord-001",
+      "product": "Iron Ore",
+      "quantity": 1200,
+      "destination": "Tata Steel - Jamshedpur",
+      "priority": "high",
+      "deadline": "2025-11-26",
+      "customer": "Tata Steel",
+      "status": "pending",
+      "value": 3840000,
+      "orderDate": "2025-11-20",
+      "estimatedDelivery": "2025-11-25",
+      "profitMargin": 15.5
+    },
+    {
+      "id": "ord-002",
+      "product": "Coking Coal",
+      "quantity": 800,
+      "destination": "JSW Steel - Bellary",
+      "priority": "high",
+      "deadline": "2025-11-27",
+      "customer": "JSW Steel",
+      "status": "pending",
+      "value": 3840000,
+      "orderDate": "2025-11-21",
+      "estimatedDelivery": "2025-11-26",
+      "profitMargin": 18.2
+    },
+    {
+      "id": "ord-003",
+      "product": "Limestone",
+      "quantity": 600,
+      "destination": "SAIL - Durgapur",
+      "priority": "medium",
+      "deadline": "2025-11-29",
+      "customer": "SAIL Durgapur",
+      "status": "pending",
+      "value": 570000,
+      "orderDate": "2025-11-22",
+      "estimatedDelivery": "2025-11-28",
+      "profitMargin": 12.3
+    },
+    {
+      "id": "ord-004",
+      "product": "Manganese Ore",
+      "quantity": 400,
+      "destination": "Vedanta - Lanjigarh",
+      "priority": "high",
+      "deadline": "2025-11-28",
+      "customer": "Vedanta",
+      "status": "pending",
+      "value": 2080000,
+      "orderDate": "2025-11-23",
+      "estimatedDelivery": "2025-11-27",
+      "profitMargin": 20.1
+    }
+  ],
+  "rakes": [
+    {
+      "id": "rk-001",
+      "name": "BOKARO-001",
+      "capacity": 1200,
+      "status": "available",
+      "location": "Bokaro Siding-1",
+      "wagons": 48,
+      "lastMaintenance": "2025-11-20",
+      "nextMaintenance": "2025-12-20",
+      "fuelLevel": 85,
+      "totalDistance": 45000,
+      "fuelEfficiency": 0.85,
+      "carbonFootprint": 2500
+    },
+    {
+      "id": "rk-002",
+      "name": "BOKARO-002",
+      "capacity": 1200,
+      "status": "available",
+      "location": "Bokaro Siding-2",
+      "wagons": 48,
+      "lastMaintenance": "2025-11-18",
+      "nextMaintenance": "2025-12-18",
+      "fuelLevel": 72,
+      "totalDistance": 52000,
+      "fuelEfficiency": 0.82,
+      "carbonFootprint": 2800
+    },
+    {
+      "id": "rk-003",
+      "name": "BOKARO-003",
+      "capacity": 1100,
+      "status": "available",
+      "location": "Bokaro Siding-3",
+      "wagons": 44,
+      "lastMaintenance": "2025-11-22",
+      "nextMaintenance": "2025-12-22",
+      "fuelLevel": 91,
+      "totalDistance": 38000,
+      "fuelEfficiency": 0.88,
+      "carbonFootprint": 2200
+    }
+  ],
+  "routes": [
+    {
+      "id": "rt-001",
+      "origin": "Bokaro",
+      "destination": "Tata Steel - Jamshedpur",
+      "distance": 320,
+      "railCost": 48000,
+      "roadCost": 72000,
+      "railTime": 48,
+      "roadTime": 24,
+      "frequency": "daily",
+      "utilization": 85
+    },
+    {
+      "id": "rt-002",
+      "origin": "Bokaro",
+      "destination": "SAIL - Durgapur",
+      "distance": 280,
+      "railCost": 42000,
+      "roadCost": 68000,
+      "railTime": 36,
+      "roadTime": 20,
+      "frequency": "daily",
+      "utilization": 72
+    },
+    {
+      "id": "rt-003",
+      "origin": "Bokaro",
+      "destination": "JSW Steel - Bellary",
+      "distance": 850,
+      "railCost": 125000,
+      "roadCost": 185000,
+      "railTime": 96,
+      "roadTime": 48,
+      "frequency": "3x weekly",
+      "utilization": 68
+    }
+  ],
+  "loadingPoints": [
+    {
+      "id": "lp-001",
+      "name": "Bokaro Siding-1",
+      "capacity": 1200,
+      "utilization": 92,
+      "material": "Iron Ore",
+      "throughput": 1104,
+      "operationalHours": "24/7",
+      "equipment": ["Loader-1", "Loader-2", "Conveyor-1"]
+    },
+    {
+      "id": "lp-002",
+      "name": "Bokaro Siding-2",
+      "capacity": 1100,
+      "utilization": 78,
+      "material": "Coking Coal",
+      "throughput": 858,
+      "operationalHours": "24/7",
+      "equipment": ["Loader-3", "Conveyor-2"]
+    },
+    {
+      "id": "lp-003",
+      "name": "Bokaro Siding-3",
+      "capacity": 1200,
+      "utilization": 65,
+      "material": "Limestone",
+      "throughput": 780,
+      "operationalHours": "06:00-22:00",
+      "equipment": ["Loader-4", "Conveyor-3"]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "c-001",
+      "name": "Minimum Rake Size",
+      "rule": "Min 300 tonnes per rake",
+      "severity": "critical",
+      "status": "active",
+      "impact": "Prevents uneconomical shipments"
+    },
+    {
+      "id": "c-002",
+      "name": "Loading Point Capacity",
+      "rule": "Max 1200 tonnes per loading point",
+      "severity": "high",
+      "status": "active",
+      "impact": "Equipment and infrastructure limitation"
+    },
+    {
+      "id": "c-003",
+      "name": "Siding Availability",
+      "rule": "5 sidings available for operations",
+      "severity": "high",
+      "status": "active",
+      "impact": "Limits concurrent operations"
+    }
+  ],
+  "warehouses": [
+    {
+      "id": "wh-001",
+      "name": "Bokaro Main Warehouse",
+      "location": "Bokaro",
+      "capacity": 50000,
+      "currentStock": 32500,
+      "utilization": 65,
+      "zones": ["A", "B", "C", "D"],
+      "temperature": 28,
+      "humidity": 45,
+      "lastUpdated": "2025-11-27T11:30:00Z"
+    },
+    {
+      "id": "wh-002",
+      "name": "Dankuni Warehouse",
+      "location": "Dankuni",
+      "capacity": 30000,
+      "currentStock": 18200,
+      "utilization": 60.7,
+      "zones": ["A", "B", "C"],
+      "temperature": 26,
+      "humidity": 50,
+      "lastUpdated": "2025-11-27T11:25:00Z"
+    },
+    {
+      "id": "wh-003",
+      "name": "Ranchi Warehouse",
+      "location": "Ranchi",
+      "capacity": 20000,
+      "currentStock": 8900,
+      "utilization": 44.5,
+      "zones": ["A", "B"],
+      "temperature": 25,
+      "humidity": 48,
+      "lastUpdated": "2025-11-27T11:20:00Z"
+    }
+  ],
+  "purchaseOrders": [
+    {
+      "id": "po-001",
+      "vendorId": "sup-001",
+      "material": "Iron Ore",
+      "quantity": 5000,
+      "unitPrice": 3200,
+      "totalValue": 16000000,
+      "orderDate": "2025-11-20",
+      "deliveryDate": "2025-12-05",
+      "status": "confirmed",
+      "paymentTerms": "Net 30"
+    },
+    {
+      "id": "po-002",
+      "vendorId": "sup-002",
+      "material": "Coking Coal",
+      "quantity": 3000,
+      "unitPrice": 4800,
+      "totalValue": 14400000,
+      "orderDate": "2025-11-21",
+      "deliveryDate": "2025-12-10",
+      "status": "confirmed",
+      "paymentTerms": "Net 45"
+    },
+    {
+      "id": "po-003",
+      "vendorId": "sup-003",
+      "material": "Limestone",
+      "quantity": 2000,
+      "unitPrice": 950,
+      "totalValue": 1900000,
+      "orderDate": "2025-11-22",
+      "deliveryDate": "2025-11-30",
+      "status": "in-transit",
+      "paymentTerms": "Net 30"
+    }
+  ],
+  "qualityRecords": [
+    {
+      "id": "qc-001",
+      "material": "Iron Ore",
+      "batchId": "BATCH-001",
+      "inspectionDate": "2025-11-22",
+      "defectRate": 0.5,
+      "ppm": 5000,
+      "grade": "Premium",
+      "status": "passed",
+      "inspector": "John Doe"
+    },
+    {
+      "id": "qc-002",
+      "material": "Coking Coal",
+      "batchId": "BATCH-002",
+      "inspectionDate": "2025-11-23",
+      "defectRate": 0.3,
+      "ppm": 3000,
+      "grade": "Grade-A",
+      "status": "passed",
+      "inspector": "Jane Smith"
+    }
+  ],
+  "returns": [
+    {
+      "id": "ret-001",
+      "originalOrderId": "ord-001",
+      "returnDate": "2025-11-28",
+      "reason": "Quality issue",
+      "quantity": 100,
+      "status": "received",
+      "refundAmount": 320000,
+      "restockingFee": 5
+    }
+  ],
+  "compliance": [
+    {
+      "id": "comp-001",
+      "regulation": "ISO 9001",
+      "requirement": "Quality Management",
+      "status": "compliant",
+      "lastAudit": "2025-11-15",
+      "nextAudit": "2026-05-15",
+      "riskLevel": "low"
+    },
+    {
+      "id": "comp-002",
+      "regulation": "ISO 14001",
+      "requirement": "Environmental Management",
+      "status": "compliant",
+      "lastAudit": "2025-10-20",
+      "nextAudit": "2026-04-20",
+      "riskLevel": "low"
+    }
+  ],
+  "demand": [
+    {
+      "id": "dem-001",
+      "material": "Iron Ore",
+      "period": "2025-11",
+      "actualDemand": 8500,
+      "forecastedDemand": 8200,
+      "forecastAccuracy": 96.5,
+      "seasonalFactor": 1.15,
+      "trendFactor": 1.05,
+      "variability": 0.12
+    },
+    {
+      "id": "dem-002",
+      "material": "Coking Coal",
+      "period": "2025-11",
+      "actualDemand": 5200,
+      "forecastedDemand": 5100,
+      "forecastAccuracy": 98.1,
+      "seasonalFactor": 1.08,
+      "trendFactor": 0.98,
+      "variability": 0.09
+    }
+  ]
+}

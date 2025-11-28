@@ -37,6 +37,7 @@ import ReportingDashboard from './features/reporting/components/ReportingDashboa
 import MonitoringDashboard from './features/monitoring/components/MonitoringDashboard'
 import CMOStockyardDashboard from './features/cmoStockyard/components/CMOStockyardDashboard'
 import DataImportDashboard from './features/dataImport/components/DataImportDashboard'
+import MaterialAvailabilityDashboard from './features/materialAvailability/components/MaterialAvailabilityDashboard'
 
 /**
  * Main App component with routing
@@ -82,6 +83,7 @@ export default function App() {
               
               {/* Data Import */}
               <Route path="/data-import" element={<DataImportDashboard />} />
+              <Route path="/material-availability" element={<MaterialAvailabilityDashboard />} />
               
               {/* New 10 Features */}
               <Route path="/inventory-management" element={<InventoryManagementDashboard />} />
