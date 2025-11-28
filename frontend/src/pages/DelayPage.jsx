@@ -14,7 +14,6 @@ import RiskHeatmap from '../components/RiskHeatmapAdvanced'
 import MaintenanceAlerts from '../components/MaintenanceAlertsAdvanced'
 import ReportGenerator from '../components/ReportGenerator'
 import AnomalyDetection from '../components/AnomalyDetection'
-import AIChatAssistant from '../components/AIChatAssistant'
 import SimulationGame from '../components/SimulationGame'
 import { predictDelay, batchPredictDelays } from '../api/delayApi'
 import { Brain } from 'lucide-react'
@@ -108,7 +107,6 @@ export default function DelayPage() {
           { id: 'maintenance', label: 'Maintenance' },
           { id: 'reports', label: 'Reports' },
           { id: 'anomalies', label: 'Anomalies' },
-          { id: 'chat', label: 'AI Chat' },
           { id: 'game', label: 'Game' },
         ].map((tab) => (
           <button
@@ -210,9 +208,6 @@ export default function DelayPage() {
 
       {/* Anomaly Detection */}
       {activeTab === 'anomalies' && <AnomalyDetection />}
-
-      {/* AI Chat */}
-      {activeTab === 'chat' && <AIChatAssistant />}
 
       {/* Simulation Game */}
       {activeTab === 'game' && <SimulationGame />}

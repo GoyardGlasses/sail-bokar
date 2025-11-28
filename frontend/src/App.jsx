@@ -40,6 +40,7 @@ import DataImportDashboard from './features/dataImport/components/DataImportDash
 import MaterialAvailabilityDashboard from './features/materialAvailability/components/MaterialAvailabilityDashboard'
 import RakeDispatchOptimization from './features/rakeDispatch/components/RakeDispatchOptimization'
 import DecisionSupportDashboard from './features/decisionSupport/components/DecisionSupportDashboard'
+import AIWebsiteChatbot from './features/aiChatbot/components/AIWebsiteChatbot'
 
 /**
  * Main App component with routing
@@ -104,6 +105,7 @@ export default function App() {
               {/* Advanced Features */}
               <Route path="/rake-dispatch" element={<RakeDispatchOptimization />} />
               <Route path="/decision-support" element={<DecisionSupportDashboard />} />
+              <Route path="/ai-chatbot" element={<AIWebsiteChatbot />} />
             </Routes>
           </main>
         </div>

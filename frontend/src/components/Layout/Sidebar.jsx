@@ -28,6 +28,7 @@ import {
   Monitor,
   Warehouse,
   Upload,
+  MessageCircle,
 } from 'lucide-react'
 
 const menuItems = [
@@ -70,6 +71,7 @@ const menuItems = [
   { type: 'divider', label: '🚀 ADVANCED FEATURES' },
   { icon: Truck, label: 'Rake Dispatch', path: '/rake-dispatch' },
   { icon: Brain, label: 'Decision Support', path: '/decision-support' },
+  { icon: MessageCircle, label: 'AI Chatbot', path: '/ai-chatbot' },
 ]
 
 /**
