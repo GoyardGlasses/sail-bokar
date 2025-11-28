@@ -375,9 +375,9 @@ export default function MaterialAvailabilityDashboard() {
 
       {/* Details Tab */}
       {activeTab === 'details' && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="space-y-6">
           {selectedMaterial ? (
-            <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow p-6 space-y-6">
               <div className="flex items-center justify-between border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-900">{selectedMaterial.name}</h2>
                 <button
@@ -464,9 +464,60 @@ export default function MaterialAvailabilityDashboard() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">Select a material from the overview to see details</p>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">All Materials Details</h2>
+              {materials.map(material => (
+                <div key={material.id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedMaterial(material)}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-gray-600 text-sm font-semibold">Material</p>
+                      <p className="text-lg font-bold text-gray-900">{material.name}</p>
+                      <p className="text-xs text-gray-500">{material.grade}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-sm font-semibold">Quantity</p>
+                      <p className="text-lg font-bold text-gray-900">{material.quantity.toLocaleString()} {material.unit}</p>
+                      <p className="text-xs text-gray-500">@ ₹{material.price.toLocaleString()}/unit</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-sm font-semibold">Location</p>
+                      <p className="text-lg font-bold text-gray-900">{material.location}</p>
+                      <p className="text-xs text-gray-500">{material.stockyard}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-sm font-semibold">Status</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          material.quantity < material.reorderPoint * 0.5 ? 'bg-red-100 text-red-800' :
+                          material.quantity < material.reorderPoint ? 'bg-orange-100 text-orange-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {material.quantity < material.reorderPoint * 0.5 ? 'Critical' :
+                           material.quantity < material.reorderPoint ? 'Low' :
+                           'Optimal'}
+                        </span>
+                        <span className={`text-sm font-semibold ${material.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {material.trend > 0 ? '↑' : '↓'} {Math.abs(material.trend).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-gray-600 text-xs">Total Value</p>
+                      <p className="text-lg font-bold text-green-600">₹{(material.quantity * material.price).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Quality Score</p>
+                      <p className="text-lg font-bold text-blue-600">⭐ {material.quality.toFixed(2)}/5</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Supplier</p>
+                      <p className="text-lg font-bold text-gray-900">{material.supplier}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
