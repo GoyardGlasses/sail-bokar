@@ -43,6 +43,7 @@ import DecisionSupportDashboard from './features/decisionSupport/components/Deci
 import AIChat from './pages/AIChat'
 import HistoricalDataPage from './pages/HistoricalDataPage'
 import HistoricalDecisionsPage from './pages/HistoricalDecisionsPage'
+import HistoricalDispatchPage from './pages/HistoricalDispatchPage'
 
 /**
  * Main App component with routing
@@ -110,6 +111,7 @@ export default function App() {
               <Route path="/ai-chatbot" element={<AIChat />} />
               <Route path="/historical-data" element={<HistoricalDataPage />} />
               <Route path="/historical-decisions" element={<HistoricalDecisionsPage />} />
+              <Route path="/historical-dispatch" element={<HistoricalDispatchPage />} />
             </Routes>
           </main>
         </div>
