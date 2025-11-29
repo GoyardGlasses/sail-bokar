@@ -30,6 +30,7 @@ import {
   Upload,
   MessageCircle,
   Database,
+  BookOpen,
 } from 'lucide-react'
 
 const menuItems = [
@@ -74,6 +75,7 @@ const menuItems = [
   { icon: Brain, label: 'Decision Support', path: '/decision-support' },
   { icon: MessageCircle, label: 'AI Chatbot', path: '/ai-chatbot' },
   { icon: Database, label: 'Historical Data', path: '/historical-data' },
+  { icon: BookOpen, label: 'Historical Decisions', path: '/historical-decisions' },
 ]
 
 /**

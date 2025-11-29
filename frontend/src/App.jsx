@@ -42,6 +42,7 @@ import RakeDispatchOptimization from './features/rakeDispatch/components/RakeDis
 import DecisionSupportDashboard from './features/decisionSupport/components/DecisionSupportDashboard'
 import AIChat from './pages/AIChat'
 import HistoricalDataPage from './pages/HistoricalDataPage'
+import HistoricalDecisionsPage from './pages/HistoricalDecisionsPage'
 
 /**
  * Main App component with routing
@@ -108,6 +109,7 @@ export default function App() {
               <Route path="/decision-support" element={<DecisionSupportDashboard />} />
               <Route path="/ai-chatbot" element={<AIChat />} />
               <Route path="/historical-data" element={<HistoricalDataPage />} />
+              <Route path="/historical-decisions" element={<HistoricalDecisionsPage />} />
             </Routes>
           </main>
         </div>
