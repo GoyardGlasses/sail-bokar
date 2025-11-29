@@ -1,15 +1,31 @@
 """
 ML Models loader and inference functions.
 SIH25208 SAIL Bokaro Steel Plant Logistics Optimization System.
+Now using REAL ML Models instead of mock models.
 """
 
 import joblib
+import pickle
 from pathlib import Path
 from typing import Optional, Dict, Any
 import pandas as pd
 import numpy as np
 from .config import settings
 from .utils import app_logger
+
+# Import real ML models
+try:
+    from ml.models_builder import MLModelsBuilder
+    from ml.data_pipeline import DataPipeline
+    from ml.feature_engineering import FeatureEngineer
+    REAL_MODELS_AVAILABLE = True
+except ImportError:
+    REAL_MODELS_AVAILABLE = False
+    app_logger.warning("Real ML models not available, will fall back to mock models")
+
+# ============================================================================
+# MOCK MODEL (Fallback when real models not available)
+# ============================================================================
 
 class MockModel:
     """Mock model for when actual models are not available."""
@@ -40,6 +56,10 @@ class MockModel:
         probs = np.random.dirichlet([1, 1], n_samples)
         return probs
 
+# ============================================================================
+# MODELS LOADER
+# ============================================================================
+
 class ModelsLoader:
     """Singleton class to load and manage ML models."""
     
@@ -54,33 +74,48 @@ class ModelsLoader:
         return cls._instance
     
     def _load_all_models(self):
-        """Load all trained models."""
-        app_logger.info("Loading ML models...")
+        """Load all trained real ML models."""
+        app_logger.info("Loading REAL ML models...")
         
-        models_config = {
-            'demand': settings.DEMAND_MODEL_PATH,
-            'rake_availability': settings.RAKE_AVAILABILITY_MODEL_PATH,
-            'delay_classifier': settings.DELAY_CLASSIFIER_MODEL_PATH,
-            'delay_regressor': settings.DELAY_REGRESSOR_MODEL_PATH,
-            'throughput': settings.THROUGHPUT_MODEL_PATH,
-            'cost': settings.COST_MODEL_PATH,
-            'mode_classifier': settings.MODE_CLASSIFIER_MODEL_PATH,
+        # Map old model names to new real model names
+        model_mapping = {
+            'demand': 'demand_forecasting_model',
+            'rake_availability': 'vehicle_allocation_model',
+            'delay_classifier': 'delay_prediction_model',
+            'delay_regressor': 'delay_prediction_model',
+            'throughput': 'fuel_consumption_model',
+            'cost': 'cost_prediction_model',
+            'mode_classifier': 'route_optimization_model',
         }
         
-        for model_name, model_path in models_config.items():
+        models_dir = Path(settings.MODELS_DIR)
+        
+        for old_name, real_name in model_mapping.items():
             try:
-                model_path = Path(model_path)
+                model_path = models_dir / f"{real_name}.pkl"
+                
                 if not model_path.exists():
-                    app_logger.warning(f"⚠️  Model file not found: {model_path}. Using mock model for {model_name}")
-                    self._models[model_name] = MockModel(model_name)
-                else:
-                    model = joblib.load(model_path)
-                    self._models[model_name] = model
-                    app_logger.info(f"✅ Loaded {model_name} from {model_path}")
+                    app_logger.warning(f"⚠️  Real model file not found: {model_path}. Checking alternative location...")
+                    # Try alternative location
+                    alt_path = models_dir / f"{old_name}.pkl"
+                    if alt_path.exists():
+                        model_path = alt_path
+                    else:
+                        app_logger.warning(f"⚠️  Model file not found: {model_path}. Will use mock model for {old_name}")
+                        self._models[old_name] = MockModel(old_name)
+                        continue
+                
+                # Load real model
+                with open(model_path, 'rb') as f:
+                    model = pickle.load(f)
+                
+                self._models[old_name] = model
+                app_logger.info(f"✅ Loaded REAL model {real_name} from {model_path}")
+                
             except Exception as e:
-                error_msg = f"Failed to load {model_name}: {str(e)}. Using mock model."
+                error_msg = f"Failed to load {old_name}: {str(e)}. Using mock model."
                 app_logger.warning(error_msg)
-                self._models[model_name] = MockModel(model_name)
+                self._models[old_name] = MockModel(old_name)
     
     def get_model(self, model_name: str):
         """Get a loaded model by name."""
