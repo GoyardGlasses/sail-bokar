@@ -29,6 +29,7 @@ import {
   Warehouse,
   Upload,
   MessageCircle,
+  Database,
 } from 'lucide-react'
 
 const menuItems = [
@@ -72,6 +73,7 @@ const menuItems = [
   { icon: Truck, label: 'Rake Dispatch', path: '/rake-dispatch' },
   { icon: Brain, label: 'Decision Support', path: '/decision-support' },
   { icon: MessageCircle, label: 'AI Chatbot', path: '/ai-chatbot' },
+  { icon: Database, label: 'Historical Data', path: '/historical-data' },
 ]
 
 /**
