@@ -36,7 +36,7 @@ import ScenarioAnalysisDashboard from './features/scenarioAnalysis/components/Sc
 import ReportingDashboard from './features/reporting/components/ReportingDashboard'
 import MonitoringDashboard from './features/monitoring/components/MonitoringDashboard'
 import CMOStockyardDashboard from './features/cmoStockyard/components/CMOStockyardDashboard'
-import DataImportDashboard from './features/dataImport/components/DataImportDashboard'
+import DataImportEnhanced from './features/dataImport/components/DataImportEnhanced'
 import MaterialAvailabilityDashboard from './features/materialAvailability/components/MaterialAvailabilityDashboard'
 import RakeDispatchOptimization from './features/rakeDispatch/components/RakeDispatchOptimization'
 import DecisionSupportDashboard from './features/decisionSupport/components/DecisionSupportDashboard'
@@ -89,7 +89,7 @@ export default function App() {
               <Route path="/scenario-analysis" element={<ScenarioAnalysisPage />} />
               
               {/* Data Import */}
-              <Route path="/data-import" element={<DataImportDashboard />} />
+              <Route path="/data-import" element={<DataImportEnhanced />} />
               <Route path="/material-availability" element={<MaterialAvailabilityDashboard />} />
               
               {/* New 10 Features */}
