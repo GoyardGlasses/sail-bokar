@@ -7,6 +7,14 @@ export default function ModelStatusComponent() {
   const [error, setError] = useState(null)
   const [expandedModel, setExpandedModel] = useState(null)
 
+  // Helper function to determine model type
+  const getModelType = (name) => {
+    if (name.includes('Optimization')) return 'Optimization'
+    if (name.includes('Risk') || name.includes('Decision')) return 'Risk/Decision'
+    if (name.includes('Maintenance') || name.includes('Satisfaction') || name.includes('Scenario')) return 'Advanced'
+    return 'Prediction'
+  }
+
   useEffect(() => {
     fetchModelStatus()
   }, [])
@@ -196,10 +204,7 @@ export default function ModelStatusComponent() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600">Model Type:</span>
                   <span className="font-semibold text-slate-900">
-                    {model.name.includes('Optimization') ? 'Optimization' :
-                     model.name.includes('Risk') || model.name.includes('Decision') ? 'Risk/Decision' :
-                     model.name.includes('Maintenance') || model.name.includes('Satisfaction') || model.name.includes('Scenario') ? 'Advanced' :
-                     'Prediction'}
+                    {getModelType(model.name)}
                   </span>
                 </div>
               </div>
