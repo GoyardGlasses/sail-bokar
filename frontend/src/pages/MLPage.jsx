@@ -9,6 +9,27 @@ import ModelStatusComponent from '../components/ModelStatusComponent'
 export default function MLPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
+  // Default predictions data
+  const defaultPredictions = {
+    delay: '2.5 days',
+    cost: '₹45,000',
+    demand: '850 tonnes',
+    quality: '98%',
+    fuel: '250 liters',
+    route: 'Bokaro-Kolkata',
+    cost_opt: '₹40,500',
+    time_opt: '18 hours',
+    vehicle: 'Truck-003',
+    material: 'CR Coils',
+    risk: '15%',
+    decision: 'Dispatch Now',
+    anomaly: 'No Anomalies',
+    supplier: '4.8/5',
+    scenario: 'Optimistic',
+    maintenance: 'No Issues',
+    satisfaction: '4.7/5'
+  }
+
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: Brain },
     { id: 'predictions', label: 'Predictions', icon: BarChart3 },
@@ -51,11 +72,31 @@ export default function MLPage() {
 
       {/* Content */}
       <div className="space-y-6">
-        {activeTab === 'dashboard' && <MLDashboard />}
-        {activeTab === 'predictions' && <PredictionsDisplay />}
-        {activeTab === 'status' && <ModelStatusComponent />}
-        {activeTab === 'alerts' && <AlertsDisplay />}
-        {activeTab === 'feedback' && <FeedbackForm />}
+        {activeTab === 'dashboard' && (
+          <div>
+            <MLDashboard />
+          </div>
+        )}
+        {activeTab === 'predictions' && (
+          <div>
+            <PredictionsDisplay predictions={defaultPredictions} loading={false} />
+          </div>
+        )}
+        {activeTab === 'status' && (
+          <div>
+            <ModelStatusComponent />
+          </div>
+        )}
+        {activeTab === 'alerts' && (
+          <div>
+            <AlertsDisplay />
+          </div>
+        )}
+        {activeTab === 'feedback' && (
+          <div>
+            <FeedbackForm />
+          </div>
+        )}
       </div>
 
       {/* Info Box */}
