@@ -44,6 +44,7 @@ import AIChat from './pages/AIChat'
 import HistoricalDataPage from './pages/HistoricalDataPage'
 import HistoricalDecisionsPage from './pages/HistoricalDecisionsPage'
 import HistoricalDispatchPage from './pages/HistoricalDispatchPage'
+import MLPage from './pages/MLPage'
 
 /**
  * Main App component with routing
@@ -112,6 +113,7 @@ export default function App() {
               <Route path="/historical-data" element={<HistoricalDataPage />} />
               <Route path="/historical-decisions" element={<HistoricalDecisionsPage />} />
               <Route path="/historical-dispatch" element={<HistoricalDispatchPage />} />
+              <Route path="/ml-center" element={<MLPage />} />
             </Routes>
           </main>
         </div>

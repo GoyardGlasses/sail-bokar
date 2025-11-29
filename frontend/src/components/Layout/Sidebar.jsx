@@ -78,6 +78,7 @@ const menuItems = [
   { icon: Database, label: 'Historical Data', path: '/historical-data' },
   { icon: BookOpen, label: 'Historical Decisions', path: '/historical-decisions' },
   { icon: Navigation, label: 'Historical Dispatch', path: '/historical-dispatch' },
+  { icon: Brain, label: 'ML Models Center', path: '/ml-center' },
 ]
 
 /**
