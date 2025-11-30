@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { Download, Upload, Filter, Search, TrendingUp, Calendar, MapPin, Package, DollarSign, AlertCircle } from 'lucide-react'
+import { Download, Upload, Filter, Search, TrendingUp, Calendar, MapPin, Package, DollarSign, AlertCircle, BarChart3, LineChart as LineChartIcon, Eye, TrendingDown, Zap } from 'lucide-react'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, ComposedChart, Area } from 'recharts'
 
 // Realistic mock historical data
 const generateHistoricalData = () => {
@@ -87,6 +88,8 @@ export default function HistoricalDataPage() {
   const [filterStatus, setFilterStatus] = useState('all')
   const [itemsPerPage, setItemsPerPage] = useState(20)
   const [currentPage, setCurrentPage] = useState(1)
+  const [activeTab, setActiveTab] = useState('table')
+  const [selectedRoute, setSelectedRoute] = useState(null)
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -123,6 +126,57 @@ export default function HistoricalDataPage() {
     return { total, onTime, delayed, avgDelay, avgCost, avgAccuracy }
   }, [historicalData])
 
+  // Time-series data for trend analysis
+  const timeSeriesData = useMemo(() => {
+    const grouped = {}
+    historicalData.forEach(item => {
+      const date = item.date.substring(0, 7) // YYYY-MM
+      if (!grouped[date]) {
+        grouped[date] = { date, count: 0, delayDays: 0, cost: 0, riskScore: 0, onTime: 0 }
+      }
+      grouped[date].count++
+      grouped[date].delayDays += item.delayDays
+      grouped[date].cost += item.totalCost
+      grouped[date].riskScore += item.riskScore
+      if (item.status === 'on-time') grouped[date].onTime++
+    })
+    return Object.values(grouped).sort((a, b) => a.date.localeCompare(b.date)).map(d => ({
+      ...d,
+      avgDelay: (d.delayDays / d.count).toFixed(1),
+      avgCost: (d.cost / d.count).toFixed(0),
+      avgRisk: (d.riskScore / d.count).toFixed(1),
+      onTimeRate: ((d.onTime / d.count) * 100).toFixed(1)
+    }))
+  }, [historicalData])
+
+  // Anomaly detection
+  const anomalies = useMemo(() => {
+    const avgDelay = stats.avgDelay
+    return historicalData.filter(d => d.delayDays > avgDelay * 2).slice(0, 10)
+  }, [historicalData, stats.avgDelay])
+
+  // Route performance
+  const routePerformance = useMemo(() => {
+    const routes = {}
+    historicalData.forEach(item => {
+      if (!routes[item.route]) {
+        routes[item.route] = { route: item.route, count: 0, delayDays: 0, cost: 0, riskScore: 0, onTime: 0 }
+      }
+      routes[item.route].count++
+      routes[item.route].delayDays += item.delayDays
+      routes[item.route].cost += item.totalCost
+      routes[item.route].riskScore += item.riskScore
+      if (item.status === 'on-time') routes[item.route].onTime++
+    })
+    return Object.values(routes).map(r => ({
+      ...r,
+      avgDelay: (r.delayDays / r.count).toFixed(1),
+      avgCost: (r.cost / r.count).toFixed(0),
+      avgRisk: (r.riskScore / r.count).toFixed(1),
+      onTimeRate: ((r.onTime / r.count) * 100).toFixed(1)
+    })).sort((a, b) => b.count - a.count)
+  }, [historicalData])
+
   const routes = ['bokaro-dhanbad', 'bokaro-hatia', 'bokaro-kolkata', 'bokaro-patna', 'bokaro-ranchi', 'bokaro-durgapur', 'bokaro-haldia']
   const materials = ['cr_coils', 'hr_coils', 'plates', 'wire_rods', 'tmt_bars', 'pig_iron', 'billets']
 
@@ -144,8 +198,34 @@ export default function HistoricalDataPage() {
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-800 mb-2">Historical Data Repository</h1>
-        <p className="text-slate-600">Complete record of all shipments, routes, and logistics operations</p>
+        <h1 className="text-4xl font-bold text-slate-800 mb-2">📊 Historical Data Repository</h1>
+        <p className="text-slate-600">Complete record of all shipments, routes, and logistics operations with advanced analytics</p>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">
+        {[
+          { id: 'table', label: 'Data Table', icon: BarChart3 },
+          { id: 'trends', label: 'Trend Analysis', icon: LineChartIcon },
+          { id: 'anomalies', label: 'Anomalies', icon: AlertCircle },
+          { id: 'routes', label: 'Route Performance', icon: MapPin },
+        ].map(tab => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Statistics Cards */}
@@ -211,6 +291,9 @@ export default function HistoricalDataPage() {
         </div>
       </div>
 
+      {/* TAB 1: DATA TABLE */}
+      {activeTab === 'table' && (
+        <>
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -412,6 +495,151 @@ export default function HistoricalDataPage() {
           </button>
         </div>
       </div>
+        </>
+      )}
+
+      {/* TAB 2: TREND ANALYSIS */}
+      {activeTab === 'trends' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">📈 Delay Trends Over Time</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <ComposedChart data={timeSeriesData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area type="monotone" dataKey="avgDelay" fill="#fecaca" stroke="#dc2626" name="Avg Delay (days)" />
+                <Line type="monotone" dataKey="onTimeRate" stroke="#16a34a" strokeWidth={2} name="On-Time Rate (%)" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">💰 Cost Trend</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={timeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="avgCost" stroke="#3b82f6" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">⚠️ Risk Trend</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={timeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="avgRisk" stroke="#ef4444" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: ANOMALIES */}
+      {activeTab === 'anomalies' && (
+        <div className="space-y-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle className="text-red-600" size={24} />
+              <h3 className="text-lg font-bold text-red-900">🚨 Detected Anomalies</h3>
+            </div>
+            <p className="text-sm text-red-700 mb-4">Found {anomalies.length} shipments with delays exceeding 2x average</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {anomalies.map((item, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-600">Route</p>
+                    <p className="font-semibold text-slate-900">{item.route}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Material</p>
+                    <p className="font-semibold text-slate-900">{item.material}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Delay</p>
+                    <p className="font-bold text-red-600">{item.delayDays} days</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Risk Score</p>
+                    <p className={`font-bold ${getRiskColor(item.riskScore)}`}>{item.riskScore}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Date</p>
+                    <p className="font-semibold text-slate-900">{item.date}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: ROUTE PERFORMANCE */}
+      {activeTab === 'routes' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">🗺️ Route Performance Comparison</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={routePerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="route" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="onTimeRate" fill="#10b981" name="On-Time Rate (%)" />
+                <Bar dataKey="avgDelay" fill="#ef4444" name="Avg Delay (days)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {routePerformance.map((route, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-600">Route</p>
+                    <p className="font-semibold text-slate-900">{route.route}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Shipments</p>
+                    <p className="font-bold text-blue-600">{route.count}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">On-Time Rate</p>
+                    <p className={`font-bold ${route.onTimeRate > 80 ? 'text-green-600' : 'text-red-600'}`}>{route.onTimeRate}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Delay</p>
+                    <p className="font-semibold text-slate-900">{route.avgDelay}d</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Cost</p>
+                    <p className="font-semibold text-slate-900">₹{route.avgCost}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Risk</p>
+                    <p className={`font-bold ${getRiskColor(route.avgRisk)}`}>{route.avgRisk}%</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
