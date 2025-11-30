@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { Search, Filter, MapPin, Truck, Package, Calendar, DollarSign, AlertCircle, CheckCircle, Clock, TrendingUp, Navigation, Zap, Users, Gauge } from 'lucide-react'
+import { Search, Filter, MapPin, Truck, Package, Calendar, DollarSign, AlertCircle, CheckCircle, Clock, TrendingUp, Navigation, Zap, Users, Gauge, BarChart3, LineChart as LineChartIcon, Award, Fuel } from 'lucide-react'
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Area } from 'recharts'
 
 // Generate realistic mock dispatch data
 const generateDispatchData = () => {
@@ -162,6 +163,7 @@ export default function HistoricalDispatchPage() {
   const [itemsPerPage, setItemsPerPage] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
   const [expandedId, setExpandedId] = useState(null)
+  const [activeTab, setActiveTab] = useState('table')
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -202,6 +204,70 @@ export default function HistoricalDispatchPage() {
     return { total, delivered, delayed, avgDelay, totalFuelConsumed, avgQuality, avgSatisfaction }
   }, [dispatchData])
 
+  // Route performance
+  const routePerformance = useMemo(() => {
+    const routes = {}
+    dispatchData.forEach(d => {
+      if (!routes[d.route]) {
+        routes[d.route] = { route: d.route, count: 0, delayDays: 0, avgQuality: 0, avgSatisfaction: 0, totalCost: 0 }
+      }
+      routes[d.route].count++
+      routes[d.route].delayDays += d.delayDays
+      routes[d.route].avgQuality += d.qualityScore
+      routes[d.route].avgSatisfaction += d.satisfaction
+      routes[d.route].totalCost += d.totalCost
+    })
+    return Object.values(routes).map(r => ({
+      ...r,
+      avgDelay: (r.delayDays / r.count).toFixed(1),
+      avgQuality: (r.avgQuality / r.count).toFixed(1),
+      avgSatisfaction: (r.avgSatisfaction / r.count).toFixed(1),
+      avgCost: (r.totalCost / r.count).toFixed(0)
+    })).sort((a, b) => b.count - a.count)
+  }, [dispatchData])
+
+  // Driver performance
+  const driverPerformance = useMemo(() => {
+    const drivers = {}
+    dispatchData.forEach(d => {
+      if (!drivers[d.driver]) {
+        drivers[d.driver] = { driver: d.driver, count: 0, delayDays: 0, avgQuality: 0, avgSatisfaction: 0, incidents: 0 }
+      }
+      drivers[d.driver].count++
+      drivers[d.driver].delayDays += d.delayDays
+      drivers[d.driver].avgQuality += d.qualityScore
+      drivers[d.driver].avgSatisfaction += d.satisfaction
+      if (d.incidents.length > 0) drivers[d.driver].incidents++
+    })
+    return Object.values(drivers).map(d => ({
+      ...d,
+      avgDelay: (d.delayDays / d.count).toFixed(1),
+      avgQuality: (d.avgQuality / d.count).toFixed(1),
+      avgSatisfaction: (d.avgSatisfaction / d.count).toFixed(1),
+      incidentRate: ((d.incidents / d.count) * 100).toFixed(1)
+    })).sort((a, b) => b.avgSatisfaction - a.avgSatisfaction)
+  }, [dispatchData])
+
+  // Dispatch type analysis
+  const dispatchTypeAnalysis = useMemo(() => {
+    const types = {}
+    dispatchData.forEach(d => {
+      if (!types[d.dispatchType]) {
+        types[d.dispatchType] = { type: d.dispatchType, count: 0, avgCost: 0, avgTime: 0, avgQuality: 0 }
+      }
+      types[d.dispatchType].count++
+      types[d.dispatchType].avgCost += d.totalCost
+      types[d.dispatchType].avgTime += d.actualDays
+      types[d.dispatchType].avgQuality += d.qualityScore
+    })
+    return Object.values(types).map(t => ({
+      ...t,
+      avgCost: (t.avgCost / t.count).toFixed(0),
+      avgTime: (t.avgTime / t.count).toFixed(1),
+      avgQuality: (t.avgQuality / t.count).toFixed(1)
+    }))
+  }, [dispatchData])
+
   const routes = [...new Set(dispatchData.map(d => d.route))]
   const statuses = ['delivered', 'in-transit', 'delayed', 'diverted', 'completed']
   const dispatchTypes = ['standard', 'express', 'economy', 'premium', 'emergency']
@@ -230,8 +296,34 @@ export default function HistoricalDispatchPage() {
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-800 mb-2">Historical Dispatch & Routes</h1>
-        <p className="text-slate-600">Complete record of all dispatches, routes taken, reasons, and detailed delivery information</p>
+        <h1 className="text-4xl font-bold text-slate-800 mb-2">🚚 Historical Dispatch & Routes</h1>
+        <p className="text-slate-600">Complete record of all dispatches with advanced analytics and performance tracking</p>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">
+        {[
+          { id: 'table', label: 'Dispatch Records', icon: BarChart3 },
+          { id: 'routes', label: 'Route Performance', icon: MapPin },
+          { id: 'drivers', label: 'Driver Performance', icon: Award },
+          { id: 'types', label: 'Dispatch Types', icon: LineChartIcon },
+        ].map(tab => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Statistics Cards */}
