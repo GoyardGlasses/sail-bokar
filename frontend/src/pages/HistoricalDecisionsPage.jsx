@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { Search, Filter, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, BarChart3, Calendar, Zap } from 'lucide-react'
+import { Search, Filter, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, BarChart3, Calendar, Zap, LineChart as LineChartIcon, PieChart as PieChartIcon, Target } from 'lucide-react'
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, ComposedChart, Area } from 'recharts'
 
 // Generate realistic mock decision data
 const generateDecisionData = () => {
@@ -110,6 +111,7 @@ export default function HistoricalDecisionsPage() {
   const [filterSeverity, setFilterSeverity] = useState('all')
   const [itemsPerPage, setItemsPerPage] = useState(15)
   const [currentPage, setCurrentPage] = useState(1)
+  const [activeTab, setActiveTab] = useState('table')
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -145,6 +147,53 @@ export default function HistoricalDecisionsPage() {
     const totalCostSavings = decisionData.reduce((sum, d) => sum + (d.costImpact < 0 ? Math.abs(d.costImpact) : 0), 0)
 
     return { total, successful, failed, avgComplexity, avgRiskMitigated, totalCostSavings }
+  }, [decisionData])
+
+  // Outcome distribution
+  const outcomeData = useMemo(() => {
+    const outcomes = {}
+    decisionData.forEach(d => {
+      outcomes[d.outcome] = (outcomes[d.outcome] || 0) + 1
+    })
+    return Object.entries(outcomes).map(([name, value]) => ({ name, value }))
+  }, [decisionData])
+
+  // Decision maker performance
+  const decisionMakerPerformance = useMemo(() => {
+    const makers = {}
+    decisionData.forEach(d => {
+      if (!makers[d.decisionMaker]) {
+        makers[d.decisionMaker] = { name: d.decisionMaker, total: 0, successful: 0, avgComplexity: 0, totalComplexity: 0 }
+      }
+      makers[d.decisionMaker].total++
+      makers[d.decisionMaker].totalComplexity += d.complexity
+      if (d.outcome === 'Success') makers[d.decisionMaker].successful++
+    })
+    return Object.values(makers).map(m => ({
+      ...m,
+      successRate: ((m.successful / m.total) * 100).toFixed(1),
+      avgComplexity: (m.totalComplexity / m.total).toFixed(1)
+    }))
+  }, [decisionData])
+
+  // Scenario impact analysis
+  const scenarioImpact = useMemo(() => {
+    const scenarios = {}
+    decisionData.forEach(d => {
+      if (!scenarios[d.scenario]) {
+        scenarios[d.scenario] = { scenario: d.scenario, count: 0, costImpact: 0, timeImpact: 0, riskMitigated: 0 }
+      }
+      scenarios[d.scenario].count++
+      scenarios[d.scenario].costImpact += d.costImpact
+      scenarios[d.scenario].timeImpact += d.timeImpact
+      scenarios[d.scenario].riskMitigated += d.riskMitigated
+    })
+    return Object.values(scenarios).map(s => ({
+      ...s,
+      avgCostImpact: (s.costImpact / s.count).toFixed(0),
+      avgTimeImpact: (s.timeImpact / s.count).toFixed(1),
+      avgRiskMitigated: (s.riskMitigated / s.count).toFixed(1)
+    })).sort((a, b) => b.count - a.count)
   }, [decisionData])
 
   const scenarios = [...new Set(decisionData.map(d => d.scenario))]
@@ -184,8 +233,34 @@ export default function HistoricalDecisionsPage() {
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-800 mb-2">Historical Decisions Repository</h1>
-        <p className="text-slate-600">Record of all strategic decisions made during complex scenarios and their outcomes</p>
+        <h1 className="text-4xl font-bold text-slate-800 mb-2">🎯 Historical Decisions Repository</h1>
+        <p className="text-slate-600">Record of all strategic decisions made during complex scenarios with advanced analytics</p>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">
+        {[
+          { id: 'table', label: 'Decision Records', icon: BarChart3 },
+          { id: 'outcomes', label: 'Outcome Analysis', icon: PieChartIcon },
+          { id: 'makers', label: 'Decision Maker Performance', icon: Target },
+          { id: 'scenarios', label: 'Scenario Impact', icon: LineChartIcon },
+        ].map(tab => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Icon size={18} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Statistics Cards */}
@@ -251,6 +326,9 @@ export default function HistoricalDecisionsPage() {
         </div>
       </div>
 
+      {/* TAB 1: DECISION RECORDS TABLE */}
+      {activeTab === 'table' && (
+        <>
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -495,6 +573,155 @@ export default function HistoricalDecisionsPage() {
           </button>
         </div>
       </div>
+        </>
+      )}
+
+      {/* TAB 2: OUTCOME ANALYSIS */}
+      {activeTab === 'outcomes' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">📊 Decision Outcomes Distribution</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={outcomeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+                    {outcomeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={['#10b981', '#3b82f6', '#ef4444', '#f59e0b'][index]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">📈 Success Rate Metrics</h3>
+              <div className="space-y-4">
+                {outcomeData.map((outcome, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span className="font-medium text-slate-700">{outcome.name}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-32 bg-slate-200 rounded-full h-2">
+                        <div className="h-2 rounded-full" style={{ width: `${(outcome.value / stats.total) * 100}%`, backgroundColor: ['#10b981', '#3b82f6', '#ef4444', '#f59e0b'][idx] }} />
+                      </div>
+                      <span className="font-bold text-slate-900 w-12 text-right">{outcome.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: DECISION MAKER PERFORMANCE */}
+      {activeTab === 'makers' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">👥 Decision Maker Performance Comparison</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={decisionMakerPerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="successRate" fill="#10b981" name="Success Rate (%)" />
+                <Bar dataKey="avgComplexity" fill="#3b82f6" name="Avg Complexity (%)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {decisionMakerPerformance.map((maker, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-600">Decision Maker</p>
+                    <p className="font-semibold text-slate-900">{maker.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Total Decisions</p>
+                    <p className="font-bold text-blue-600">{maker.total}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Successful</p>
+                    <p className="font-bold text-green-600">{maker.successful}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Success Rate</p>
+                    <p className={`font-bold ${maker.successRate > 70 ? 'text-green-600' : 'text-yellow-600'}`}>{maker.successRate}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Complexity</p>
+                    <p className="font-semibold text-slate-900">{maker.avgComplexity}%</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: SCENARIO IMPACT */}
+      {activeTab === 'scenarios' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">🎯 Scenario Impact on Risk Mitigation</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={scenarioImpact}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="scenario" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="avgRiskMitigated" fill="#10b981" name="Avg Risk Mitigated (%)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {scenarioImpact.map((scenario, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-600">Scenario</p>
+                    <p className="font-semibold text-slate-900">{scenario.scenario}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Occurrences</p>
+                    <p className="font-bold text-blue-600">{scenario.count}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Cost Impact</p>
+                    <p className={`font-semibold ${scenario.avgCostImpact < 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {scenario.avgCostImpact < 0 ? '-' : '+'}₹{Math.abs(scenario.avgCostImpact)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Time Impact</p>
+                    <p className={`font-semibold ${scenario.avgTimeImpact < 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {scenario.avgTimeImpact < 0 ? '-' : '+'}
+                      {Math.abs(scenario.avgTimeImpact)}d
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Risk Mitigated</p>
+                    <p className="font-bold text-green-600">{scenario.avgRiskMitigated}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Effectiveness</p>
+                    <p className={`font-bold ${scenario.avgRiskMitigated > 50 ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {scenario.avgRiskMitigated > 50 ? 'High' : 'Medium'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
