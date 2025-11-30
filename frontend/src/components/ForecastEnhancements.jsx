@@ -167,32 +167,231 @@ export function HistoricalComparison({ data }) {
   )
 }
 
-// 6. WHAT-IF ANALYSIS
+// 6. WHAT-IF ANALYSIS - ENHANCED
 export function WhatIfAnalysis() {
   const [scenarios, setScenarios] = useState([
-    { name: 'Base Case', trainingDays: 60, horizonDays: 30, impact: 0 },
-    { name: 'More Data', trainingDays: 180, horizonDays: 30, impact: 2.3 },
-    { name: 'Shorter Horizon', trainingDays: 60, horizonDays: 7, impact: 3.8 },
+    { name: 'Base Case', trainingDays: 60, horizonDays: 30, impact: 0, demandChange: 0, costChange: 0, riskChange: 0 },
+    { name: 'More Data', trainingDays: 180, horizonDays: 30, impact: 2.3, demandChange: 1.2, costChange: -2.1, riskChange: -1.5 },
+    { name: 'Shorter Horizon', trainingDays: 60, horizonDays: 7, impact: 3.8, demandChange: 0.8, costChange: -0.5, riskChange: -2.3 },
+    { name: 'Market Surge', trainingDays: 60, horizonDays: 30, impact: 1.5, demandChange: 15, costChange: 8.5, riskChange: 3.2 },
+    { name: 'Economic Downturn', trainingDays: 60, horizonDays: 30, impact: -2.1, demandChange: -12, costChange: -5.2, riskChange: 5.8 },
   ])
 
+  const [selectedScenario, setSelectedScenario] = useState(0)
+  const [customParams, setCustomParams] = useState({ training: 60, horizon: 30, seasonality: 1, trend: 1 })
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-bold text-slate-900">What-If Analysis</h3>
-      <div className="space-y-3">
-        {scenarios.map((s, i) => (
-          <div key={i} className="card p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-bold text-slate-900">{s.name}</p>
-                <p className="text-sm text-slate-600">Training: {s.trainingDays}d | Horizon: {s.horizonDays}d</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-blue-600">{s.impact}%</p>
-                <p className="text-xs text-slate-600">Accuracy Impact</p>
-              </div>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-bold text-slate-900 mb-4">🔮 What-If Analysis</h3>
+        <p className="text-sm text-slate-600 mb-4">Explore different scenarios and their impact on forecasts</p>
+      </div>
+
+      {/* Scenario Comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h4 className="font-bold text-slate-900 mb-4">📊 Predefined Scenarios</h4>
+          <div className="space-y-2">
+            {scenarios.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedScenario(i)}
+                className={`w-full text-left p-3 rounded-lg border-2 transition ${
+                  selectedScenario === i
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <p className="font-semibold text-slate-900">{s.name}</p>
+                <p className="text-xs text-slate-600">Impact: {s.impact > 0 ? '+' : ''}{s.impact}%</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Selected Scenario Details */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h4 className="font-bold text-slate-900 mb-4">📈 Impact Analysis</h4>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+              <span className="text-sm font-medium text-slate-700">Accuracy Impact</span>
+              <span className={`text-lg font-bold ${scenarios[selectedScenario].impact >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {scenarios[selectedScenario].impact > 0 ? '+' : ''}{scenarios[selectedScenario].impact}%
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+              <span className="text-sm font-medium text-slate-700">Demand Change</span>
+              <span className={`text-lg font-bold ${scenarios[selectedScenario].demandChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {scenarios[selectedScenario].demandChange > 0 ? '+' : ''}{scenarios[selectedScenario].demandChange}%
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+              <span className="text-sm font-medium text-slate-700">Cost Impact</span>
+              <span className={`text-lg font-bold ${scenarios[selectedScenario].costChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {scenarios[selectedScenario].costChange > 0 ? '+' : ''}{scenarios[selectedScenario].costChange}%
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+              <span className="text-sm font-medium text-slate-700">Risk Change</span>
+              <span className={`text-lg font-bold ${scenarios[selectedScenario].riskChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {scenarios[selectedScenario].riskChange > 0 ? '+' : ''}{scenarios[selectedScenario].riskChange}%
+              </span>
             </div>
           </div>
-        ))}
+        </div>
+      </div>
+
+      {/* Custom Parameter Builder */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h4 className="font-bold text-slate-900 mb-4">⚙️ Custom Scenario Builder</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Training Days: {customParams.training}</label>
+            <input
+              type="range"
+              min="7"
+              max="365"
+              value={customParams.training}
+              onChange={(e) => setCustomParams({ ...customParams, training: parseInt(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Forecast Horizon: {customParams.horizon}</label>
+            <input
+              type="range"
+              min="1"
+              max="90"
+              value={customParams.horizon}
+              onChange={(e) => setCustomParams({ ...customParams, horizon: parseInt(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Seasonality: {customParams.seasonality.toFixed(1)}x</label>
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={customParams.seasonality}
+              onChange={(e) => setCustomParams({ ...customParams, seasonality: parseFloat(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Trend: {customParams.trend.toFixed(1)}x</label>
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={customParams.trend}
+              onChange={(e) => setCustomParams({ ...customParams, trend: parseFloat(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+        </div>
+        <button className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+          Run Custom Scenario
+        </button>
+      </div>
+
+      {/* Scenario Comparison Chart */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h4 className="font-bold text-slate-900 mb-4">📊 Scenario Comparison</h4>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={scenarios}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 12 }} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="impact" fill="#3b82f6" name="Accuracy Impact %" />
+            <Bar dataKey="demandChange" fill="#10b981" name="Demand Change %" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Risk Matrix */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h4 className="font-bold text-slate-900 mb-4">⚠️ Risk vs Reward Matrix</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {scenarios.map((s, i) => (
+            <div
+              key={i}
+              className={`p-4 rounded-lg border-2 ${
+                s.riskChange > 3 ? 'border-red-300 bg-red-50' : s.riskChange > 0 ? 'border-yellow-300 bg-yellow-50' : 'border-green-300 bg-green-50'
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <p className="font-semibold text-slate-900">{s.name}</p>
+                <span className={`text-xs font-bold px-2 py-1 rounded ${
+                  s.riskChange > 3 ? 'bg-red-200 text-red-800' : s.riskChange > 0 ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'
+                }`}>
+                  {s.riskChange > 0 ? 'HIGH RISK' : 'LOW RISK'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <p className="text-slate-600">Reward</p>
+                  <p className="font-bold text-slate-900">{s.impact > 0 ? '+' : ''}{s.impact}%</p>
+                </div>
+                <div>
+                  <p className="text-slate-600">Risk</p>
+                  <p className="font-bold text-slate-900">{s.riskChange > 0 ? '+' : ''}{s.riskChange}%</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sensitivity Analysis */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h4 className="font-bold text-slate-900 mb-4">📉 Sensitivity Analysis</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-medium text-slate-700 mb-3">Training Data Sensitivity</p>
+            <div className="space-y-2">
+              {[30, 60, 90, 180].map((days) => (
+                <div key={days} className="flex justify-between items-center p-2 bg-slate-50 rounded">
+                  <span className="text-sm text-slate-600">{days} days</span>
+                  <div className="w-32 bg-slate-200 rounded-full h-2">
+                    <div className="h-2 rounded-full bg-blue-500" style={{ width: `${(days / 180) * 100}%` }} />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-900">{(85 + (days / 180) * 10).toFixed(1)}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-700 mb-3">Forecast Horizon Sensitivity</p>
+            <div className="space-y-2">
+              {[7, 14, 30, 60].map((days) => (
+                <div key={days} className="flex justify-between items-center p-2 bg-slate-50 rounded">
+                  <span className="text-sm text-slate-600">{days} days</span>
+                  <div className="w-32 bg-slate-200 rounded-full h-2">
+                    <div className="h-2 rounded-full bg-green-500" style={{ width: `${(1 - days / 60) * 100}%` }} />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-900">{(95 - (days / 60) * 15).toFixed(1)}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recommendations */}
+      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg shadow p-6 border border-blue-200">
+        <h4 className="font-bold text-slate-900 mb-3">💡 Recommendations</h4>
+        <ul className="space-y-2 text-sm text-slate-700">
+          <li>✓ Use "More Data" scenario for 2.3% accuracy improvement</li>
+          <li>✓ "Shorter Horizon" provides best accuracy (3.8%) for short-term forecasts</li>
+          <li>✓ Monitor "Market Surge" scenario - high demand change (+15%)</li>
+          <li>✓ "Economic Downturn" shows highest risk increase (+5.8%)</li>
+          <li>✓ Combine scenarios for robust forecasting strategy</li>
+        </ul>
       </div>
     </div>
   )
