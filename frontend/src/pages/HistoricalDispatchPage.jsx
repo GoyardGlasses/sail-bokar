@@ -399,6 +399,9 @@ export default function HistoricalDispatchPage() {
         </div>
       </div>
 
+      {/* TAB 1: DISPATCH RECORDS TABLE */}
+      {activeTab === 'table' && (
+        <>
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -755,6 +758,160 @@ export default function HistoricalDispatchPage() {
           </button>
         </div>
       </div>
+        </>
+      )}
+
+      {/* TAB 2: ROUTE PERFORMANCE */}
+      {activeTab === 'routes' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">🗺️ Route Quality Performance</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={routePerformance}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="route" angle={-45} textAnchor="end" height={80} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="avgQuality" fill="#10b981" name="Avg Quality (%)" />
+                  <Bar dataKey="avgSatisfaction" fill="#3b82f6" name="Avg Satisfaction (%)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">⏱️ Route Delay Analysis</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={routePerformance}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="route" angle={-45} textAnchor="end" height={80} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="avgDelay" fill="#ef4444" name="Avg Delay (days)" />
+                  <Bar dataKey="avgCost" fill="#f59e0b" name="Avg Cost (₹)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {routePerformance.map((route, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                  <div><p className="text-xs text-slate-600">Route</p><p className="font-semibold text-slate-900">{route.route}</p></div>
+                  <div><p className="text-xs text-slate-600">Dispatches</p><p className="font-bold text-blue-600">{route.count}</p></div>
+                  <div><p className="text-xs text-slate-600">Avg Delay</p><p className={`font-semibold ${route.avgDelay > 1 ? 'text-red-600' : 'text-green-600'}`}>{route.avgDelay}d</p></div>
+                  <div><p className="text-xs text-slate-600">Quality</p><p className="font-bold text-purple-600">{route.avgQuality}%</p></div>
+                  <div><p className="text-xs text-slate-600">Satisfaction</p><p className="font-bold text-green-600">{route.avgSatisfaction}%</p></div>
+                  <div><p className="text-xs text-slate-600">Avg Cost</p><p className="font-semibold text-slate-900">₹{route.avgCost}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: DRIVER PERFORMANCE */}
+      {activeTab === 'drivers' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">👥 Driver Performance Ranking</h3>
+            <div className="space-y-3">
+              {driverPerformance.map((driver, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">{idx + 1}</div>
+                    <div>
+                      <p className="font-semibold text-slate-900">{driver.driver}</p>
+                      <p className="text-xs text-slate-600">{driver.count} trips completed</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-xs text-slate-600">Satisfaction</p>
+                      <p className="font-bold text-green-600">{driver.avgSatisfaction}%</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-600">Quality</p>
+                      <p className="font-bold text-purple-600">{driver.avgQuality}%</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-600">Incidents</p>
+                      <p className={`font-bold ${driver.incidentRate < 5 ? 'text-green-600' : 'text-red-600'}`}>{driver.incidentRate}%</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: DISPATCH TYPE ANALYSIS */}
+      {activeTab === 'types' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">💰 Cost by Dispatch Type</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dispatchTypeAnalysis}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="type" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="avgCost" fill="#f59e0b" name="Avg Cost (₹)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">⭐ Quality by Dispatch Type</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dispatchTypeAnalysis}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="type" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="avgQuality" fill="#10b981" name="Avg Quality (%)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {dispatchTypeAnalysis.map((type, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-600">Dispatch Type</p>
+                    <p className="font-semibold text-slate-900 capitalize">{type.type}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Count</p>
+                    <p className="font-bold text-blue-600">{type.count}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Cost</p>
+                    <p className="font-semibold text-slate-900">₹{type.avgCost}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Avg Time</p>
+                    <p className="font-semibold text-slate-900">{type.avgTime}d</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Quality</p>
+                    <p className="font-bold text-green-600">{type.avgQuality}%</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
