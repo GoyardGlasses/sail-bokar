@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react'
 import { Activity, Moon, Sun, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { checkHealth } from '../../api/endpoints'
 import { useAppStore } from '../../store/useAppStore'
+import { useAuth } from '../../context/AuthContext'
 
 /**
  * Navbar - Top navigation component
  */
 export default function Navbar() {
   const { isHealthy, setIsHealthy, theme, setTheme } = useAppStore()
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const checkBackendHealth = async () => {
@@ -26,6 +30,11 @@ export default function Navbar() {
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
   }
 
   return (
@@ -59,7 +68,11 @@ export default function Navbar() {
               <Sun size={20} className="text-slate-600" />
             )}
           </button>
-          <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Logout">
+          <button
+            onClick={handleLogout}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Logout"
+          >
             <LogOut size={20} className="text-slate-600" />
           </button>
         </div>

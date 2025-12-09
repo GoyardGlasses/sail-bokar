@@ -329,6 +329,17 @@ p {
 }
 
 /* ============================================================================
+   TEXT COLOR OVERRIDES (DEMO)
+   Force neutral dark text utilities to render as pure white so black
+   text never appears on dark backgrounds.
+   ============================================================================ */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 {
+  color: #ffffff !important;
+}
+
+/* ============================================================================
    RESPONSIVE UTILITIES
    ============================================================================ */
 

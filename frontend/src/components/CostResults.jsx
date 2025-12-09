@@ -41,6 +41,11 @@ export default function CostResults({ data, onExport }) {
       {data.by_destination && data.by_destination.length > 0 && (
         <div className="card p-6">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Cost Per Ton by Destination</h3>
+          <p className="text-xs text-slate-600 mb-3">
+            This bar chart compares the predicted logistics cost per ton for each destination. Taller bars indicate
+            destinations where moving one ton is more expensive, so they are natural candidates for optimisation
+            (better rake combinations, different routes, or mode changes) if volumes are high.
+          </p>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.by_destination}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -58,6 +63,11 @@ export default function CostResults({ data, onExport }) {
       {data.drivers && data.drivers.length > 0 ? (
         <div className="card p-6">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Cost Drivers Breakdown</h3>
+          <p className="text-xs text-slate-600 mb-3">
+            Each bar shows how much a specific driver (for example distance, loading, demurrage, or handling) adds to the
+            total logistics cost. The bigger the bar, the more that factor is pushing up your cost per ton, so you should
+            focus negotiations and process improvements on those drivers first.
+          </p>
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data.drivers}>
               <CartesianGrid strokeDasharray="3 3" />

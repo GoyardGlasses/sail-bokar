@@ -112,6 +112,23 @@ export interface PlannedRake {
   }
   priority: number
   slaCompliance: boolean
+  // Multi-destination support
+  multiDestination?: boolean
+  destinations?: {
+    destination: string
+    orders: RakeComposition[]
+    unloadingSequence: number
+    unloadingTime: number
+  }[]
+  unloadingSequenceCost?: number
+  // Rail vs Road support
+  transportMode?: 'rail' | 'road' | 'hybrid'
+  modeComparison?: any
+  // Multi-stockyard support
+  sourceStockyards?: {
+    stockyardId: string
+    quantity: number
+  }[]
 }
 
 export interface RakeComposition {

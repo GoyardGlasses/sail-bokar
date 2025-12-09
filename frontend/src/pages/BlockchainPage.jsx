@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Lock, CheckCircle, AlertCircle, Search, AlertTriangle, Code, Users, Zap, Shield, TrendingUp, Activity, Link2, Layers } from 'lucide-react'
 import AuditTable from '../components/AuditTable'
 import {
@@ -17,6 +17,8 @@ import {
   DisputeResolution,
 } from '../components/BlockchainAdvancedFeatures2'
 import { fetchBlockchainAuditTrail, verifyTransaction, getBlockchainStats } from '../api/blockchainApi'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 export default function BlockchainPage() {
   const [activeTab, setActiveTab] = useState('audit')
@@ -27,11 +29,67 @@ export default function BlockchainPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [blockchainConfigured, setBlockchainConfigured] = useState(true)
+  const { dataImported, getPrediction } = useMLPredictions()
+  const [mlRisk, setMlRisk] = useState(null)
+  const [mlAnomaly, setMlAnomaly] = useState(null)
 
   useEffect(() => {
     loadBlockchainStats()
     loadAuditTrail(rakeId)
   }, [])
+
+  useEffect(() => {
+    if (!dataImported) return
+
+    try {
+      const risk = getPrediction('risk_assessment')
+      const anomaly = getPrediction('anomaly_detection')
+      setMlRisk(risk)
+      setMlAnomaly(anomaly)
+    } catch (err) {
+      console.error('Error reading ML predictions for blockchain:', err)
+    }
+  }, [dataImported, getPrediction])
+
+  const mlSecuritySummary = useMemo(() => {
+    if (!mlRisk && !mlAnomaly) return null
+
+    const parseNumber = (raw) => {
+      if (raw == null) return null
+      if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null
+      if (typeof raw === 'string') {
+        const n = Number(raw)
+        return Number.isFinite(n) ? n : null
+      }
+      if (typeof raw === 'object') {
+        if (typeof raw.score === 'number') return raw.score
+        if (typeof raw.risk_score === 'number') return raw.risk_score
+        if (typeof raw.value === 'number') return raw.value
+      }
+      return null
+    }
+
+    const riskScoreRaw = Array.isArray(mlRisk) ? mlRisk[0] : mlRisk
+    const anomalyRaw = Array.isArray(mlAnomaly) ? mlAnomaly[0] : mlAnomaly
+
+    const riskScoreVal = parseNumber(riskScoreRaw)
+    const anomalyCountVal = parseNumber(
+      anomalyRaw && typeof anomalyRaw === 'object' && 'anomaly_count' in anomalyRaw
+        ? anomalyRaw.anomaly_count
+        : anomalyRaw
+    )
+
+    if (riskScoreVal == null && anomalyCountVal == null) return null
+
+    const riskPct = riskScoreVal != null
+      ? (riskScoreVal <= 1 ? riskScoreVal * 100 : riskScoreVal)
+      : null
+
+    return {
+      riskPct,
+      anomalyCount: anomalyCountVal,
+    }
+  }, [mlRisk, mlAnomaly])
 
   const loadBlockchainStats = async () => {
     try {
@@ -85,6 +143,8 @@ export default function BlockchainPage() {
         <p className="text-slate-600">Immutable record of rake dispatch events</p>
       </div>
 
+      <InlineDataImport templateId="operations" />
+
       {/* Blockchain Not Configured */}
       {!blockchainConfigured && (
         <div className="card p-6 bg-yellow-50 border-l-4 border-yellow-500">
@@ -125,6 +185,27 @@ export default function BlockchainPage() {
             <p className="text-sm text-slate-600">Avg Confirmation</p>
             <p className="text-3xl font-bold text-slate-900 mt-2">{blockchainStats.avg_confirmation_time}</p>
           </div>
+        </div>
+      )}
+
+      {mlSecuritySummary && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {mlSecuritySummary.riskPct != null && (
+            <div className="card p-4">
+              <p className="text-sm text-slate-600">ML Risk Score</p>
+              <p className="text-3xl font-bold text-slate-900 mt-2">
+                {mlSecuritySummary.riskPct.toFixed(1)}%
+              </p>
+            </div>
+          )}
+          {mlSecuritySummary.anomalyCount != null && (
+            <div className="card p-4">
+              <p className="text-sm text-slate-600">ML Detected Anomalies</p>
+              <p className="text-3xl font-bold text-slate-900 mt-2">
+                {Math.round(mlSecuritySummary.anomalyCount).toLocaleString()}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

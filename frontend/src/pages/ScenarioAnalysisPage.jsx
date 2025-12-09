@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
 import { AlertCircle, TrendingUp, TrendingDown, Clock, DollarSign, CheckCircle, AlertTriangle, Info, Zap, Brain, BarChart3, Activity, Shield, GitBranch, Download, MessageSquare, Eye } from 'lucide-react'
 import {
@@ -16,10 +16,15 @@ import {
   ExportReporting,
 } from '../components/ScenarioAdvancedFeatures2'
 import axios from 'axios'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import { useImportedData } from '../hooks/useImportedData'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
 export default function ScenarioAnalysisPage() {
+  const { dataImported, getPrediction, lastUpdated } = useMLPredictions()
+  const [mlScenarioAnalysis, setMlScenarioAnalysis] = useState(null)
   const [material, setMaterial] = useState('HR_Coils')
   const [predictedDemand, setPredictedDemand] = useState(2500)
   const [confidence, setConfidence] = useState(0.85)
@@ -28,12 +33,21 @@ export default function ScenarioAnalysisPage() {
   const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState(15)
   const [riskFactors, setRiskFactors] = useState(['Supply Shortage', 'Market Volatility'])
   const [loading, setLoading] = useState(false)
+
+  // Keep ML scenario_analysis prediction in sync with latest pipeline outputs
+  useEffect(() => {
+    if (!getPrediction) return
+    const scenarioAnalysis = getPrediction('scenario_analysis')
+    setMlScenarioAnalysis(scenarioAnalysis)
+  }, [lastUpdated, getPrediction])
+
   const [analysisResult, setAnalysisResult] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [advancedTab, setAdvancedTab] = useState('monte-carlo')
   const [materials, setMaterials] = useState([])
   const [scenarioHistory, setScenarioHistory] = useState([])
   const [showHistory, setShowHistory] = useState(false)
+  const { data: importedData, isLoaded } = useImportedData()
 
   const availableRiskFactors = [
     'Supply Shortage',
@@ -45,6 +59,75 @@ export default function ScenarioAnalysisPage() {
     'Market Volatility',
     'Supplier Issue'
   ]
+
+  const hasImportedOrders = useMemo(() => {
+    return (
+      isLoaded &&
+      importedData &&
+      Array.isArray(importedData.orders) &&
+      importedData.orders.length > 0
+    )
+  }, [isLoaded, importedData])
+
+  const importedOrdersSummary = useMemo(() => {
+    if (!hasImportedOrders) return null
+
+    let totalDemandFromOrders = 0
+    try {
+      importedData.orders.forEach((o) => {
+        const qty = Number(o.totalQuantity ?? o.quantity ?? o.tonnage ?? 0)
+        if (Number.isFinite(qty) && qty > 0) {
+          totalDemandFromOrders += qty
+        }
+      })
+    } catch (err) {
+      console.error('Failed to summarize imported orders for Scenario Analysis:', err)
+    }
+
+    return {
+      ordersCount: importedData.orders.length,
+      totalDemand: totalDemandFromOrders,
+    }
+  }, [hasImportedOrders, importedData])
+
+  // When imported data is available, use it to initialize predictedDemand
+  useEffect(() => {
+    if (!importedOrdersSummary || !importedOrdersSummary.totalDemand) return
+
+    try {
+      const raw = importedOrdersSummary.totalDemand
+      const clamped = Math.max(100, Math.min(10000, Math.round(raw)))
+      setPredictedDemand(clamped)
+    } catch (err) {
+      console.error('Failed to derive predicted demand from imported orders:', err)
+    }
+  }, [importedOrdersSummary])
+
+  const mlScenarioSummary = useMemo(() => {
+    if (!mlScenarioAnalysis) return null
+
+    let scenarioCount = null
+
+    if (Array.isArray(mlScenarioAnalysis)) {
+      scenarioCount = mlScenarioAnalysis.length
+    } else if (Array.isArray(mlScenarioAnalysis.scenario_predictions)) {
+      scenarioCount = mlScenarioAnalysis.scenario_predictions.length
+    }
+
+    const riskLevel =
+      mlScenarioAnalysis.overall_risk_level ||
+      mlScenarioAnalysis.risk_level ||
+      null
+
+    if (scenarioCount == null && !riskLevel) {
+      return { hasData: true }
+    }
+
+    return {
+      scenarioCount,
+      riskLevel,
+    }
+  }, [mlScenarioAnalysis])
 
   useEffect(() => {
     fetchMaterials()
@@ -175,6 +258,48 @@ export default function ScenarioAnalysisPage() {
           <h1 className="text-4xl font-bold text-white mb-2">Scenario-Based Predictive Analytics</h1>
           <p className="text-slate-400">Analyze future scenarios using historical context and data-driven decisions</p>
         </div>
+
+        <InlineDataImport templateId="operations" />
+
+        {(importedOrdersSummary || mlScenarioSummary) && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {importedOrdersSummary && (
+              <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
+                <p className="text-sm text-slate-300">Imported Orders</p>
+                <p className="text-2xl font-bold text-white mt-1">
+                  {importedOrdersSummary.ordersCount.toLocaleString()} orders
+                </p>
+                {importedOrdersSummary.totalDemand > 0 && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    Total demand ~ {Math.round(importedOrdersSummary.totalDemand).toLocaleString()} units
+                  </p>
+                )}
+              </div>
+            )}
+            {mlScenarioSummary && (
+              <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
+                <p className="text-sm text-slate-300">ML Scenario Analysis</p>
+                {mlScenarioSummary.scenarioCount != null ? (
+                  <p className="text-2xl font-bold text-blue-400 mt-1">
+                    {mlScenarioSummary.scenarioCount} scenarios modeled
+                  </p>
+                ) : (
+                  <p className="text-2xl font-bold text-blue-400 mt-1">Live model output</p>
+                )}
+                {mlScenarioSummary.riskLevel && (
+                  <p className="text-xs text-slate-400 mt-1 uppercase">
+                    Overall risk: {mlScenarioSummary.riskLevel}
+                  </p>
+                )}
+                {!mlScenarioSummary.riskLevel && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    Using global scenario_analysis predictions
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Input Panel */}

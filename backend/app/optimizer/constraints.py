@@ -149,25 +149,29 @@ def add_loading_time_constraints(
         throughput_tph: Throughput in tonnes per hour
         slot_duration_minutes: Duration of each time slot
     """
+    # Use a linear capacity-per-slot approximation so that the constraint is
+    # compatible with CP-SAT (no division by IntVar).
+    if throughput_tph <= 0:
+        return
+
+    capacity_per_slot = int(throughput_tph * slot_duration_minutes / 60) or 1
+
     for rake_id, vars_dict in rake_vars.items():
         tonnes = vars_dict['tonnes']
         start_slot = vars_dict.get('start_slot')
         end_slot = vars_dict.get('end_slot')
-        
-        if start_slot and end_slot and throughput_tph > 0:
-            # Calculate minimum loading time in slots
-            loading_hours = tonnes / throughput_tph
-            loading_minutes = loading_hours * 60
-            min_slots = int((loading_minutes + slot_duration_minutes - 1) // slot_duration_minutes)
-            
-            # end_slot >= start_slot + min_slots
-            model.Add(end_slot >= start_slot + min_slots)
+
+        if start_slot is not None and end_slot is not None:
+            # Calculate minimum loading time in slots (capacity-based)
+            # tonnes <= capacity_per_slot * (end_slot - start_slot + 1)
+            slots_expr = end_slot - start_slot + 1
+            model.Add(tonnes <= slots_expr * capacity_per_slot)
 
 def add_multi_destination_constraints(
     model: cp_model.CpModel,
-    rake_vars: Dict[str, Any],
+    order_vars: Dict[str, Any],
     available_rakes: int,
-    multi_dest_threshold: float = 0.5
+    max_destinations_per_rake: int = 1
 ) -> None:
     """
     Add constraints for multi-destination rakes.
@@ -178,9 +182,38 @@ def add_multi_destination_constraints(
         available_rakes: Number of available rakes
         multi_dest_threshold: Threshold for allowing multi-destination
     """
-    # Allow multi-destination only if rake availability is low
-    # This is handled in the objective function penalty rather than hard constraint
-    pass
+    if available_rakes <= 0 or max_destinations_per_rake <= 0:
+        return
+
+    dest_used_vars = {}
+
+    for order_id, vars_dict in order_vars.items():
+        destination = vars_dict.get('destination')
+        rail_var = vars_dict.get('rail_assigned')
+
+        if destination is None or rail_var is None:
+            continue
+
+        dest_key = str(destination)
+        if dest_key not in dest_used_vars:
+            dest_used_vars[dest_key] = model.NewBoolVariable(f'dest_{dest_key}_rail_used')
+
+        dest_used_var = dest_used_vars[dest_key]
+
+        model.Add(rail_var <= dest_used_var)
+
+    for dest_key, dest_used_var in dest_used_vars.items():
+        rail_vars_for_dest = [
+            vars_dict.get('rail_assigned')
+            for vars_dict in order_vars.values()
+            if str(vars_dict.get('destination')) == dest_key and vars_dict.get('rail_assigned') is not None
+        ]
+
+        if rail_vars_for_dest:
+            model.Add(sum(rail_vars_for_dest) >= dest_used_var)
+
+    if dest_used_vars:
+        model.Add(sum(dest_used_vars.values()) <= available_rakes * max_destinations_per_rake)
 
 def add_safety_stock_constraints(
     model: cp_model.CpModel,

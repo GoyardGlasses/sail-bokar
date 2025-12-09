@@ -25,6 +25,9 @@ export default function DataImportEnhanced() {
   const [uploadedFileName, setUploadedFileName] = useState(null)
   const [fileFormat, setFileFormat] = useState('json')
   const [uploadStatus, setUploadStatus] = useState(null)
+  const [mlAnalysis, setMlAnalysis] = useState(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analysisStatus, setAnalysisStatus] = useState(null)
 
   // Sample comprehensive data template
   const sampleDataTemplate = {
@@ -186,38 +189,42 @@ ${sampleDataTemplate.routes.map(r => `- ${r.origin} to ${r.destination}: ${r.dis
             throw new Error('Unsupported file format')
           }
 
-          setImportedData(data)
-          localStorage.setItem('imported_data', JSON.stringify(data))
+          // Normalize to backend schema: always send all required top-level keys
+          const normalizedData = {
+            stockyards: Array.isArray(data.stockyards) ? data.stockyards : [],
+            materials: Array.isArray(data.materials) ? data.materials : [],
+            orders: Array.isArray(data.orders) ? data.orders : [],
+            rakes: Array.isArray(data.rakes) ? data.rakes : [],
+            routes: Array.isArray(data.routes) ? data.routes : [],
+            loadingPoints: Array.isArray(data.loadingPoints) ? data.loadingPoints : [],
+            constraints: Array.isArray(data.constraints) ? data.constraints : [],
+          }
+
+          setImportedData(normalizedData)
+          localStorage.setItem('imported_data', JSON.stringify(normalizedData))
 
           // Send to ML Pipeline
           try {
-            const response = await fetch('/api/ml/data/import', {
+            const response = await fetch('/api/data-import/import', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                data: data,
-                timestamp: new Date().toISOString(),
-                source: 'data_import_center',
-                fileFormat: fileType
-              }),
+              body: JSON.stringify(normalizedData),
             })
 
-            if (response.ok) {
-              setUploadStatus({
-                type: 'success',
-                message: `✅ Data imported successfully from ${fileType.toUpperCase()}!\n📊 ML Pipeline Processing:\n- Data validated\n- Features extracted\n- Models analyzing...`
-              })
-            } else {
-              setUploadStatus({
-                type: 'success',
-                message: `✅ Data imported successfully! (ML processing in background)`
-              })
+            if (!response.ok) {
+              const errorText = await response.text()
+              throw new Error(errorText || 'Failed to import data into ML pipeline')
             }
-          } catch (mlError) {
-            console.log('ML Pipeline processing in background:', mlError)
+
             setUploadStatus({
               type: 'success',
-              message: `✅ Data imported successfully from ${fileType.toUpperCase()}!`
+              message: `✅ Data imported successfully from ${fileType.toUpperCase()} and sent to the ML pipeline.\nYou can now run full ML analysis to generate predictions.`
+            })
+          } catch (mlError) {
+            console.error('Error importing data to ML pipeline:', mlError)
+            setUploadStatus({
+              type: 'error',
+              message: `❌ Backend import failed: ${mlError.message || 'Unknown error'}`
             })
           }
         } catch (error) {
@@ -234,6 +241,56 @@ ${sampleDataTemplate.routes.map(r => `- ${r.origin} to ${r.destination}: ${r.dis
         type: 'error',
         message: `❌ Error reading file: ${error.message}`
       })
+    }
+  }
+
+  const runMLAnalysis = async () => {
+    if (!importedData) {
+      setAnalysisStatus({ type: 'error', message: 'No data imported. Please upload data first.' })
+      return
+    }
+
+    setAnalyzing(true)
+    setAnalysisStatus({ type: 'loading', message: 'Importing data to ML Pipeline...' })
+
+    try {
+      // Step 1: Import data to backend
+      const importResponse = await fetch('/api/data-import/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(importedData)
+      })
+
+      if (!importResponse.ok) {
+        throw new Error('Failed to import data')
+      }
+
+      setAnalysisStatus({ type: 'loading', message: 'Running all 17 ML models...' })
+
+      // Step 2: Run ML analysis
+      const analysisResponse = await fetch('/api/data-import/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      if (!analysisResponse.ok) {
+        throw new Error('Failed to run analysis')
+      }
+
+      const analysisData = await analysisResponse.json()
+      setMlAnalysis(analysisData.predictions)
+
+      setAnalysisStatus({
+        type: 'success',
+        message: `✅ ML Analysis Complete!\n📊 All 17 models executed successfully\n🎯 Predictions ready for all features`
+      })
+    } catch (error) {
+      setAnalysisStatus({
+        type: 'error',
+        message: `❌ Analysis failed: ${error.message}`
+      })
+    } finally {
+      setAnalyzing(false)
     }
   }
 
@@ -598,6 +655,53 @@ ${sampleDataTemplate.routes.map(r => `- ${r.origin} to ${r.destination}: ${r.dis
                 <Trash2 size={18} />
                 Clear Imported Data
               </button>
+
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+                <h3 className="font-bold text-slate-900 dark:text-slate-50 mb-3">🧠 Run ML Analysis</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  Send this dataset to the ML pipeline and run all models to generate predictions used across dashboards.
+                </p>
+                <button
+                  onClick={runMLAnalysis}
+                  disabled={analyzing}
+                  className="px-4 py-2 bg-blue-600 disabled:opacity-60 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  {analyzing ? 'Running analysis...' : 'Run ML Analysis'}
+                </button>
+
+                {analysisStatus && (
+                  <div
+                    className={`mt-4 p-3 rounded-lg border ${
+                      analysisStatus.type === 'success'
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                        : analysisStatus.type === 'error'
+                        ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                        : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                    }`}
+                  >
+                    <p
+                      className={`text-sm whitespace-pre-line ${
+                        analysisStatus.type === 'success'
+                          ? 'text-green-900 dark:text-green-100'
+                          : analysisStatus.type === 'error'
+                          ? 'text-red-900 dark:text-red-100'
+                          : 'text-blue-900 dark:text-blue-100'
+                      }`}
+                    >
+                      {analysisStatus.message}
+                    </p>
+                  </div>
+                )}
+
+                {mlAnalysis && (
+                  <div className="mt-4 bg-slate-100 dark:bg-slate-900 p-3 rounded-lg max-h-64 overflow-y-auto">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Predictions preview</p>
+                    <pre className="text-xs text-slate-900 dark:text-slate-50 font-mono whitespace-pre-wrap break-words">
+                      {JSON.stringify(mlAnalysis, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <div className="bg-white dark:bg-slate-800 rounded-lg p-12 text-center border border-slate-200 dark:border-slate-700">

@@ -15,6 +15,7 @@ import {
   Trash2,
   Edit2,
 } from 'lucide-react'
+import type { Product, WagonType, Compatibility, ProductConstraint, WagonConstraint } from '../types'
 
 export default function ProductWagonMatrixDashboard() {
   const [activeTab, setActiveTab] = useState<'matrix' | 'products' | 'wagons' | 'constraints'>('matrix')
@@ -404,39 +405,259 @@ export default function ProductWagonMatrixDashboard() {
         {/* Constraints Tab */}
         {activeTab === 'constraints' && (
           <div className="space-y-4">
-            {constraints.length === 0 ? (
+            {mockCompatibilities.length === 0 ? (
               <div className="card text-center py-8">
                 <CheckCircle className="mx-auto text-green-600 mb-3" size={32} />
                 <p className="text-slate-600 dark:text-slate-400">No constraints defined</p>
               </div>
             ) : (
-              constraints.map((constraint) => (
-                <div key={constraint.id} className="card">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900 dark:text-slate-50">
-                        {constraint.type}
-                      </p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                        {constraint.reason}
-                      </p>
+              mockCompatibilities
+                .filter((c) => c.constraints.length > 0)
+                .map((compat, idx) => (
+                  <div key={`${compat.productId}-${compat.wagonTypeId}-${idx}`} className="card">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-semibold text-slate-900 dark:text-slate-50">
+                          {compat.notes}
+                        </p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                          Constraints: {compat.constraints.join(', ') || 'None'}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          !compat.isCompatible
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {!compat.isCompatible ? 'Critical' : 'Warning'}
+                      </span>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        constraint.severity === 'critical'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {constraint.severity}
-                    </span>
                   </div>
-                </div>
-              ))
+                ))
             )}
           </div>
         )}
       </div>
     </div>
   )
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function analyzeProduct(productId: string): {
+  compatibleWagons: WagonType[]
+  averageEfficiency: number
+  constraints: ProductConstraint[]
+} {
+  const mockWagons: WagonType[] = [
+    {
+      id: 'wagon-open-001',
+      name: 'Open Wagon 30T',
+      capacity: 30,
+      volume: 35,
+      type: 'open',
+      loadingEquipment: ['conveyor', 'loader'],
+      unloadingEquipment: ['dumper'],
+      maxLoadingTime: 120,
+      costPerKm: 50,
+      maintenanceSchedule: 30,
+    },
+    {
+      id: 'wagon-covered-001',
+      name: 'Covered Wagon 25T',
+      capacity: 25,
+      volume: 28,
+      type: 'covered',
+      loadingEquipment: ['conveyor'],
+      unloadingEquipment: ['manual'],
+      maxLoadingTime: 180,
+      costPerKm: 60,
+      maintenanceSchedule: 30,
+    },
+    {
+      id: 'wagon-tanker-001',
+      name: 'Tanker 20T',
+      capacity: 20,
+      volume: 22,
+      type: 'tanker',
+      loadingEquipment: ['pump'],
+      unloadingEquipment: ['pump'],
+      maxLoadingTime: 90,
+      costPerKm: 70,
+      maintenanceSchedule: 15,
+    },
+  ]
+
+  const mockCompatibilities: Compatibility[] = [
+    {
+      productId: 'coal-001',
+      wagonTypeId: 'wagon-covered-001',
+      isCompatible: true,
+      efficiency: 95,
+      safetyRating: 98,
+      utilizationRating: 92,
+      notes: 'Excellent compatibility',
+      constraints: [],
+      recommendations: ['Use for long-distance transport'],
+    },
+    {
+      productId: 'coal-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: false,
+      efficiency: 30,
+      safetyRating: 20,
+      utilizationRating: 40,
+      notes: 'Dust exposure risk',
+      constraints: ['dust_control_required'],
+      recommendations: ['Not recommended for coal transport'],
+    },
+    {
+      productId: 'iron-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: true,
+      efficiency: 98,
+      safetyRating: 99,
+      utilizationRating: 95,
+      notes: 'Perfect match',
+      constraints: [],
+      recommendations: ['Preferred option'],
+    },
+    {
+      productId: 'limestone-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: true,
+      efficiency: 92,
+      safetyRating: 95,
+      utilizationRating: 90,
+      notes: 'Good compatibility',
+      constraints: [],
+      recommendations: ['Standard option'],
+    },
+  ]
+
+  const compatibilities = mockCompatibilities.filter((c) => c.productId === productId)
+  const compatibleWagons = mockWagons.filter((w) =>
+    compatibilities.some((c) => c.wagonTypeId === w.id && c.isCompatible)
+  )
+  const averageEfficiency =
+    compatibilities.length > 0
+      ? compatibilities.reduce((sum, c) => sum + c.efficiency, 0) / compatibilities.length
+      : 0
+
+  return {
+    compatibleWagons,
+    averageEfficiency,
+    constraints: [],
+  }
+}
+
+function analyzeWagon(wagonTypeId: string): {
+  compatibleProducts: Product[]
+  averageEfficiency: number
+  constraints: WagonConstraint[]
+} {
+  const mockProducts: Product[] = [
+    {
+      id: 'coal-001',
+      name: 'Coal',
+      type: 'coal',
+      density: 1400,
+      weight: 1400,
+      volume: 1,
+      specialHandling: ['dust_control'],
+      storageRequirements: ['covered'],
+      hazardous: false,
+      maxStackHeight: 5,
+    },
+    {
+      id: 'iron-001',
+      name: 'Iron Ore',
+      type: 'iron_ore',
+      density: 2500,
+      weight: 2500,
+      volume: 1,
+      specialHandling: [],
+      storageRequirements: ['open'],
+      hazardous: false,
+      maxStackHeight: 8,
+    },
+    {
+      id: 'limestone-001',
+      name: 'Limestone',
+      type: 'limestone',
+      density: 2700,
+      weight: 2700,
+      volume: 1,
+      specialHandling: [],
+      storageRequirements: ['open'],
+      hazardous: false,
+      maxStackHeight: 6,
+    },
+  ]
+
+  const mockCompatibilities: Compatibility[] = [
+    {
+      productId: 'coal-001',
+      wagonTypeId: 'wagon-covered-001',
+      isCompatible: true,
+      efficiency: 95,
+      safetyRating: 98,
+      utilizationRating: 92,
+      notes: 'Excellent compatibility',
+      constraints: [],
+      recommendations: ['Use for long-distance transport'],
+    },
+    {
+      productId: 'coal-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: false,
+      efficiency: 30,
+      safetyRating: 20,
+      utilizationRating: 40,
+      notes: 'Dust exposure risk',
+      constraints: ['dust_control_required'],
+      recommendations: ['Not recommended for coal transport'],
+    },
+    {
+      productId: 'iron-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: true,
+      efficiency: 98,
+      safetyRating: 99,
+      utilizationRating: 95,
+      notes: 'Perfect match',
+      constraints: [],
+      recommendations: ['Preferred option'],
+    },
+    {
+      productId: 'limestone-001',
+      wagonTypeId: 'wagon-open-001',
+      isCompatible: true,
+      efficiency: 92,
+      safetyRating: 95,
+      utilizationRating: 90,
+      notes: 'Good compatibility',
+      constraints: [],
+      recommendations: ['Standard option'],
+    },
+  ]
+
+  const compatibilities = mockCompatibilities.filter((c) => c.wagonTypeId === wagonTypeId)
+  const compatibleProducts = mockProducts.filter((p) =>
+    compatibilities.some((c) => c.productId === p.id && c.isCompatible)
+  )
+  const averageEfficiency =
+    compatibilities.length > 0
+      ? compatibilities.reduce((sum, c) => sum + c.efficiency, 0) / compatibilities.length
+      : 0
+
+  return {
+    compatibleProducts,
+    averageEfficiency,
+    constraints: [],
+  }
 }

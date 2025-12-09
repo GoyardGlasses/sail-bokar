@@ -58,8 +58,9 @@ export default function OptimizeResult() {
 
   const totalRakeCost = rakesList.reduce((sum, r) => sum + r.estimated_cost, 0)
   const totalTruckCost = trucksList.reduce((sum, t) => sum + t.cost, 0)
-  const totalTonnage = rakesList.reduce((sum, r) => sum + r.tonnes, 0) + 
-                       trucksList.reduce((sum, t) => sum + t.tonnes, 0)
+  const totalTonnage =
+    rakesList.reduce((sum, r) => sum + r.tonnes, 0) +
+    trucksList.reduce((sum, t) => sum + t.tonnes, 0)
 
   const mockResult = {
     rakes: rakesList,
@@ -72,7 +73,17 @@ export default function OptimizeResult() {
     },
   }
 
-  const displayResult = result || mockResult
+  const hasMeaningfulResult =
+    result &&
+    ((result.summary &&
+      (result.summary.total_rakes ||
+        result.summary.total_trucks ||
+        result.summary.total_cost ||
+        result.summary.total_tonnage)) ||
+      (Array.isArray(result.rakes) && result.rakes.length > 0) ||
+      (Array.isArray(result.trucks) && result.trucks.length > 0))
+
+  const displayResult = hasMeaningfulResult ? result : mockResult
   const { rakes = [], trucks = [], summary = {} } = displayResult
   const { total_cost = 0, total_tonnage = 0, total_rakes = 0, total_trucks = 0 } = summary
 

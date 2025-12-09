@@ -22,5 +22,22 @@ export function useImportedData() {
     }
   }, [])
 
+  useEffect(() => {
+    const handler = (event: any) => {
+      if (event && event.detail) {
+        setData(event.detail)
+        setIsLoaded(true)
+      }
+    }
+
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('imported-data-updated', handler as EventListener)
+
+      return () => {
+        window.removeEventListener('imported-data-updated', handler as EventListener)
+      }
+    }
+  }, [])
+
   return { data, isLoaded }
 }

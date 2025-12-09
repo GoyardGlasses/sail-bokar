@@ -85,6 +85,11 @@ export default function DelayResults({ data, isLoading, error, onRetry }) {
       {/* Chart */}
       <div className="card">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Delay Probability by Route</h3>
+        <p className="text-xs text-slate-600 mb-3">
+          Each bar shows one origin–destination route on the horizontal axis and the modelled probability of a delay on
+          the vertical axis. Taller bars mean lanes where rakes or trucks are more likely to miss schedule, so operations
+          teams should prioritise extra rakes, schedule buffers or alternative routes for those lanes.
+        </p>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useMLPredictions } from '../../../context/MLPredictionsContext'
 import {
   Brain,
   TrendingUp,
@@ -514,11 +515,85 @@ const mockDecisions: DecisionRecommendation[] = [
 
 export default function DecisionSupportDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'decisions' | 'scenarios' | 'analysis'>('overview')
-  const [selectedDecision, setSelectedDecision] = useState<DecisionRecommendation | null>(null)
+  const [selectedDecision, setSelectedDecision] = useState<DecisionRecommendation | null>(mockDecisions[0] ?? null)
   const [filterPriority, setFilterPriority] = useState<'all' | 'critical' | 'high' | 'medium' | 'low'>('all')
   const [sortBy, setSortBy] = useState<'confidence' | 'priority' | 'impact'>('confidence')
 
-  const filteredDecisions = mockDecisions.filter(d => filterPriority === 'all' || d.priority === filterPriority)
+  const { dataImported, getPrediction } = useMLPredictions()
+
+  // Runtime decisions: start from mock decisions and enrich with ML-driven ones when available
+  let runtimeDecisions: DecisionRecommendation[] = mockDecisions
+
+  if (dataImported) {
+    try {
+      const raw: any = getPrediction('decision_support')
+      const items: any[] = Array.isArray(raw) ? raw : raw ? [raw] : []
+
+      if (items.length > 0) {
+        const base = mockDecisions[0]
+
+        const mlDecisions: DecisionRecommendation[] = items.map((item, index) => {
+          const confSource: number | undefined =
+            typeof item?.confidence === 'number'
+              ? item.confidence
+              : typeof item?.confidence_score === 'number'
+                ? item.confidence_score
+                : typeof item?.probability === 'number'
+                  ? item.probability
+                  : undefined
+
+          const confidence = confSource !== undefined
+            ? (confSource <= 1 ? Math.round(confSource * 100) : Math.round(confSource))
+            : base.confidence
+
+          const priorityMap: Record<string, 'critical' | 'high' | 'medium' | 'low'> = {
+            critical: 'critical',
+            high: 'high',
+            medium: 'medium',
+            low: 'low',
+          }
+
+          const prioritySource = (item?.priority || item?.severity || base.priority).toString().toLowerCase()
+          const mappedPriority = priorityMap[prioritySource] ?? base.priority
+
+          const decisionText =
+            item?.recommended_action ||
+            item?.decision ||
+            item?.action ||
+            base.decision
+
+          let reasoningLines: string[]
+          if (Array.isArray(item?.reasoning)) {
+            reasoningLines = item.reasoning.map((r: any) => String(r))
+          } else if (Array.isArray(item?.factors)) {
+            reasoningLines = item.factors.map((f: any) => String(f))
+          } else if (item?.rationale) {
+            reasoningLines = [String(item.rationale)]
+          } else {
+            reasoningLines = base.reasoning
+          }
+
+          return {
+            ...base,
+            id: item?.id || item?.decisionId || `ml-dec-${index + 1}`,
+            title: item?.title || item?.decision_title || base.title,
+            priority: mappedPriority,
+            confidence,
+            decision: decisionText,
+            reasoning: reasoningLines,
+          }
+        })
+
+        if (mlDecisions.length > 0) {
+          runtimeDecisions = [...mlDecisions, ...mockDecisions]
+        }
+      }
+    } catch (e) {
+      runtimeDecisions = mockDecisions
+    }
+  }
+
+  const filteredDecisions = runtimeDecisions.filter(d => filterPriority === 'all' || d.priority === filterPriority)
 
   const sortedDecisions = [...filteredDecisions].sort((a, b) => {
     if (sortBy === 'confidence') return b.confidence - a.confidence
@@ -578,7 +653,7 @@ export default function DecisionSupportDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Active Decisions</p>
-              <p className="text-3xl font-bold text-gray-900">{mockDecisions.length}</p>
+              <p className="text-3xl font-bold text-gray-900">{runtimeDecisions.length}</p>
               <p className="text-xs text-gray-500 mt-2">Requiring action</p>
             </div>
             <Brain className="w-12 h-12 text-purple-100" />
@@ -589,7 +664,7 @@ export default function DecisionSupportDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Critical Priority</p>
-              <p className="text-3xl font-bold text-gray-900">{mockDecisions.filter(d => d.priority === 'critical').length}</p>
+              <p className="text-3xl font-bold text-gray-900">{runtimeDecisions.filter(d => d.priority === 'critical').length}</p>
               <p className="text-xs text-red-600 mt-2">Immediate action needed</p>
             </div>
             <AlertCircle className="w-12 h-12 text-red-100" />
@@ -600,7 +675,7 @@ export default function DecisionSupportDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Avg Confidence</p>
-              <p className="text-3xl font-bold text-gray-900">{Math.round(mockDecisions.reduce((sum, d) => sum + d.confidence, 0) / mockDecisions.length)}%</p>
+              <p className="text-3xl font-bold text-gray-900">{Math.round(runtimeDecisions.reduce((sum, d) => sum + d.confidence, 0) / (runtimeDecisions.length || 1))}%</p>
               <p className="text-xs text-green-600 mt-2">High reliability</p>
             </div>
             <CheckCircle className="w-12 h-12 text-green-100" />

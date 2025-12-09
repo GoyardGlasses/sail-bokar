@@ -133,6 +133,13 @@ class OptimizeService:
             'demurrage_rate_per_wagon_per_hour': 100,
             'truck_cost_per_km_per_tonne': 30,
             'delay_penalty_per_hour': 1000,
+            'planning_datetime': datetime.utcnow().isoformat(),
+            'sla_penalty_per_tonne_hour': 100,
+            'sla_tight_window_hours': 24,
+            'sla_priority_weight_high': 2.0,
+            'sla_priority_weight_medium': 1.0,
+            'sla_priority_weight_low': 0.5,
+            'mode_mismatch_penalty_per_tonne': 50,
         }
         
         # Add distance for each destination

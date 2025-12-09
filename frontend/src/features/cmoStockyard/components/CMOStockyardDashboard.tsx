@@ -15,6 +15,7 @@ import {
   X,
   Check,
 } from 'lucide-react'
+import { useImportedData } from '../../../hooks/useImportedData'
 import { cmoStockyardsMockData } from '../../../services/mockData'
 
 export default function CMOStockyardDashboard() {
@@ -25,15 +26,63 @@ export default function CMOStockyardDashboard() {
   // Use mock data with dynamic capabilities
   const [stockyards, setStockyards] = useState(cmoStockyardsMockData.stockyards)
 
-  // Load from localStorage on mount
+   const { data: importedData, isLoaded } = useImportedData()
+
+  // Load from imported data or localStorage on mount
   useEffect(() => {
+    if (!isLoaded) return
+
     try {
-      const stored = localStorage.getItem('dynamic_cmoStockyards')
-      if (stored) setStockyards(JSON.parse(stored))
+      if (importedData?.stockyards && Array.isArray(importedData.stockyards) && importedData.stockyards.length > 0) {
+        const mapped = importedData.stockyards.map((s: any, index: number) => {
+          const fallback = cmoStockyardsMockData.stockyards[index % cmoStockyardsMockData.stockyards.length]
+
+          const capacity = Number(s?.capacity ?? fallback.capacity ?? 0)
+          const expectedDemand = Number(
+            s?.expectedDemand ?? s?.demand ?? fallback.expectedDemand ?? 0
+          )
+
+          const rawUtil = Number(s?.utilization ?? s?.utilizationPercent ?? 0)
+          let utilization = rawUtil
+          if (!Number.isFinite(utilization) || utilization <= 0) {
+            if (capacity > 0 && expectedDemand > 0) {
+              const derived = Math.min(100, Math.round((expectedDemand / capacity) * 100))
+              utilization = derived
+            } else {
+              utilization = Number(fallback.utilization ?? 0)
+            }
+          }
+
+          const statusRaw = (s?.status || fallback.status || 'operational').toString().toLowerCase()
+          const status =
+            statusRaw === 'maintenance'
+              ? 'maintenance'
+              : statusRaw === 'inactive'
+                ? 'inactive'
+                : 'operational'
+
+          return {
+            id: s?.id || fallback.id,
+            code: s?.code || fallback.code,
+            name: s?.name || fallback.name,
+            location: s?.location || fallback.location,
+            distance: Number(s?.distance ?? s?.distanceKm ?? fallback.distance ?? 0),
+            expectedDemand,
+            capacity,
+            utilization,
+            status,
+          }
+        })
+
+        setStockyards(mapped)
+      } else {
+        const stored = localStorage.getItem('dynamic_cmoStockyards')
+        if (stored) setStockyards(JSON.parse(stored))
+      }
     } catch (error) {
-      console.error('Failed to load from localStorage:', error)
+      console.error('Failed to load from localStorage or imported data:', error)
     }
-  }, [])
+  }, [isLoaded, importedData])
 
   // Save to localStorage whenever data changes
   useEffect(() => {

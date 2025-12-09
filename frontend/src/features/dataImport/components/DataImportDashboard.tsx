@@ -19,6 +19,91 @@ export default function DataImportDashboard() {
   const [copied, setCopied] = useState(false)
   const [importedData, setImportedData] = useState<any>(null)
 
+  // Download template functions
+  const downloadJSONTemplate = () => {
+    const templateData = {
+      metadata: {
+        version: "1.0",
+        timestamp: new Date().toISOString(),
+        description: "Comprehensive logistics dataset for SAIL Bokaro system"
+      },
+      orders: [],
+      materials: [],
+      routes: [],
+      vehicles: [],
+      suppliers: [],
+      stockyards: [],
+      constraints: {}
+    }
+    
+    const dataStr = JSON.stringify(templateData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'logistics_data_template.json'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadCSVTemplate = () => {
+    const csvContent = `orderId,customerId,customerName,material,quantity,unit,sourceStockyard,destination,deliveryDate,priority,specialRequirements,status
+ORD-2024-001,CUST-001,Company Name,Material Type,500,tons,Bokaro-Main,Destination City,2024-12-10,high,None,pending`
+    
+    const dataBlob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'logistics_data_template.csv'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadSampleData = () => {
+    fetch('/src/data/sample_logistics_data.json')
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'sample_logistics_data.json'
+        link.click()
+        URL.revokeObjectURL(url)
+      })
+      .catch(() => {
+        // Fallback: create sample data
+        const sampleData = {
+          orders: [
+            { orderId: 'ORD-2024-001', customerId: 'CUST-001', customerName: 'Tata Steel', material: 'HR Coils', quantity: 500, unit: 'tons', sourceStockyard: 'Bokaro-Main', destination: 'Kolkata Port', deliveryDate: '2024-12-10', priority: 'high', specialRequirements: 'Temperature controlled', status: 'pending' }
+          ],
+          materials: [
+            { materialId: 'MAT-001', name: 'HR Coils', thickness: '1.2-12.7mm', width: '600-1500mm', density: 7.85, unitPrice: 3500, availableQuantity: 5000 }
+          ],
+          routes: [
+            { routeId: 'RT-001', name: 'Bokaro-Kolkata', origin: 'Bokaro', destination: 'Kolkata', distance: 180, estimatedTime: 8, riskScore: 12 }
+          ],
+          vehicles: [
+            { vehicleId: 'VEH-001', registrationNumber: 'BR-01-AB-1001', type: 'Truck', capacity: 50, fuelType: 'Diesel', mileage: 8, costPerKm: 5, status: 'available' }
+          ],
+          suppliers: [
+            { supplierId: 'SUP-001', name: 'SAIL Bokaro', location: 'Bokaro', rating: 4.8, onTimeDelivery: 95, qualityScore: 92 }
+          ],
+          stockyards: [
+            { stockyardId: 'SY-001', name: 'Bokaro-Main', location: 'Bokaro', capacity: 50000, currentInventory: 35000, railSiding: true }
+          ]
+        }
+        
+        const dataStr = JSON.stringify(sampleData, null, 2)
+        const dataBlob = new Blob([dataStr], { type: 'application/json' })
+        const url = URL.createObjectURL(dataBlob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'sample_logistics_data.json'
+        link.click()
+        URL.revokeObjectURL(url)
+      })
+  }
+
   // Sample comprehensive data template
   const sampleDataTemplate = {
     stockyards: [
@@ -79,27 +164,23 @@ export default function DataImportDashboard() {
           
           // Send data to ML Pipeline for processing
           try {
-            const response = await fetch('/api/ml/data/import', {
+            const response = await fetch('/api/data-import/import', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({
-                data: data,
-                timestamp: new Date().toISOString(),
-                source: 'data_import_center'
-              }),
+              body: JSON.stringify(data),
             })
-            
+
             if (response.ok) {
-              const result = await response.json()
-              alert('✅ Data imported successfully!\n\n📊 ML Pipeline Processing:\n- Data validated\n- Features extracted\n- Models analyzing...\n\nAll features will now use this data.')
+              alert('✅ Data imported into the ML pipeline successfully. You can now run analysis and view predictions across dashboards.')
             } else {
-              alert('✅ Data imported successfully! (ML processing in background)')
+              const errorText = await response.text()
+              alert(`❌ Backend import failed: ${errorText || response.statusText}`)
             }
           } catch (mlError) {
-            console.log('ML Pipeline processing in background:', mlError)
-            alert('✅ Data imported successfully! All features will now use this data.')
+            console.log('ML Pipeline import failed:', mlError)
+            alert(`❌ Backend import failed: ${mlError instanceof Error ? mlError.message : 'Unknown error'}`)
           }
         } catch (error) {
           alert('❌ Invalid JSON format. Please check your file.')

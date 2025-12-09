@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
 import { FileText, Download, Eye, Trash2, Plus, Calendar, Filter } from 'lucide-react'
+import { useImportedData } from '../../../hooks/useImportedData'
+import { useMLPredictions } from '../../../context/MLPredictionsContext'
 
 export default function ReportingDashboard() {
   const [activeTab, setActiveTab] = useState<'reports' | 'analytics' | 'export'>('reports')
+
+  const { data: importedData, isLoaded } = useImportedData()
+  const { getPrediction, dataImported } = useMLPredictions()
 
   const mockReports = [
     {
@@ -43,6 +48,101 @@ export default function ReportingDashboard() {
     { metric: 'Most Used Format', value: 'PDF', change: '62%' },
     { metric: 'Export Success Rate', value: '99.8%', change: '+0.2%' },
   ]
+
+  const hasImported = isLoaded && importedData && Object.keys(importedData).length > 0
+
+  const mlCost = dataImported ? getPrediction('cost_prediction') : null
+  const mlDelay = dataImported ? getPrediction('delay_prediction') : null
+
+  const dynamicReports = hasImported
+    ? [
+        importedData.orders && Array.isArray(importedData.orders) && importedData.orders.length > 0
+          ? {
+              id: 'r-orders-dynamic',
+              name: `Orders Summary (${importedData.orders.length} orders)`,
+              type: 'summary',
+              format: 'pdf',
+              generatedAt: new Date().toISOString(),
+              generatedBy: 'AI Reporter',
+              size: 'auto',
+              status: 'completed',
+            }
+          : null,
+        importedData.rakes && Array.isArray(importedData.rakes) && importedData.rakes.length > 0
+          ? {
+              id: 'r-rakes-dynamic',
+              name: `Rake Utilization (${importedData.rakes.length} rakes)`,
+              type: 'detailed',
+              format: 'excel',
+              generatedAt: new Date().toISOString(),
+              generatedBy: 'AI Reporter',
+              size: 'auto',
+              status: 'completed',
+            }
+          : null,
+        mlCost
+          ? {
+              id: 'r-cost-ml',
+              name: 'AI Cost Prediction Snapshot',
+              type: 'technical',
+              format: 'html',
+              generatedAt: new Date().toISOString(),
+              generatedBy: 'ML Engine',
+              size: 'auto',
+              status: 'completed',
+            }
+          : null,
+        mlDelay
+          ? {
+              id: 'r-delay-ml',
+              name: 'Delay Risk Assessment',
+              type: 'risk',
+              format: 'pdf',
+              generatedAt: new Date().toISOString(),
+              generatedBy: 'ML Engine',
+              size: 'auto',
+              status: 'completed',
+            }
+          : null,
+      ].filter(Boolean) as typeof mockReports
+    : []
+
+  const runtimeReports = dynamicReports.length > 0 ? [...dynamicReports, ...mockReports] : mockReports
+
+  const totalReports = runtimeReports.length
+  const pdfCount = runtimeReports.filter((r) => r.format.toLowerCase() === 'pdf').length
+  const excelCount = runtimeReports.filter((r) => r.format.toLowerCase() === 'excel').length
+  const htmlCount = runtimeReports.filter((r) => r.format.toLowerCase() === 'html').length
+
+  const runtimeAnalytics = hasImported
+    ? [
+        {
+          metric: 'Total Reports Generated',
+          value: totalReports.toString(),
+          change: '+ auto',
+        },
+        {
+          metric: 'Orders in Dataset',
+          value: (importedData.orders?.length || 0).toString(),
+          change: '',
+        },
+        {
+          metric: 'Most Used Format',
+          value:
+            pdfCount >= excelCount && pdfCount >= htmlCount
+              ? 'PDF'
+              : excelCount >= htmlCount
+                ? 'Excel'
+                : 'HTML',
+          change: '',
+        },
+        {
+          metric: 'ML-Driven Reports',
+          value: [mlCost, mlDelay].filter(Boolean).length.toString(),
+          change: '',
+        },
+      ]
+    : mockAnalytics
 
   return (
     <div className="space-y-6 p-8">

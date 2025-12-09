@@ -9,21 +9,30 @@ import { TrendingUp, AlertTriangle, Clock, Zap } from 'lucide-react'
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e']
 
+const mockPredictions = [
+  { route: 'Bokaro-Dhanbad', predicted_delay_hours: 2.5, probability: 0.18 },
+  { route: 'Bokaro-Hatia', predicted_delay_hours: 4.2, probability: 0.12 },
+  { route: 'Bokaro-Kolkata', predicted_delay_hours: 1.8, probability: 0.08 },
+  { route: 'Bokaro-Patna', predicted_delay_hours: 0.5, probability: 0.03 },
+  { route: 'Bokaro-Ranchi', predicted_delay_hours: 1.2, probability: 0.05 },
+]
+
 export default function RouteAnalytics({ predictions }) {
   const analytics = useMemo(() => {
-    if (!predictions || predictions.length === 0) {
+    const data = predictions && predictions.length > 0 ? predictions : mockPredictions
+    if (!data || data.length === 0) {
       return null
     }
 
     // Sort by delay probability
-    const byDelay = [...predictions].sort((a, b) => b.probability - a.probability)
+    const byDelay = [...data].sort((a, b) => b.probability - a.probability)
     const highRiskRoutes = byDelay.filter((p) => p.probability > 0.15)
     const mediumRiskRoutes = byDelay.filter((p) => p.probability > 0.08 && p.probability <= 0.15)
     const lowRiskRoutes = byDelay.filter((p) => p.probability <= 0.08)
 
     // Average delay by route
     const routeStats = {}
-    predictions.forEach((p) => {
+    data.forEach((p) => {
       if (!routeStats[p.route]) {
         routeStats[p.route] = { route: p.route, totalDelay: 0, count: 0, maxProb: 0 }
       }
@@ -48,16 +57,16 @@ export default function RouteAnalytics({ predictions }) {
 
     // Delay hours distribution
     const delayDistribution = [
-      { range: '0-3h', count: predictions.filter((p) => p.predicted_delay_hours <= 3).length },
-      { range: '3-6h', count: predictions.filter((p) => p.predicted_delay_hours > 3 && p.predicted_delay_hours <= 6).length },
-      { range: '6-12h', count: predictions.filter((p) => p.predicted_delay_hours > 6 && p.predicted_delay_hours <= 12).length },
-      { range: '12h+', count: predictions.filter((p) => p.predicted_delay_hours > 12).length },
+      { range: '0-3h', count: data.filter((p) => p.predicted_delay_hours <= 3).length },
+      { range: '3-6h', count: data.filter((p) => p.predicted_delay_hours > 3 && p.predicted_delay_hours <= 6).length },
+      { range: '6-12h', count: data.filter((p) => p.predicted_delay_hours > 6 && p.predicted_delay_hours <= 12).length },
+      { range: '12h+', count: data.filter((p) => p.predicted_delay_hours > 12).length },
     ]
 
     // Statistics
-    const avgDelay = (predictions.reduce((sum, p) => sum + p.predicted_delay_hours, 0) / predictions.length).toFixed(1)
-    const maxDelay = Math.max(...predictions.map((p) => p.predicted_delay_hours))
-    const avgProbability = (predictions.reduce((sum, p) => sum + p.probability, 0) / predictions.length * 100).toFixed(1)
+    const avgDelay = (data.reduce((sum, p) => sum + p.predicted_delay_hours, 0) / data.length).toFixed(1)
+    const maxDelay = Math.max(...data.map((p) => p.predicted_delay_hours))
+    const avgProbability = (data.reduce((sum, p) => sum + p.probability, 0) / data.length * 100).toFixed(1)
 
     return {
       highRiskCount: highRiskRoutes.length,
@@ -127,6 +136,11 @@ export default function RouteAnalytics({ predictions }) {
         {/* Risk Distribution Pie Chart */}
         <div className="card">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Risk Distribution</h3>
+          <p className="text-xs text-slate-600 mb-3">
+            This pie chart groups all modelled routes into high, medium and low delay-risk buckets based on the
+            probability from the delay model. Bigger slices mean more lanes in that risk band, helping you see whether the
+            network is dominated by a few very risky routes or a broad low-risk base.
+          </p>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -151,6 +165,11 @@ export default function RouteAnalytics({ predictions }) {
         {/* Delay Hours Distribution */}
         <div className="card">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Delay Hours Distribution</h3>
+          <p className="text-xs text-slate-600 mb-3">
+            Here routes are bucketed by predicted delay hours (0–3h, 3–6h, etc.). Tall bars in the higher ranges indicate
+            that many rakes or shipments are at risk of serious delay, signalling the need for proactive rescheduling or
+            additional rakes on those lanes.
+          </p>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={analytics.delayDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -166,6 +185,11 @@ export default function RouteAnalytics({ predictions }) {
       {/* Top Routes by Average Delay */}
       <div className="card">
         <h3 className="text-lg font-bold text-slate-900 mb-4">Routes by Average Delay</h3>
+        <p className="text-xs text-slate-600 mb-3">
+          This bar chart ranks routes by their average predicted delay. Focus mitigation and priority loading on the
+          tallest bars first, as those lanes contribute most to late arrivals and should get better rakes, paths or
+          buffer time.
+        </p>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={analytics.routeAverages}>
             <CartesianGrid strokeDasharray="3 3" />

@@ -17,8 +17,15 @@ import {
 } from '../components/ThroughputAdvancedFeatures2'
 import { fetchThroughputData } from '../api/throughputApi'
 import { TrendingUp, Calendar, MapPin, Truck, AlertCircle, Zap, Clock, Gauge, Users, AlertTriangle, TrendingDown, DollarSign, Download, BarChart3, Brain } from 'lucide-react'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import { useImportedData } from '../hooks/useImportedData'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 export default function ThroughputPage() {
+  const { dataImported, getPrediction } = useMLPredictions()
+  const { data: importedData, isLoaded } = useImportedData()
+  const [mlFuelConsumption, setMlFuelConsumption] = useState(null)
+  const [mlMinLoadingTime, setMlMinLoadingTime] = useState(null)
   const [throughputData, setThroughputData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -26,6 +33,16 @@ export default function ThroughputPage() {
   const [mlModels] = useState({
     throughputOptimization: { name: 'Throughput Optimization', accuracy: 91.3, status: 'active' },
   })
+
+  // Get ML prediction when data is imported
+  useEffect(() => {
+    if (dataImported) {
+      const fuelPred = getPrediction('fuel_consumption')
+      setMlFuelConsumption(fuelPred)
+      const minLoadingPred = getPrediction('minimum_loading_time')
+      setMlMinLoadingTime(minLoadingPred)
+    }
+  }, [dataImported, getPrediction])
 
   // Form state
   const [startDate, setStartDate] = useState(() => {
@@ -67,6 +84,60 @@ export default function ThroughputPage() {
     handleFetchData()
   }, [])
 
+  useEffect(() => {
+    if (!isLoaded || !importedData?.orders || !Array.isArray(importedData.orders)) return
+
+    try {
+      const orders = importedData.orders
+
+      const start = new Date(startDate)
+      const end = new Date(endDate)
+
+      const byDate = new Map()
+
+      orders.forEach((o) => {
+        const rawDate = (o.orderDate || o.createdAt || new Date().toISOString()).toString().slice(0, 10)
+        const dateObj = new Date(rawDate)
+        if (Number.isNaN(dateObj.getTime())) return
+        if (dateObj < start || dateObj > end) return
+
+        const lpId = loadingPoint
+        const lpField = o.loadingPointId || o.loadingPoint || null
+        if (lpField && lpField !== lpId) return
+
+        const qty = Number(o.totalQuantity ?? o.quantity ?? 0)
+        if (!Number.isFinite(qty) || qty <= 0) return
+
+        const prev = byDate.get(rawDate) || 0
+        byDate.set(rawDate, prev + qty)
+      })
+
+      if (byDate.size === 0) return
+
+      const throughputSeries = Array.from(byDate.entries())
+        .sort(([d1], [d2]) => d1.localeCompare(d2))
+        .map(([date, qty]) => ({
+          date,
+          throughput: qty,
+        }))
+
+      const totalQty = throughputSeries.reduce((sum, d) => sum + d.throughput, 0)
+      const avgThroughput = totalQty / throughputSeries.length
+      const peakThroughput = Math.max(...throughputSeries.map((d) => d.throughput))
+      const totalDispatches = orders.length
+
+      setThroughputData((prev) => ({
+        ...(prev || {}),
+        avgThroughput,
+        peakThroughput,
+        totalDispatches,
+        throughput: throughputSeries,
+      }))
+    } catch (e) {
+      console.error('Failed to derive throughput from imported data:', e)
+    }
+  }, [isLoaded, importedData, startDate, endDate, loadingPoint])
+
   const selectedLP = loadingPoints.find(lp => lp.id === loadingPoint)
 
   return (
@@ -79,6 +150,8 @@ export default function ThroughputPage() {
         </div>
         <p className="text-slate-600">Monitor and analyze loading point throughput over time</p>
       </div>
+
+      <InlineDataImport templateId="throughput" />
 
       {/* Error Message */}
       {error && (
@@ -229,6 +302,59 @@ export default function ThroughputPage() {
               </div>
             </div>
           </div>
+
+          {mlFuelConsumption && (
+            <div className="card p-4">
+              <div className="flex items-start gap-3">
+                <Brain size={20} className="text-indigo-600 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-slate-600">AI Fuel Insight</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">
+                    {(() => {
+                      const raw = Number(
+                        mlFuelConsumption.avgFuelPerDispatch ??
+                          mlFuelConsumption.averageConsumption ??
+                          mlFuelConsumption.fuel_per_tonne ??
+                          0,
+                      )
+                      return raw > 0 ? raw.toFixed(1) : '—'
+                    })()}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Confidence{' '}
+                    {(() => {
+                      const c = Number(mlFuelConsumption.confidence ?? 0)
+                      if (!c) return 'N/A'
+                      const pct = c <= 1 ? c * 100 : c
+                      return `${pct.toFixed(0)}%`
+                    })()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {mlMinLoadingTime && mlMinLoadingTime.status !== 'no_data' && (
+            <div className="card p-4">
+              <div className="flex items-start gap-3">
+                <Clock size={20} className="text-emerald-600 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-slate-600">Minimum Loading Time (AI)</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">
+                    {(() => {
+                      const v = Number(mlMinLoadingTime.fastest_time_hours ?? 0)
+                      return v > 0 ? `${v.toFixed(1)} h` : '—'
+                    })()}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {mlMinLoadingTime.fastest_loading_point
+                      ? `Fastest at ${mlMinLoadingTime.fastest_loading_point}`
+                      : 'Based on throughput model and rake capacity'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="card p-4">
             <div className="flex items-start gap-3">

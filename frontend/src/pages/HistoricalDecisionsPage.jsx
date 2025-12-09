@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Search, Filter, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, BarChart3, Calendar, Zap, LineChart as LineChartIcon, PieChart as PieChartIcon, Target } from 'lucide-react'
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, ComposedChart, Area } from 'recharts'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 // Generate realistic mock decision data
 const generateDecisionData = () => {
@@ -37,7 +39,13 @@ const generateDecisionData = () => {
 
   const outcomes = ['Success', 'Partial Success', 'Failed', 'Pending']
   const routes = ['bokaro-dhanbad', 'bokaro-hatia', 'bokaro-kolkata', 'bokaro-patna', 'bokaro-ranchi', 'bokaro-durgapur', 'bokaro-haldia']
-  const materials = ['cr_coils', 'hr_coils', 'plates', 'wire_rods', 'tmt_bars', 'pig_iron', 'billets']
+  const materials = ['cr_coils', 'hr_coils', 'plates', 'sheets']
+  const materialSpecs = {
+    'cr_coils': { thickness: '0.5-3.0mm', width: '600-1500mm', length: 'coil' },
+    'hr_coils': { thickness: '1.2-12.7mm', width: '600-1500mm', length: 'coil' },
+    'plates': { thickness: '3-100mm', width: '1000-2000mm', length: '2000-6000mm' },
+    'sheets': { thickness: '0.4-2.0mm', width: '800-1500mm', length: '2000-4000mm' }
+  }
 
   const data = []
   const startDate = new Date('2023-01-01')
@@ -104,6 +112,8 @@ const generateDecisionData = () => {
 }
 
 export default function HistoricalDecisionsPage() {
+  const { dataImported, getPrediction } = useMLPredictions()
+  const [mlDecisionSupport, setMlDecisionSupport] = useState(null)
   const [decisionData] = useState(generateDecisionData())
   const [searchTerm, setSearchTerm] = useState('')
   const [filterScenario, setFilterScenario] = useState('all')
@@ -112,6 +122,14 @@ export default function HistoricalDecisionsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(15)
   const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState('table')
+
+  // Get ML prediction when data is imported
+  useEffect(() => {
+    if (dataImported) {
+      const decisionSupport = getPrediction('decision_support')
+      setMlDecisionSupport(decisionSupport)
+    }
+  }, [dataImported, getPrediction])
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -236,6 +254,8 @@ export default function HistoricalDecisionsPage() {
         <h1 className="text-4xl font-bold text-slate-800 mb-2">🎯 Historical Decisions Repository</h1>
         <p className="text-slate-600">Record of all strategic decisions made during complex scenarios with advanced analytics</p>
       </div>
+
+      <InlineDataImport templateId="operations" />
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">

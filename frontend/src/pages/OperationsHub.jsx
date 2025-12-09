@@ -14,9 +14,12 @@ import {
   Scatter,
 } from 'recharts'
 import { MapPin, MessageCircle, Download } from 'lucide-react'
-import ModernLayout from '../components/ModernLayout'
 import MetricCard from '../components/MetricCard'
 import ChartCard from '../components/ChartCard'
+import { useImportedData } from '../hooks/useImportedData'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
+import InlineDecisionSummary from '../features/decisionSupport/components/InlineDecisionSummary'
 
 const OperationsHub = () => {
   const [selectedRake, setSelectedRake] = useState('SAIL-R001')
@@ -25,7 +28,12 @@ const OperationsHub = () => {
   ])
   const [inputMessage, setInputMessage] = useState('')
 
-  const rakeUtilizationData = [
+  const { data: importedData, isLoaded } = useImportedData()
+  const { dataImported, getPrediction } = useMLPredictions()
+  const delayPrediction = dataImported ? getPrediction('delay_prediction') : null
+  const costPrediction = dataImported ? getPrediction('cost_prediction') : null
+
+  const baseRakeUtilizationData = [
     { utilization: 65, cost: 320, name: 'R001' },
     { utilization: 72, cost: 350, name: 'R002' },
     { utilization: 68, cost: 330, name: 'R003' },
@@ -36,7 +44,35 @@ const OperationsHub = () => {
     { utilization: 88, cost: 450, name: 'R008' },
   ]
 
-  const emptyRakeData = [
+  let rakeUtilizationData = baseRakeUtilizationData
+
+  if (isLoaded && importedData && Array.isArray(importedData.rakes) && importedData.rakes.length > 0) {
+    try {
+      const rakes = importedData.rakes
+      rakeUtilizationData = rakes.slice(0, baseRakeUtilizationData.length).map((r, idx) => {
+        const base = baseRakeUtilizationData[idx] || {}
+        const utilRaw = Number(r?.utilization ?? r?.utilization_percent ?? base.utilization ?? 0)
+        const costRaw = Number(
+          r?.cost_per_tonne ??
+            r?.costPerTon ??
+            base.cost ??
+            0
+        )
+
+        return {
+          utilization:
+            Number.isFinite(utilRaw) && utilRaw > 0 ? Math.min(100, utilRaw) : base.utilization || 70,
+          cost:
+            Number.isFinite(costRaw) && costRaw > 0 ? costRaw : base.cost || 350,
+          name: r.rakeId || r.id || base.name || `R${String(idx + 1).padStart(3, '0')}`,
+        }
+      })
+    } catch (e) {
+      rakeUtilizationData = baseRakeUtilizationData
+    }
+  }
+
+  const baseEmptyRakeData = [
     { day: 'Day 1', turnaround: 45, weather: -5000, dynamic: -1971 },
     { day: 'Day 2', turnaround: 38, weather: -3000, dynamic: -1500 },
     { day: 'Day 3', turnaround: 52, weather: -4500, dynamic: -2100 },
@@ -58,18 +94,60 @@ const OperationsHub = () => {
       ])
       setInputMessage('')
     }
+
   }
 
+  const dynamicEstimatedCost =
+    costPrediction &&
+    (typeof costPrediction.estimated_cost === 'number'
+      ? costPrediction.estimated_cost
+      : typeof costPrediction.average_cost_per_shipment === 'number'
+        ? costPrediction.average_cost_per_shipment
+        : typeof costPrediction.average_cost_per_ton === 'number'
+          ? costPrediction.average_cost_per_ton
+          : null)
+
+  const estimatedCostDisplay =
+    typeof dynamicEstimatedCost === 'number'
+      ? `₹${dynamicEstimatedCost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+      : '₹45,000'
+
+  const dynamicOnTimeProbability =
+    delayPrediction &&
+    (typeof delayPrediction.on_time_probability === 'number'
+      ? delayPrediction.on_time_probability <= 1
+        ? delayPrediction.on_time_probability * 100
+        : delayPrediction.on_time_probability
+      : typeof delayPrediction.on_time_percentage === 'number'
+        ? delayPrediction.on_time_percentage
+        : null)
+
+  const onTimeDisplay =
+    typeof dynamicOnTimeProbability === 'number'
+      ? `${dynamicOnTimeProbability.toFixed(1)}%`
+      : '98%'
+
+  const dynamicRakeAvailability =
+    isLoaded && importedData && Array.isArray(importedData.rakes)
+      ? importedData.rakes.length
+      : null
+
+  const rakeAvailabilityDisplay =
+    dynamicRakeAvailability != null && dynamicRakeAvailability > 0
+      ? `${dynamicRakeAvailability} empty rakes`
+      : '3 empty rakes'
+
   return (
-    <ModernLayout>
-      <div className="space-y-6">
+    <div className="p-8 space-y-6">
         {/* Page Header */}
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Operations Hub — Yard Map & Decision Assistant</h1>
-          <p className="text-slate-400">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Operations Hub — Yard Map & Decision Assistant</h1>
+          <p className="text-slate-600">
             Interactive operations map combined with an AI Decision Assistant to explore rake availability, loading points and dispatch recommendations.
           </p>
         </div>
+
+        <InlineDataImport templateId="operations" />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -81,7 +159,13 @@ const OperationsHub = () => {
                 <div className="text-center">
                   <MapPin size={48} className="text-cyan-400 mx-auto mb-3" />
                   <p className="text-slate-400">Interactive Yard Map</p>
-                  <p className="text-sm text-slate-500 mt-1">Showing 12 loading points across SAIL network</p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Showing{' '}
+                    {isLoaded && importedData && Array.isArray(importedData.loadingPoints) && importedData.loadingPoints.length > 0
+                      ? importedData.loadingPoints.length
+                      : 12}{' '}
+                    loading points across SAIL network
+                  </p>
                 </div>
               </div>
             </div>
@@ -130,7 +214,16 @@ const OperationsHub = () => {
               subtitle="Time from empty arrival to next dispatch"
             >
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={emptyRakeData}>
+                <BarChart data={
+                  isLoaded && importedData && Array.isArray(importedData.rakes) && importedData.rakes.length > 0
+                    ? importedData.rakes.map((rake, idx) => ({
+                        day: `Day ${idx + 1}`,
+                        turnaround: rake.turnaround_time ?? baseEmptyRakeData[idx].turnaround,
+                        weather: rake.weather_impact ?? baseEmptyRakeData[idx].weather,
+                        dynamic: rake.dynamic_routing_impact ?? baseEmptyRakeData[idx].dynamic,
+                      }))
+                    : baseEmptyRakeData
+                }>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                   <XAxis dataKey="day" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
@@ -219,17 +312,17 @@ const OperationsHub = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-slate-700/50 rounded-lg p-4">
               <p className="text-sm text-slate-400 mb-2">Estimated Cost</p>
-              <p className="text-2xl font-bold text-cyan-400">₹45,000</p>
+              <p className="text-2xl font-bold text-cyan-400">{estimatedCostDisplay}</p>
               <p className="text-xs text-slate-500 mt-1">Lower than other options due to freight distance</p>
             </div>
             <div className="bg-slate-700/50 rounded-lg p-4">
               <p className="text-sm text-slate-400 mb-2">On-Time Delivery</p>
-              <p className="text-2xl font-bold text-green-400">98%</p>
+              <p className="text-2xl font-bold text-green-400">{onTimeDisplay}</p>
               <p className="text-xs text-slate-500 mt-1">Would likely proceed? Compared to 85% from Stockyard A</p>
             </div>
             <div className="bg-slate-700/50 rounded-lg p-4">
               <p className="text-sm text-slate-400 mb-2">Rake Availability</p>
-              <p className="text-2xl font-bold text-cyan-400">3 empty rakes</p>
+              <p className="text-2xl font-bold text-cyan-400">{rakeAvailabilityDisplay}</p>
               <p className="text-xs text-slate-500 mt-1">Currently available at Nagpur yard</p>
             </div>
             <div className="bg-slate-700/50 rounded-lg p-4">
@@ -238,8 +331,12 @@ const OperationsHub = () => {
             </div>
           </div>
         </div>
+
+        <InlineDecisionSummary
+          context="operations"
+          pageTitle="Operations Hub  Yard Map & Decision Assistant"
+        />
       </div>
-    </ModernLayout>
   )
 }
 

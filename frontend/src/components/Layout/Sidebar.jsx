@@ -32,23 +32,28 @@ import {
   Database,
   BookOpen,
   Navigation,
+  Mail,
+  RefreshCw,
+  Clock,
+  MapPin,
 } from 'lucide-react'
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: TrendingUp, label: 'Demand Forecast', path: '/forecast' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+  { icon: Map, label: 'Operations Hub', path: '/operations-hub' },
+  { icon: Brain, label: 'Ops ML Decisions', path: '/operations-ml' },
+  { icon: TrendingUp, label: 'Demand', path: '/demand' },
   { icon: AlertCircle, label: 'Delay Prediction', path: '/delay' },
   { icon: Zap, label: 'Throughput', path: '/throughput' },
+  { icon: Clock, label: 'Min Loading Time', path: '/minimum-loading-time' },
   { icon: Zap, label: 'Throughput Optimization', path: '/throughput-optimization' },
-  { icon: DollarSign, label: 'Cost Analysis', path: '/cost' },
+  { icon: DollarSign, label: 'Cost', path: '/cost' },
   { icon: Truck, label: 'Optimize', path: '/optimize' },
-  { icon: Brain, label: 'ML Models', path: '/models' },
-  { icon: Settings, label: 'Admin', path: '/admin' },
   // Advanced Features
   { icon: Lightbulb, label: 'AI Forecast', path: '/ai-forecast' },
-  { icon: GitBranch, label: 'Blockchain', path: '/blockchain' },
+  
   { icon: Layers, label: 'Advanced Opt', path: '/advanced-optimization' },
-  { icon: Box, label: '3D Visualization', path: '/visualization-3d' },
+  
   { icon: Map, label: 'Scenario Analysis', path: '/scenario-analysis' },
   
   // DATA IMPORT SECTION
@@ -61,24 +66,30 @@ const menuItems = [
   { icon: Package, label: 'Inventory Management', path: '/inventory-management' },
   { icon: Warehouse, label: 'CMO Stockyards', path: '/cmo-stockyards' },
   { icon: ShoppingCart, label: 'Order Management', path: '/order-management' },
-  { icon: Train, label: 'Rake Formation', path: '/rake-formation' },
+  { icon: Train, label: 'Rakes', path: '/rakes' },
   { icon: Grid3x3, label: 'Product-Wagon Matrix', path: '/product-wagon-matrix' },
-  { icon: Route, label: 'Rail vs Road', path: '/rail-road-optimization' },
-  { icon: BarChart3, label: 'Cost Analysis Pro', path: '/cost-analysis' },
+  { icon: Route, label: 'Rail vs Road', path: '/rail-vs-road' },
   { icon: Recommendation, label: 'Production Rec', path: '/production-recommendation' },
-  { icon: Lock, label: 'Constraints Mgmt', path: '/constraints-management' },
-  { icon: FileText, label: 'Reporting', path: '/reporting' },
-  { icon: Monitor, label: 'Monitoring', path: '/monitoring' },
+  
+  // PHASE 3: QUALITY & SUPPLIER SECTION
+  { type: 'divider', label: '🔍 QUALITY & SUPPLY' },
+  { icon: BarChart3, label: 'Quality Control', path: '/quality-control' },
+  { icon: Truck, label: 'Supply Chain', path: '/supply-chain' },
+  
+  
   
   // ADVANCED FEATURES SECTION
-  { type: 'divider', label: '🚀 ADVANCED FEATURES' },
-  { icon: Truck, label: 'Rake Dispatch', path: '/rake-dispatch' },
+
+  
+  // PHASE 2 FEATURES
+  
+  // PHASE 3 FEATURES
+  { type: 'divider', label: '🏢 ENTERPRISE FEATURES' },
+  { icon: Database, label: 'SAP Connector', path: '/sap-connector' },
   { icon: Brain, label: 'Decision Support', path: '/decision-support' },
   { icon: MessageCircle, label: 'AI Chatbot', path: '/ai-chatbot' },
-  { icon: Database, label: 'Historical Data', path: '/historical-data' },
-  { icon: BookOpen, label: 'Historical Decisions', path: '/historical-decisions' },
-  { icon: Navigation, label: 'Historical Dispatch', path: '/historical-dispatch' },
-  { icon: Brain, label: 'ML Models Center', path: '/ml-center' },
+  { icon: Database, label: 'Database Dashboard', path: '/database-dashboard' },
+  { icon: BookOpen, label: 'History', path: '/history' },
 ]
 
 /**

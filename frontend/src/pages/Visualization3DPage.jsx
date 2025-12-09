@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Box, Map, Activity, Zap, Brain, AlertCircle, MapPin } from 'lucide-react'
 import axios from 'axios'
 import { Map3D } from '../components/Map3D'
@@ -7,6 +7,9 @@ import { Network3D } from '../components/Network3D'
 import { Heatmap3D } from '../components/Heatmap3D'
 import IndiaMap from '../components/IndiaMap'
 import { getRouteData, getAssistantSuggestion, getMockRouteData } from '../api/mapApi'
+import { useImportedData } from '../hooks/useImportedData'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
@@ -20,6 +23,46 @@ export default function Visualization3DPage() {
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedView, setSelectedView] = useState('warehouse')
+  const { data: importedData, isLoaded } = useImportedData()
+  const { dataImported, getPrediction } = useMLPredictions()
+
+  const datasetSummary = useMemo(() => {
+    if (!isLoaded || !importedData) return null
+
+    const orders = Array.isArray(importedData.orders) ? importedData.orders.length : 0
+    const stockyards = Array.isArray(importedData.stockyards) ? importedData.stockyards.length : 0
+    const routes = Array.isArray(importedData.routes) ? importedData.routes.length : 0
+
+    if (!orders && !stockyards && !routes) return null
+
+    return { orders, stockyards, routes }
+  }, [isLoaded, importedData])
+
+  const mlRouteOptimizationRaw = useMemo(() => {
+    if (!dataImported || !getPrediction) return null
+    const raw = getPrediction('route_optimization')
+    if (!raw) return null
+    return Array.isArray(raw) ? raw[0] : raw
+  }, [dataImported, getPrediction])
+
+  const mlRouteSummary = useMemo(() => {
+    if (!mlRouteOptimizationRaw || typeof mlRouteOptimizationRaw !== 'object') return null
+
+    const bestRoute =
+      mlRouteOptimizationRaw.optimalRoute ||
+      mlRouteOptimizationRaw.best_route ||
+      mlRouteOptimizationRaw.recommended_route ||
+      null
+
+    const riskLevel =
+      mlRouteOptimizationRaw.risk_level ||
+      mlRouteOptimizationRaw.risk ||
+      null
+
+    if (!bestRoute && !riskLevel) return { hasData: true }
+
+    return { bestRoute, riskLevel }
+  }, [mlRouteOptimizationRaw])
 
   useEffect(() => {
     fetchVisualizationData()
@@ -68,6 +111,44 @@ export default function Visualization3DPage() {
         </div>
         <p className="text-gray-600">Interactive Network & Warehouse Views</p>
       </div>
+
+      <InlineDataImport templateId="operations" />
+
+      {(datasetSummary || mlRouteSummary) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {datasetSummary && (
+            <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
+              <p className="text-sm text-gray-600">Uploaded Dataset</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
+                {datasetSummary.orders.toLocaleString()} orders
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {datasetSummary.stockyards.toLocaleString()} stockyards · {datasetSummary.routes.toLocaleString()} routes
+              </p>
+            </div>
+          )}
+          {mlRouteSummary && (
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <p className="text-sm text-gray-600">ML Route Optimization</p>
+              {mlRouteSummary.bestRoute && (
+                <p className="text-sm font-semibold text-green-700 mt-1">
+                  Best Route: {mlRouteSummary.bestRoute}
+                </p>
+              )}
+              {mlRouteSummary.riskLevel && (
+                <p className="text-xs text-gray-500 mt-1 uppercase">
+                  Risk level: {mlRouteSummary.riskLevel}
+                </p>
+              )}
+              {!mlRouteSummary.riskLevel && !mlRouteSummary.bestRoute && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Using global route_optimization predictions
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* View Selector */}
       <div className="bg-white rounded-lg shadow p-4">

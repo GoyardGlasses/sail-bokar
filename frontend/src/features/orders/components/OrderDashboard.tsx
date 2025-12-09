@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { useOrderStore } from '../store'
 import { Order, OrderStatus, OrderPriority } from '../types'
+import { useImportedData } from '../../../hooks/useImportedData'
 
 export default function OrderDashboard() {
   const [activeTab, setActiveTab] = useState<'orders' | 'tracking' | 'matching' | 'alerts'>('orders')
@@ -41,6 +42,8 @@ export default function OrderDashboard() {
     updateOrder,
     removeOrder,
   } = useOrderStore()
+
+  const { data: importedData, isLoaded } = useImportedData()
 
   const summary = getOrderSummary()
   const statusCount = getOrdersByStatusCount()
@@ -192,6 +195,128 @@ export default function OrderDashboard() {
     },
   ]
 
+  const hasImportedOrders =
+    isLoaded &&
+    importedData?.orders &&
+    Array.isArray(importedData.orders) &&
+    importedData.orders.length > 0
+
+  const runtimeOrders: Order[] = hasImportedOrders
+    ? importedData.orders.map((o: any, index: number) => {
+        const fallback = mockOrders[index % mockOrders.length]
+
+        const quantity = Number(
+          o?.totalQuantity ?? o?.quantity ?? fallback.totalQuantity ?? 0
+        )
+
+        const estimatedCost = Number(
+          o?.estimatedCost ?? o?.cost ?? fallback.estimatedCost ?? 0
+        )
+
+        const priorityRaw = (o?.priority || fallback.priority || 'medium')
+          .toString()
+          .toLowerCase()
+        const priority: OrderPriority =
+          priorityRaw === 'urgent'
+            ? 'urgent'
+            : priorityRaw === 'high'
+              ? 'high'
+              : priorityRaw === 'low'
+                ? 'low'
+                : 'medium'
+
+        const statusRaw = (o?.status || fallback.status || 'pending')
+          .toString()
+          .toLowerCase()
+        const status: OrderStatus =
+          statusRaw === 'allocated'
+            ? 'allocated'
+            : statusRaw === 'loading'
+              ? 'loading'
+              : statusRaw === 'dispatched'
+                ? 'dispatched'
+                : statusRaw === 'in_transit' || statusRaw === 'in-transit'
+                  ? 'in_transit'
+                  : statusRaw === 'delivered'
+                    ? 'delivered'
+                    : statusRaw === 'cancelled' || statusRaw === 'canceled'
+                      ? 'cancelled'
+                      : 'pending'
+
+        const baseItem = fallback.items[0]
+
+        const items =
+          Array.isArray(o?.items) && o.items.length > 0
+            ? o.items.map((it: any, idx: number) => ({
+                id: it?.id || `imp-item-${index}-${idx}`,
+                materialId: it?.materialId || it?.materialCode || baseItem.materialId,
+                materialName: it?.materialName || it?.material || baseItem.materialName,
+                quantity: Number(it?.quantity ?? baseItem.quantity),
+                quantityUnit: it?.quantityUnit || baseItem.quantityUnit,
+                destination: it?.destination || o?.destination || baseItem.destination,
+                priority: (it?.priority || priority) as OrderPriority,
+              }))
+            : [
+                {
+                  id: `imp-item-${index}-0`,
+                  materialId: o?.materialId || o?.materialCode || baseItem.materialId,
+                  materialName: o?.materialName || o?.material || baseItem.materialName,
+                  quantity,
+                  quantityUnit: o?.quantityUnit || baseItem.quantityUnit,
+                  destination: o?.destination || baseItem.destination,
+                  priority,
+                },
+              ]
+
+        return {
+          id: o?.id || o?.orderId || fallback.id,
+          orderId: o?.orderId || fallback.orderId,
+          customerId: o?.customerId || fallback.customerId,
+          customer: {
+            id: o?.customerId || fallback.customer.id,
+            name: o?.customerName || fallback.customer.name,
+            email: o?.customerEmail || fallback.customer.email,
+            phone: o?.customerPhone || fallback.customer.phone,
+            location:
+              o?.customerLocation || o?.destination || fallback.customer.location,
+            creditLimit: Number(
+              o?.creditLimit ?? fallback.customer.creditLimit ?? 0,
+            ),
+            rating: Number(o?.rating ?? fallback.customer.rating ?? 0),
+          },
+          items,
+          totalQuantity: quantity || fallback.totalQuantity,
+          orderDate: o?.orderDate || o?.createdAt || fallback.orderDate,
+          requiredDeliveryDate:
+            o?.requiredDeliveryDate || o?.deliveryDate || fallback.requiredDeliveryDate,
+          sla: Number(o?.sla ?? fallback.sla ?? 0),
+          priority,
+          status,
+          fulfillmentMode: o?.fulfillmentMode || o?.mode || fallback.fulfillmentMode,
+          estimatedCost,
+          createdAt: o?.createdAt || fallback.createdAt,
+          updatedAt: o?.updatedAt || fallback.updatedAt,
+        }
+      })
+    : mockOrders
+
+  const summaryData = hasImportedOrders
+    ? {
+        ...summary,
+        totalOrders: runtimeOrders.length,
+        pendingOrders: runtimeOrders.filter((o) => o.status === 'pending').length,
+        deliveredOrders: runtimeOrders.filter((o) => o.status === 'delivered').length,
+        totalQuantity: runtimeOrders.reduce(
+          (sum, o) => sum + (o.totalQuantity || 0),
+          0,
+        ),
+        totalValue: runtimeOrders.reduce(
+          (sum, o) => sum + (o.estimatedCost || 0),
+          0,
+        ),
+      }
+    : summary
+
   // Initialize with mock data
   useEffect(() => {
     if (orders.length === 0) {
@@ -200,7 +325,7 @@ export default function OrderDashboard() {
   }, [])
 
   // Filter orders
-  const filteredOrders = mockOrders.filter((o) => {
+  const filteredOrders = runtimeOrders.filter((o) => {
     const statusMatch = filterStatus === 'all' || o.status === filterStatus
     const priorityMatch = filterPriority === 'all' || o.priority === filterPriority
     return statusMatch && priorityMatch
@@ -271,10 +396,10 @@ export default function OrderDashboard() {
             <span className="text-sm text-slate-600 dark:text-slate-400">Total Orders</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            {summary.totalOrders}
+            {summaryData.totalOrders}
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.pendingOrders} pending
+            {summaryData.pendingOrders} pending
           </p>
         </div>
 
@@ -284,10 +409,10 @@ export default function OrderDashboard() {
             <span className="text-sm text-slate-600 dark:text-slate-400">Delivered</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            {summary.deliveredOrders}
+            {summaryData.deliveredOrders}
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.onTimeDeliveryRate}% on-time
+            {summaryData.onTimeDeliveryRate}% on-time
           </p>
         </div>
 
@@ -297,10 +422,10 @@ export default function OrderDashboard() {
             <span className="text-sm text-slate-600 dark:text-slate-400">Total Value</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            ₹{(summary.totalValue / 100000).toFixed(1)}L
+            ₹{(summaryData.totalValue / 100000).toFixed(1)}L
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.totalQuantity.toLocaleString()} tonnes
+            {summaryData.totalQuantity.toLocaleString()} tonnes
           </p>
         </div>
 
@@ -310,10 +435,10 @@ export default function OrderDashboard() {
             <span className="text-sm text-slate-600 dark:text-slate-400">SLA Compliance</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            {summary.slaComplianceRate}%
+            {summaryData.slaComplianceRate}%
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.averageDeliveryTime}h avg delivery
+            {summaryData.averageDeliveryTime}h avg delivery
           </p>
         </div>
 
@@ -322,7 +447,7 @@ export default function OrderDashboard() {
             <AlertTriangle className="text-red-600" size={24} />
             <span className="text-sm text-slate-600 dark:text-slate-400">Alerts</span>
           </div>
-          <p className="text-2xl font-bold text-red-600">{summary.criticalAlerts}</p>
+          <p className="text-2xl font-bold text-red-600">{summaryData.criticalAlerts}</p>
           <p className="text-xs text-slate-500 mt-1">
             {totalAlerts} total alerts
           </p>

@@ -1,0 +1,6 @@
+ortools
+pydantic
+scikit-learn
+numpy
+pandas
+pytest

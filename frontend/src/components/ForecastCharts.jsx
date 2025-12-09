@@ -32,9 +32,26 @@ export default function ForecastCharts({ data, isLoading }) {
 
   // KPI calculations
   const summary = data.summary || {}
+  const horizonDays = data.predictions.length
   const avgDemand = Math.round(
     data.predictions.reduce((sum, p) => sum + (p.demand || 0), 0) / data.predictions.length
   )
+
+  let peakDemand = null
+  let peakDate = null
+  data.predictions.forEach((p) => {
+    const d = typeof p.demand === 'number' ? p.demand : 0
+    if (!Number.isFinite(d)) return
+    if (peakDemand === null || d > peakDemand) {
+      peakDemand = d
+      peakDate = p.date
+    }
+  })
+
+  const totalTonnes =
+    typeof summary.predicted_tonnes === 'number' && Number.isFinite(summary.predicted_tonnes)
+      ? summary.predicted_tonnes
+      : avgDemand * horizonDays
 
   return (
     <div className="space-y-6">
@@ -61,7 +78,18 @@ export default function ForecastCharts({ data, isLoading }) {
 
       {/* Time-Series Chart */}
       <div className="card">
-        <h3 className="text-lg font-bold text-slate-900 mb-4">Demand Forecast with 90% Confidence Interval</h3>
+        <h3 className="text-lg font-bold text-slate-900 mb-1">Demand Forecast with 90% Confidence Interval</h3>
+        <p className="text-xs text-slate-600 mb-3">
+          Over the next {horizonDays} days, the model predicts an average of {avgDemand.toLocaleString()} tonnes per
+          day, totalling approximately {totalTonnes.toLocaleString()} tonnes. The blue line shows predicted demand by
+          day, while the shaded band between the upper and lower series is the 90% confidence interval.{' '}
+          {peakDemand != null && peakDate && (
+            <span>
+              The highest day in this forecast is {peakDate} at about {peakDemand.toLocaleString()} tonnes, which is
+              roughly {Math.round((peakDemand / avgDemand - 1) * 100)}% above the average.
+            </span>
+          )}
+        </p>
         <ResponsiveContainer width="100%" height={400}>
           <ComposedChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />

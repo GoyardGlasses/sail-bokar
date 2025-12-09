@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { AlertCircle, CheckCircle, Lock, Zap } from 'lucide-react'
 
 export default function ConstraintsManagementDashboard() {
-  const [activeTab, setActiveTab] = useState<'constraints' | 'violations' | 'rules'>('constraints')
+  const [activeTab, setActiveTab] = useState<'constraints' | 'violations'>('constraints')
 
   const mockConstraints = [
     {
@@ -45,6 +45,37 @@ export default function ConstraintsManagementDashboard() {
     },
   ]
 
+  const [constraints, setConstraints] = useState(mockConstraints)
+
+  const handleAddConstraint = () => {
+    const nameInput = window.prompt('Enter constraint name', 'Min Rake Size')
+    if (!nameInput || !nameInput.trim()) {
+      return
+    }
+
+    const ruleInput = window.prompt('Enter constraint rule/description', 'Minimum 300 tonnes per rake')
+    if (!ruleInput || !ruleInput.trim()) {
+      return
+    }
+
+    setConstraints((prev) => {
+      const base = prev || []
+      const nextIndex = base.length + 1
+      const id = `c-${String(nextIndex).padStart(3, '0')}`
+      return [
+        ...base,
+        {
+          id,
+          name: nameInput.trim(),
+          type: 'custom',
+          severity: 'high',
+          status: 'active',
+          rule: ruleInput.trim(),
+        },
+      ]
+    })
+  }
+
   return (
     <div className="space-y-6 p-8">
       {/* Header */}
@@ -57,7 +88,10 @@ export default function ConstraintsManagementDashboard() {
             Manage operational and business constraints
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <button
+          onClick={handleAddConstraint}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
           <Lock size={18} />
           Add Constraint
         </button>
@@ -68,7 +102,7 @@ export default function ConstraintsManagementDashboard() {
         <div className="card">
           <p className="text-sm text-slate-600 dark:text-slate-400">Active Constraints</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            {mockConstraints.length}
+            {constraints.length}
           </p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">All critical</p>
         </div>
@@ -94,7 +128,6 @@ export default function ConstraintsManagementDashboard() {
         {[
           { id: 'constraints', label: 'Constraints', icon: Lock },
           { id: 'violations', label: 'Violations', icon: AlertCircle },
-          { id: 'rules', label: 'Rules', icon: Zap },
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -115,7 +148,7 @@ export default function ConstraintsManagementDashboard() {
       <div className="space-y-4">
         {activeTab === 'constraints' && (
           <div className="space-y-3">
-            {mockConstraints.map((constraint) => (
+            {constraints.map((constraint) => (
               <div key={constraint.id} className="card border-l-4 border-blue-500">
                 <div className="flex items-start justify-between">
                   <div>
@@ -160,14 +193,6 @@ export default function ConstraintsManagementDashboard() {
                 </div>
               ))
             )}
-          </div>
-        )}
-
-        {activeTab === 'rules' && (
-          <div className="card">
-            <p className="text-slate-600 dark:text-slate-400 text-center py-8">
-              Rules management coming soon
-            </p>
           </div>
         )}
       </div>

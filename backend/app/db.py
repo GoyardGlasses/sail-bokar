@@ -23,6 +23,10 @@ DB_POOL_SIZE = int(os.getenv('DB_POOL_SIZE', '10'))
 DB_MAX_OVERFLOW = int(os.getenv('DB_MAX_OVERFLOW', '20'))
 USE_CSV_MODE = os.getenv('USE_CSV_MODE', 'false').lower() == 'true'
 
+# Database status
+DB_INITIALIZED = False
+DB_READY = False
+
 # Create engine
 try:
     engine = create_engine(

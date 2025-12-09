@@ -15,6 +15,8 @@ import {
   Calendar,
   Users,
 } from 'lucide-react'
+import { useImportedData } from '../../../hooks/useImportedData'
+import { useMLPredictions } from '../../../context/MLPredictionsContext'
 
 interface Rake {
   id: string
@@ -157,6 +159,87 @@ export default function RakeDispatchOptimization() {
   const [rakes, setRakes] = useState<Rake[]>(mockRakes)
   const [orders, setOrders] = useState<Order[]>(mockOrders)
   const [dispatchPlans, setDispatchPlans] = useState<DispatchPlan[]>([])
+
+  const { data: importedData, isLoaded } = useImportedData()
+  const { dataImported, getPrediction } = useMLPredictions()
+
+  const mlRouteOptimizationRaw: any = dataImported ? getPrediction('route_optimization') : null
+  const mlRouteOptimization: any = Array.isArray(mlRouteOptimizationRaw) ? mlRouteOptimizationRaw[0] : mlRouteOptimizationRaw
+
+  // When imported data is available, map it into rakes & orders while keeping mocks as fallback
+  useEffect(() => {
+    if (!isLoaded) return
+
+    try {
+      if (importedData?.rakes && Array.isArray(importedData.rakes) && importedData.rakes.length > 0) {
+        const mappedRakes: Rake[] = importedData.rakes.map((r: any, index: number) => {
+          const fallback = mockRakes[index % mockRakes.length]
+
+          const capacity = Number(r?.capacity ?? fallback.capacity)
+          const currentLoad = Number(r?.currentLoad ?? r?.load ?? fallback.currentLoad)
+          const utilization = capacity > 0
+            ? Math.round((currentLoad / capacity) * 100)
+            : fallback.utilization
+
+          const statusRaw = (r?.status || fallback.status || 'scheduled').toString().toLowerCase()
+          const status: Rake['status'] =
+            statusRaw === 'available' ? 'available' :
+            statusRaw === 'in-transit' || statusRaw === 'in_transit' ? 'in-transit' :
+            statusRaw === 'maintenance' ? 'maintenance' :
+            'scheduled'
+
+          return {
+            id: r?.id || r?.rakeId || fallback.id,
+            name: r?.name || fallback.name,
+            capacity: capacity || fallback.capacity,
+            currentLoad: currentLoad || fallback.currentLoad,
+            destination: r?.destination || r?.routeDestination || fallback.destination,
+            status,
+            eta: r?.eta || (typeof r?.etaHours === 'number' ? `${r.etaHours}h` : fallback.eta),
+            cost: Number(r?.cost ?? r?.estimatedCost ?? fallback.cost),
+            utilization,
+            lastLocation: r?.lastLocation || fallback.lastLocation,
+            progress: typeof r?.progress === 'number' ? r.progress : fallback.progress,
+          }
+        })
+        setRakes(mappedRakes)
+      }
+
+      if (importedData?.orders && Array.isArray(importedData.orders) && importedData.orders.length > 0) {
+        const mappedOrders: Order[] = importedData.orders.map((o: any, index: number) => {
+          const fallback = mockOrders[index % mockOrders.length]
+
+          const priorityRaw = (o?.priority || fallback.priority || 'medium').toString().toLowerCase()
+          const priority: Order['priority'] =
+            priorityRaw === 'high' || priorityRaw === 'urgent' ? 'high' :
+            priorityRaw === 'low' ? 'low' :
+            'medium'
+
+          const statusRaw = (o?.status || fallback.status || 'assigned').toString().toLowerCase()
+          const status: Order['status'] =
+            statusRaw === 'pending' ? 'pending' :
+            statusRaw === 'dispatched' ? 'dispatched' :
+            statusRaw === 'delivered' ? 'delivered' :
+            'assigned'
+
+          return {
+            id: o?.id || o?.orderId || fallback.id,
+            product: o?.product || o?.material || fallback.product,
+            quantity: Number(o?.quantity ?? fallback.quantity),
+            destination: o?.destination || fallback.destination,
+            priority,
+            deadline: o?.deliveryDate || fallback.deadline,
+            customer: o?.customerName || o?.customer || fallback.customer,
+            status,
+          }
+        })
+        setOrders(mappedOrders)
+      }
+    } catch (error) {
+      // If anything goes wrong, stay with mock-based defaults
+      console.error('Failed to map imported data for rake dispatch:', error)
+    }
+  }, [isLoaded, importedData])
 
   useEffect(() => {
     // Calculate dispatch plans
@@ -566,6 +649,46 @@ export default function RakeDispatchOptimization() {
               </div>
             </div>
           </div>
+
+          {mlRouteOptimization && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">ML Route Optimization Insight</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Optimal route suggestion from ML models based on your uploaded data.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600">Optimal Route</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {mlRouteOptimization.optimalRoute || mlRouteOptimization.best_route || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Cost Savings</p>
+                  <p className="text-lg font-bold text-green-600">
+                    ₹{Number(mlRouteOptimization.costSavings ?? mlRouteOptimization.cost_savings ?? 0).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Time Savings (h)</p>
+                  <p className="text-lg font-bold text-blue-600">
+                    {Number(mlRouteOptimization.timeSavings ?? mlRouteOptimization.time_savings ?? 0).toFixed(1)}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between text-sm">
+                <span className="text-gray-600">Model Confidence</span>
+                <span className="text-lg font-bold text-purple-600">
+                  {(() => {
+                    const raw = Number(mlRouteOptimization.confidence ?? 0)
+                    if (!raw) return '0%'
+                    const pct = raw <= 1 ? raw * 100 : raw
+                    return `${pct.toFixed(0)}%`
+                  })()}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

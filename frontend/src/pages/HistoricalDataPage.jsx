@@ -1,11 +1,19 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Download, Upload, Filter, Search, TrendingUp, Calendar, MapPin, Package, DollarSign, AlertCircle, BarChart3, LineChart as LineChartIcon, Eye, TrendingDown, Zap } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, ComposedChart, Area } from 'recharts'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 // Realistic mock historical data
 const generateHistoricalData = () => {
   const routes = ['bokaro-dhanbad', 'bokaro-hatia', 'bokaro-kolkata', 'bokaro-patna', 'bokaro-ranchi', 'bokaro-durgapur', 'bokaro-haldia']
-  const materials = ['cr_coils', 'hr_coils', 'plates', 'wire_rods', 'tmt_bars', 'pig_iron', 'billets']
+  const materials = ['cr_coils', 'hr_coils', 'plates', 'sheets']
+  const materialSpecs = {
+    'cr_coils': { thickness: '0.5-3.0mm', width: '600-1500mm', length: 'coil', density: 7.85 },
+    'hr_coils': { thickness: '1.2-12.7mm', width: '600-1500mm', length: 'coil', density: 7.85 },
+    'plates': { thickness: '3-100mm', width: '1000-2000mm', length: '2000-6000mm', density: 7.85 },
+    'sheets': { thickness: '0.4-2.0mm', width: '800-1500mm', length: '2000-4000mm', density: 7.85 }
+  }
   const statuses = ['delivered', 'delayed', 'on-time', 'cancelled']
   
   const data = []
@@ -47,10 +55,7 @@ const generateHistoricalData = () => {
       'cr_coils': 15,
       'hr_coils': 22,
       'plates': 28,
-      'wire_rods': 18,
-      'tmt_bars': 20,
-      'pig_iron': 32,
-      'billets': 19,
+      'sheets': 18,
     }
     
     const baseRisk = (routeRiskMap[route] + materialRiskMap[material]) / 2
@@ -58,6 +63,7 @@ const generateHistoricalData = () => {
     const trafficRisk = trafficLevel === 'very-high' ? 15 : trafficLevel === 'high' ? 8 : 0
     const riskScore = Math.min(100, baseRisk + weatherRisk + trafficRisk)
     
+    const specs = materialSpecs[material]
     data.push({
       id: i + 1,
       date: date.toISOString().split('T')[0],
@@ -74,6 +80,10 @@ const generateHistoricalData = () => {
       trafficLevel,
       riskScore: Math.round(riskScore),
       accuracy: Math.round(Math.random() * 20 + 80), // 80-100% accuracy
+      thickness: specs.thickness,
+      width: specs.width,
+      length: specs.length,
+      density: specs.density,
     })
   }
   
@@ -81,6 +91,8 @@ const generateHistoricalData = () => {
 }
 
 export default function HistoricalDataPage() {
+  const { dataImported, getPrediction } = useMLPredictions()
+  const [mlPredictions, setMlPredictions] = useState({})
   const [historicalData] = useState(generateHistoricalData())
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRoute, setFilterRoute] = useState('all')
@@ -90,6 +102,18 @@ export default function HistoricalDataPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState('table')
   const [selectedRoute, setSelectedRoute] = useState(null)
+
+  // Get ML predictions when data is imported
+  useEffect(() => {
+    if (dataImported) {
+      const predictions = {
+        delay: getPrediction('delay_prediction'),
+        cost: getPrediction('cost_prediction'),
+        demand: getPrediction('demand_forecasting'),
+      }
+      setMlPredictions(predictions)
+    }
+  }, [dataImported, getPrediction])
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -201,6 +225,8 @@ export default function HistoricalDataPage() {
         <h1 className="text-4xl font-bold text-slate-800 mb-2">📊 Historical Data Repository</h1>
         <p className="text-slate-600">Complete record of all shipments, routes, and logistics operations with advanced analytics</p>
       </div>
+
+      <InlineDataImport templateId="operations" />
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">
@@ -399,6 +425,9 @@ export default function HistoricalDataPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Date</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Route</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Material</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Thickness</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Width</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Length</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Tonnage</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Planned</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Actual</th>
@@ -415,6 +444,9 @@ export default function HistoricalDataPage() {
                   <td className="px-6 py-3 text-sm text-slate-600">{item.date}</td>
                   <td className="px-6 py-3 text-sm text-slate-700 font-medium">{item.route}</td>
                   <td className="px-6 py-3 text-sm text-slate-600">{item.material}</td>
+                  <td className="px-6 py-3 text-sm text-blue-600 font-medium">{item.thickness}</td>
+                  <td className="px-6 py-3 text-sm text-blue-600 font-medium">{item.width}</td>
+                  <td className="px-6 py-3 text-sm text-blue-600 font-medium">{item.length}</td>
                   <td className="px-6 py-3 text-sm text-slate-600">{item.tonnage}T</td>
                   <td className="px-6 py-3 text-sm text-slate-600">{item.plannedDays}d</td>
                   <td className="px-6 py-3 text-sm text-slate-600">{item.actualDays}d</td>

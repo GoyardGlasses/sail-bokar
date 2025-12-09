@@ -1,11 +1,19 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Search, Filter, MapPin, Truck, Package, Calendar, DollarSign, AlertCircle, CheckCircle, Clock, TrendingUp, Navigation, Zap, Users, Gauge, BarChart3, LineChart as LineChartIcon, Award, Fuel } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Area } from 'recharts'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 // Generate realistic mock dispatch data
 const generateDispatchData = () => {
   const routes = ['bokaro-dhanbad', 'bokaro-hatia', 'bokaro-kolkata', 'bokaro-patna', 'bokaro-ranchi', 'bokaro-durgapur', 'bokaro-haldia']
-  const materials = ['cr_coils', 'hr_coils', 'plates', 'wire_rods', 'tmt_bars', 'pig_iron', 'billets']
+  const materials = ['cr_coils', 'hr_coils', 'plates', 'sheets']
+  const materialSpecs = {
+    'cr_coils': { thickness: '0.5-3.0mm', width: '600-1500mm', length: 'coil' },
+    'hr_coils': { thickness: '1.2-12.7mm', width: '600-1500mm', length: 'coil' },
+    'plates': { thickness: '3-100mm', width: '1000-2000mm', length: '2000-6000mm' },
+    'sheets': { thickness: '0.4-2.0mm', width: '800-1500mm', length: '2000-4000mm' }
+  }
   const vehicles = ['Truck-001', 'Truck-002', 'Truck-003', 'Truck-004', 'Truck-005', 'Truck-006', 'Truck-007', 'Truck-008', 'Truck-009', 'Truck-010']
   const drivers = ['Driver Rajesh', 'Driver Amit', 'Driver Priya', 'Driver Vikram', 'Driver Neha', 'Driver Arjun', 'Driver Deepak', 'Driver Sanjay']
   const reasons = [
@@ -155,6 +163,8 @@ const generateDispatchData = () => {
 }
 
 export default function HistoricalDispatchPage() {
+  const { dataImported, getPrediction } = useMLPredictions()
+  const [mlPredictions, setMlPredictions] = useState({})
   const [dispatchData] = useState(generateDispatchData())
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRoute, setFilterRoute] = useState('all')
@@ -164,6 +174,18 @@ export default function HistoricalDispatchPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [expandedId, setExpandedId] = useState(null)
   const [activeTab, setActiveTab] = useState('table')
+
+  // Get ML predictions when data is imported
+  useEffect(() => {
+    if (dataImported) {
+      const predictions = {
+        delay: getPrediction('delay_prediction'),
+        fuel: getPrediction('fuel_consumption'),
+        quality: getPrediction('quality_prediction'),
+      }
+      setMlPredictions(predictions)
+    }
+  }, [dataImported, getPrediction])
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -299,6 +321,8 @@ export default function HistoricalDispatchPage() {
         <h1 className="text-4xl font-bold text-slate-800 mb-2">🚚 Historical Dispatch & Routes</h1>
         <p className="text-slate-600">Complete record of all dispatches with advanced analytics and performance tracking</p>
       </div>
+
+      <InlineDataImport templateId="operations" />
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-slate-300 mb-6 overflow-x-auto pb-2">
@@ -614,6 +638,25 @@ export default function HistoricalDispatchPage() {
               {/* Expanded Details */}
               {expandedId === dispatch.id && (
                 <div className="border-t border-slate-200 pt-4 space-y-4">
+                  {/* Material Specifications */}
+                  <div className="bg-purple-50 p-3 rounded">
+                    <p className="text-sm font-semibold text-slate-800 mb-2">Material Specifications:</p>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div>
+                        <p className="text-xs text-slate-600">Thickness</p>
+                        <p className="font-semibold text-slate-800">{dispatch.thickness}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600">Width</p>
+                        <p className="font-semibold text-slate-800">{dispatch.width}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600">Length</p>
+                        <p className="font-semibold text-slate-800">{dispatch.length}</p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Quality Metrics */}
                   <div className="bg-blue-50 p-3 rounded">
                     <p className="text-sm font-semibold text-slate-800 mb-2">Quality Metrics:</p>

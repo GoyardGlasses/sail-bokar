@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "timestamp": "2024-12-03T23:44:00Z",
+    "description": "Comprehensive logistics dataset covering all 31+ pages with detailed information",
+    "totalRecords": 5000,
+    "dataTypes": ["orders", "materials", "routes", "vehicles", "suppliers", "stockyards", "historical_shipments", "historical_decisions", "historical_dispatches", "ml_predictions", "alerts", "reports", "analytics"]
+  },
+  "orders": [
+    {"orderId": "ORD-2024-001", "customerId": "CUST-001", "customerName": "Tata Steel Limited", "material": "HR Coils", "quantity": 500, "unit": "tons", "sourceStockyard": "Bokaro-Main", "destination": "Kolkata Port", "deliveryDate": "2024-12-10", "priority": "high", "specialRequirements": "Temperature controlled", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 65000, "estimatedDelay": 0.5},
+    {"orderId": "ORD-2024-002", "customerId": "CUST-002", "customerName": "JSW Steel", "material": "CR Coils", "quantity": 350, "unit": "tons", "sourceStockyard": "Bokaro-East", "destination": "Mumbai Port", "deliveryDate": "2024-12-15", "priority": "medium", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 52000, "estimatedDelay": 1.2},
+    {"orderId": "ORD-2024-003", "customerId": "CUST-003", "customerName": "NMDC Limited", "material": "Plates", "quantity": 400, "unit": "tons", "sourceStockyard": "Bokaro-West", "destination": "Durgapur", "deliveryDate": "2024-12-08", "priority": "urgent", "specialRequirements": "Rush delivery", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 48000, "estimatedDelay": 0.2},
+    {"orderId": "ORD-2024-004", "customerId": "CUST-004", "customerName": "ArcelorMittal", "material": "Wire Rods", "quantity": 250, "unit": "tons", "sourceStockyard": "Bokaro-Main", "destination": "Ranchi", "deliveryDate": "2024-12-12", "priority": "medium", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 35000, "estimatedDelay": 0.8},
+    {"orderId": "ORD-2024-005", "customerId": "CUST-005", "customerName": "Essar Steel", "material": "TMT Bars", "quantity": 600, "unit": "tons", "sourceStockyard": "Bokaro-East", "destination": "Patna", "deliveryDate": "2024-12-14", "priority": "high", "specialRequirements": "Bundled packaging", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 72000, "estimatedDelay": 0.3},
+    {"orderId": "ORD-2024-006", "customerId": "CUST-001", "customerName": "Tata Steel Limited", "material": "Pig Iron", "quantity": 800, "unit": "tons", "sourceStockyard": "Bokaro-Main", "destination": "Hatia", "deliveryDate": "2024-12-11", "priority": "medium", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 58000, "estimatedDelay": 0.6},
+    {"orderId": "ORD-2024-007", "customerId": "CUST-006", "customerName": "Jindal Steel", "material": "Billets", "quantity": 450, "unit": "tons", "sourceStockyard": "Bokaro-West", "destination": "Kolkata", "deliveryDate": "2024-12-13", "priority": "low", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 42000, "estimatedDelay": 1.5},
+    {"orderId": "ORD-2024-008", "customerId": "CUST-007", "customerName": "SAIL Rourkela", "material": "HR Coils", "quantity": 550, "unit": "tons", "sourceStockyard": "Bokaro-East", "destination": "Durgapur", "deliveryDate": "2024-12-09", "priority": "high", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 68000, "estimatedDelay": 0.4},
+    {"orderId": "ORD-2024-009", "customerId": "CUST-008", "customerName": "Vedanta Limited", "material": "Plates", "quantity": 320, "unit": "tons", "sourceStockyard": "Bokaro-Main", "destination": "Haldia", "deliveryDate": "2024-12-16", "priority": "medium", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 55000, "estimatedDelay": 1.1},
+    {"orderId": "ORD-2024-010", "customerId": "CUST-009", "customerName": "Hindalco Industries", "material": "CR Coils", "quantity": 280, "unit": "tons", "sourceStockyard": "Bokaro-West", "destination": "Pune", "deliveryDate": "2024-12-17", "priority": "low", "specialRequirements": "None", "status": "pending", "createdDate": "2024-12-03", "estimatedCost": 38000, "estimatedDelay": 2.0}
+  ],
+  "materials": [
+    {"materialId": "MAT-001", "name": "HR Coils", "thickness": "1.2-12.7mm", "width": "600-1500mm", "length": "coil", "density": 7.85, "unitPrice": 3500, "availableQuantity": 5000, "storageLocation": "Bokaro-Main", "riskFactor": 22, "qualityScore": 85, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 500, "maxStockLevel": 10000},
+    {"materialId": "MAT-002", "name": "CR Coils", "thickness": "0.5-3.0mm", "width": "600-1500mm", "length": "coil", "density": 7.85, "unitPrice": 5200, "availableQuantity": 3500, "storageLocation": "Bokaro-East", "riskFactor": 15, "qualityScore": 92, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 400, "maxStockLevel": 8000},
+    {"materialId": "MAT-003", "name": "Plates", "thickness": "3-100mm", "width": "1000-2000mm", "length": "2000-6000mm", "density": 7.85, "unitPrice": 4200, "availableQuantity": 2800, "storageLocation": "Bokaro-West", "riskFactor": 28, "qualityScore": 88, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 300, "maxStockLevel": 7000},
+    {"materialId": "MAT-004", "name": "Wire Rods", "thickness": "5.5-16mm", "width": "N/A", "length": "coil", "density": 7.85, "unitPrice": 2800, "availableQuantity": 4200, "storageLocation": "Bokaro-Main", "riskFactor": 18, "qualityScore": 90, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 450, "maxStockLevel": 9000},
+    {"materialId": "MAT-005", "name": "TMT Bars", "thickness": "8-32mm", "width": "N/A", "length": "12m", "density": 7.85, "unitPrice": 3100, "availableQuantity": 6000, "storageLocation": "Bokaro-East", "riskFactor": 20, "qualityScore": 87, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 600, "maxStockLevel": 12000},
+    {"materialId": "MAT-006", "name": "Pig Iron", "thickness": "N/A", "width": "N/A", "length": "bulk", "density": 7.3, "unitPrice": 2500, "availableQuantity": 8000, "storageLocation": "Bokaro-Main", "riskFactor": 32, "qualityScore": 82, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 800, "maxStockLevel": 15000},
+    {"materialId": "MAT-007", "name": "Billets", "thickness": "100-150mm", "width": "100-150mm", "length": "600-1200mm", "density": 7.85, "unitPrice": 3400, "availableQuantity": 3500, "storageLocation": "Bokaro-West", "riskFactor": 19, "qualityScore": 89, "supplier": "SAIL Bokaro", "lastUpdated": "2024-12-03", "minStockLevel": 350, "maxStockLevel": 7500}
+  ],
+  "routes": [
+    {"routeId": "RT-001", "name": "Bokaro-Dhanbad", "origin": "Bokaro", "destination": "Dhanbad", "distance": 85, "estimatedTime": 4, "riskScore": 85, "weatherRisk": "high", "trafficLevel": "high", "tollCost": 500, "fuelCost": 425, "totalCost": 925, "railAvailable": true, "roadAvailable": true, "railTime": 6, "railCost": 800, "roadTime": 4, "roadCost": 925, "historicalDelay": 2.5, "delayVariance": 1.2, "onTimePercentage": 68},
+    {"routeId": "RT-002", "name": "Bokaro-Hatia", "origin": "Bokaro", "destination": "Hatia", "distance": 120, "estimatedTime": 6, "riskScore": 35, "weatherRisk": "medium", "trafficLevel": "medium", "tollCost": 800, "fuelCost": 600, "totalCost": 1400, "railAvailable": true, "roadAvailable": true, "railTime": 8, "railCost": 1200, "roadTime": 6, "roadCost": 1400, "historicalDelay": 0.8, "delayVariance": 0.5, "onTimePercentage": 85},
+    {"routeId": "RT-003", "name": "Bokaro-Kolkata", "origin": "Bokaro", "destination": "Kolkata", "distance": 180, "estimatedTime": 8, "riskScore": 12, "weatherRisk": "low", "trafficLevel": "low", "tollCost": 1200, "fuelCost": 900, "totalCost": 2100, "railAvailable": true, "roadAvailable": true, "railTime": 12, "railCost": 1800, "roadTime": 8, "roadCost": 2100, "historicalDelay": 0.3, "delayVariance": 0.2, "onTimePercentage": 95},
+    {"routeId": "RT-004", "name": "Bokaro-Patna", "origin": "Bokaro", "destination": "Patna", "distance": 150, "estimatedTime": 7, "riskScore": 8, "weatherRisk": "low", "trafficLevel": "low", "tollCost": 1000, "fuelCost": 750, "totalCost": 1750, "railAvailable": true, "roadAvailable": true, "railTime": 10, "railCost": 1500, "roadTime": 7, "roadCost": 1750, "historicalDelay": 0.2, "delayVariance": 0.1, "onTimePercentage": 98},
+    {"routeId": "RT-005", "name": "Bokaro-Ranchi", "origin": "Bokaro", "destination": "Ranchi", "distance": 95, "estimatedTime": 5, "riskScore": 10, "weatherRisk": "low", "trafficLevel": "low", "tollCost": 600, "fuelCost": 475, "totalCost": 1075, "railAvailable": false, "roadAvailable": true, "railTime": 0, "railCost": 0, "roadTime": 5, "roadCost": 1075, "historicalDelay": 0.4, "delayVariance": 0.3, "onTimePercentage": 92},
+    {"routeId": "RT-006", "name": "Bokaro-Durgapur", "origin": "Bokaro", "destination": "Durgapur", "distance": 110, "estimatedTime": 5.5, "riskScore": 15, "weatherRisk": "low", "trafficLevel": "medium", "tollCost": 700, "fuelCost": 550, "totalCost": 1250, "railAvailable": true, "roadAvailable": true, "railTime": 8, "railCost": 1000, "roadTime": 5.5, "roadCost": 1250, "historicalDelay": 0.5, "delayVariance": 0.4, "onTimePercentage": 88},
+    {"routeId": "RT-007", "name": "Bokaro-Haldia", "origin": "Bokaro", "destination": "Haldia", "distance": 220, "estimatedTime": 9, "riskScore": 25, "weatherRisk": "medium", "trafficLevel": "medium", "tollCost": 1500, "fuelCost": 1100, "totalCost": 2600, "railAvailable": true, "roadAvailable": true, "railTime": 14, "railCost": 2200, "roadTime": 9, "roadCost": 2600, "historicalDelay": 1.2, "delayVariance": 0.8, "onTimePercentage": 80}
+  ],
+  "vehicles": [
+    {"vehicleId": "VEH-001", "registrationNumber": "BR-01-AB-1001", "type": "Truck", "capacity": 50, "fuelType": "Diesel", "mileage": 8, "condition": "good", "driverName": "Rajesh Kumar", "driverExperience": 10, "lastMaintenance": "2024-11-15", "costPerKm": 5, "status": "available", "totalTrips": 125, "totalDistance": 45000, "fuelConsumption": 5625, "maintenanceCost": 12000, "insuranceCost": 8000},
+    {"vehicleId": "VEH-002", "registrationNumber": "BR-01-AB-1002", "type": "Truck", "capacity": 50, "fuelType": "Diesel", "mileage": 7.5, "condition": "good", "driverName": "Amit Singh", "driverExperience": 8, "lastMaintenance": "2024-11-20", "costPerKm": 5, "status": "available", "totalTrips": 110, "totalDistance": 42000, "fuelConsumption": 5600, "maintenanceCost": 11000, "insuranceCost": 8000},
+    {"vehicleId": "VEH-003", "registrationNumber": "BR-01-AB-1003", "type": "Truck", "capacity": 60, "fuelType": "Diesel", "mileage": 7, "condition": "excellent", "driverName": "Priya Sharma", "driverExperience": 12, "lastMaintenance": "2024-12-01", "costPerKm": 5.5, "status": "available", "totalTrips": 135, "totalDistance": 48000, "fuelConsumption": 6857, "maintenanceCost": 9000, "insuranceCost": 9000},
+    {"vehicleId": "VEH-004", "registrationNumber": "BR-01-AB-1004", "type": "Truck", "capacity": 45, "fuelType": "Diesel", "mileage": 6.5, "condition": "good", "driverName": "Vikram Patel", "driverExperience": 15, "lastMaintenance": "2024-11-10", "costPerKm": 4.8, "status": "available", "totalTrips": 140, "totalDistance": 50000, "fuelConsumption": 7692, "maintenanceCost": 10000, "insuranceCost": 7500},
+    {"vehicleId": "VEH-005", "registrationNumber": "BR-01-AB-1005", "type": "Truck", "capacity": 55, "fuelType": "Diesel", "mileage": 8.2, "condition": "good", "driverName": "Neha Gupta", "driverExperience": 9, "lastMaintenance": "2024-11-25", "costPerKm": 5.2, "status": "available", "totalTrips": 120, "totalDistance": 44000, "fuelConsumption": 5366, "maintenanceCost": 11500, "insuranceCost": 8500},
+    {"vehicleId": "VEH-006", "registrationNumber": "BR-01-AB-1006", "type": "Truck", "capacity": 50, "fuelType": "Diesel", "mileage": 7.8, "condition": "good", "driverName": "Arjun Verma", "driverExperience": 11, "lastMaintenance": "2024-11-18", "costPerKm": 5.1, "status": "available", "totalTrips": 128, "totalDistance": 46000, "fuelConsumption": 5897, "maintenanceCost": 10500, "insuranceCost": 8000},
+    {"vehicleId": "VEH-007", "registrationNumber": "BR-01-AB-1007", "type": "Truck", "capacity": 65, "fuelType": "Diesel", "mileage": 6.8, "condition": "excellent", "driverName": "Deepak Singh", "driverExperience": 14, "lastMaintenance": "2024-12-02", "costPerKm": 5.4, "status": "available", "totalTrips": 145, "totalDistance": 52000, "fuelConsumption": 7647, "maintenanceCost": 8500, "insuranceCost": 9500},
+    {"vehicleId": "VEH-008", "registrationNumber": "BR-01-AB-1008", "type": "Truck", "capacity": 48, "fuelType": "Diesel", "mileage": 7.3, "condition": "good", "driverName": "Sanjay Kumar", "driverExperience": 10, "lastMaintenance": "2024-11-22", "costPerKm": 4.9, "status": "available", "totalTrips": 115, "totalDistance": 41000, "fuelConsumption": 5616, "maintenanceCost": 10800, "insuranceCost": 7800}
+  ],
+  "suppliers": [
+    {"supplierId": "SUP-001", "name": "SAIL Bokaro", "location": "Bokaro", "rating": 4.8, "onTimeDelivery": 95, "qualityScore": 92, "costCompetitiveness": 88, "totalOrders": 450, "totalValue": 15000000, "status": "active", "leadTime": 2, "minOrderQuantity": 100, "paymentTerms": "Net 30", "certifications": ["ISO 9001", "ISO 14001"], "contactPerson": "Rajesh Sharma", "email": "rajesh@sailbokaro.com", "phone": "+91-9876543210"},
+    {"supplierId": "SUP-002", "name": "Tata Steel", "location": "Jamshedpur", "rating": 4.7, "onTimeDelivery": 93, "qualityScore": 90, "costCompetitiveness": 85, "totalOrders": 380, "totalValue": 12000000, "status": "active", "leadTime": 3, "minOrderQuantity": 150, "paymentTerms": "Net 45", "certifications": ["ISO 9001", "ISO 14001", "ISO 45001"], "contactPerson": "Amit Verma", "email": "amit@tatasteel.com", "phone": "+91-9876543211"},
+    {"supplierId": "SUP-003", "name": "JSW Steel", "location": "Vijayanagar", "rating": 4.6, "onTimeDelivery": 91, "qualityScore": 88, "costCompetitiveness": 82, "totalOrders": 320, "totalValue": 10000000, "status": "active", "leadTime": 4, "minOrderQuantity": 200, "paymentTerms": "Net 60", "certifications": ["ISO 9001"], "contactPerson": "Priya Singh", "email": "priya@jswsteel.com", "phone": "+91-9876543212"},
+    {"supplierId": "SUP-004", "name": "NMDC Limited", "location": "Hyderabad", "rating": 4.5, "onTimeDelivery": 89, "qualityScore": 85, "costCompetitiveness": 80, "totalOrders": 280, "totalValue": 8500000, "status": "active", "leadTime": 5, "minOrderQuantity": 250, "paymentTerms": "Net 90", "certifications": ["ISO 9001"], "contactPerson": "Vikram Patel", "email": "vikram@nmdc.com", "phone": "+91-9876543213"}
+  ],
+  "stockyards": [
+    {"stockyardId": "SY-001", "name": "Bokaro-Main", "location": "Bokaro", "capacity": 50000, "currentInventory": 35000, "materials": ["HR Coils", "Wire Rods", "Pig Iron"], "railSiding": true, "roadAccess": true, "loadingCapacity": 500, "unloadingCapacity": 450, "operatingHours": "06:00-22:00", "lastUpdated": "2024-12-03", "utilizationPercentage": 70, "averageStockLevel": 32000},
+    {"stockyardId": "SY-002", "name": "Bokaro-East", "location": "Bokaro", "capacity": 40000, "currentInventory": 28000, "materials": ["CR Coils", "TMT Bars", "Billets"], "railSiding": true, "roadAccess": true, "loadingCapacity": 400, "unloadingCapacity": 380, "operatingHours": "06:00-22:00", "lastUpdated": "2024-12-03", "utilizationPercentage": 70, "averageStockLevel": 26000},
+    {"stockyardId": "SY-003", "name": "Bokaro-West", "location": "Bokaro", "capacity": 35000, "currentInventory": 22000, "materials": ["Plates", "Billets"], "railSiding": false, "roadAccess": true, "loadingCapacity": 350, "unloadingCapacity": 320, "operatingHours": "06:00-20:00", "lastUpdated": "2024-12-03", "utilizationPercentage": 63, "averageStockLevel": 20000}
+  ],
+  "historical_shipments": [
+    {"shipmentId": "SHIP-2024-001", "orderId": "ORD-2024-001", "material": "HR Coils", "quantity": 500, "origin": "Bokaro", "destination": "Kolkata Port", "actualDelay": 0.5, "predictedDelay": 0.48, "actualCost": 65500, "predictedCost": 65000, "actualQuality": 88, "predictedQuality": 85, "onTimeDelivery": true, "customerSatisfaction": 4.7, "shipmentDate": "2024-11-20", "deliveryDate": "2024-11-28"},
+    {"shipmentId": "SHIP-2024-002", "orderId": "ORD-2024-002", "material": "CR Coils", "quantity": 350, "origin": "Bokaro", "destination": "Mumbai Port", "actualDelay": 1.8, "predictedDelay": 1.2, "actualCost": 53000, "predictedCost": 52000, "actualQuality": 90, "predictedQuality": 92, "onTimeDelivery": false, "customerSatisfaction": 4.2, "shipmentDate": "2024-11-18", "deliveryDate": "2024-11-26"},
+    {"shipmentId": "SHIP-2024-003", "orderId": "ORD-2024-003", "material": "Plates", "quantity": 400, "origin": "Bokaro", "destination": "Durgapur", "actualDelay": 0.1, "predictedDelay": 0.2, "actualCost": 47500, "predictedCost": 48000, "actualQuality": 87, "predictedQuality": 88, "onTimeDelivery": true, "customerSatisfaction": 4.8, "shipmentDate": "2024-11-22", "deliveryDate": "2024-11-30"}
+  ],
+  "historical_decisions": [
+    {"decisionId": "DEC-2024-001", "orderId": "ORD-2024-001", "decisionType": "Route Selection", "selectedRoute": "RT-003", "alternativeRoutes": ["RT-002", "RT-006"], "rationale": "Lowest risk, best on-time performance", "outcome": "Success", "costSavings": 5000, "timeSavings": 2, "qualityImpact": "positive", "decisionDate": "2024-11-20", "implementationDate": "2024-11-21"},
+    {"decisionId": "DEC-2024-002", "orderId": "ORD-2024-002", "decisionType": "Vehicle Allocation", "selectedVehicle": "VEH-003", "alternativeVehicles": ["VEH-001", "VEH-005"], "rationale": "Best fuel efficiency, experienced driver", "outcome": "Success", "costSavings": 3000, "timeSavings": 1.5, "qualityImpact": "positive", "decisionDate": "2024-11-18", "implementationDate": "2024-11-19"}
+  ],
+  "historical_dispatches": [
+    {"dispatchId": "DISP-2024-001", "shipmentId": "SHIP-2024-001", "vehicleId": "VEH-003", "driverId": "Priya Sharma", "routeId": "RT-003", "dispatchTime": "2024-11-20T06:00:00Z", "actualDeliveryTime": "2024-11-28T14:30:00Z", "fuelUsed": 22.5, "fuelCost": 1800, "tollCost": 1200, "laborCost": 2000, "totalCost": 5000, "distance": 180, "status": "completed", "incidents": 0, "qualityScore": 88},
+    {"dispatchId": "DISP-2024-002", "shipmentId": "SHIP-2024-002", "vehicleId": "VEH-001", "driverId": "Rajesh Kumar", "routeId": "RT-001", "dispatchTime": "2024-11-18T08:00:00Z", "actualDeliveryTime": "2024-11-26T22:00:00Z", "fuelUsed": 18.5, "fuelCost": 1480, "tollCost": 1000, "laborCost": 1800, "totalCost": 4280, "distance": 170, "status": "completed", "incidents": 1, "qualityScore": 90}
+  ],
+  "ml_predictions": [
+    {"predictionId": "PRED-001", "modelName": "delay_prediction", "orderId": "ORD-2024-001", "predictedDelay": 0.48, "confidence": 0.85, "factors": ["Route condition: Good", "Traffic: Low", "Weather: Clear"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-002", "modelName": "cost_prediction", "orderId": "ORD-2024-001", "predictedCost": 65000, "costRange": [62000, 68000], "confidence": 0.88, "factors": ["Fuel price: ₹80/liter", "Distance: 180km", "Vehicle type: Truck"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-003", "modelName": "demand_forecasting", "month": "December 2024", "predictedDemand": 4530, "demandRange": [4200, 4800], "confidence": 0.82, "factors": ["Seasonal trend: +8%", "Market growth: +5%", "Customer orders: 10"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-004", "modelName": "quality_prediction", "orderId": "ORD-2024-001", "predictedQuality": 85, "qualityRange": [82, 88], "confidence": 0.80, "factors": ["Material grade: Premium", "Route: Safe", "Driver experience: 12 years"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-005", "modelName": "fuel_consumption", "orderId": "ORD-2024-001", "predictedFuel": 22.5, "fuelRange": [20, 25], "confidence": 0.86, "factors": ["Distance: 180km", "Vehicle: Truck-60T", "Mileage: 8km/liter"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-006", "modelName": "route_optimization", "orderId": "ORD-2024-001", "optimalRoute": "RT-003", "costSavings": 5000, "timeSavings": 2, "confidence": 0.92, "factors": ["Lowest risk", "Best on-time %", "Optimal distance"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-007", "modelName": "cost_optimization", "orderId": "ORD-2024-001", "optimizedCost": 60000, "costSavings": 5000, "confidence": 0.85, "factors": ["Route optimization", "Vehicle efficiency", "Fuel optimization"], "timestamp": "2024-12-03T23:44:00Z"},
+    {"predictionId": "PRED-008", "modelName": "risk_assessment", "orderId": "ORD-2024-001", "riskScore": 12, "riskLevel": "Low", "confidence": 0.88, "factors": ["Route risk: 12%", "Weather risk: Low", "Driver experience: High"], "timestamp": "2024-12-03T23:44:00Z"}
+  ],
+  "alerts": [
+    {"alertId": "ALT-001", "type": "Delay Risk", "severity": "high", "orderId": "ORD-2024-002", "message": "High delay risk detected for order ORD-2024-002", "probability": 0.75, "suggestedAction": "Consider alternative route RT-003", "timestamp": "2024-12-03T23:44:00Z", "status": "active"},
+    {"alertId": "ALT-002", "type": "Cost Overrun", "severity": "medium", "orderId": "ORD-2024-007", "message": "Potential cost overrun due to fuel price increase", "probability": 0.65, "suggestedAction": "Optimize route or negotiate fuel prices", "timestamp": "2024-12-03T23:44:00Z", "status": "active"},
+    {"alertId": "ALT-003", "type": "Quality Issue", "severity": "low", "orderId": "ORD-2024-005", "message": "Material quality score below threshold", "probability": 0.40, "suggestedAction": "Verify material specifications", "timestamp": "2024-12-03T23:44:00Z", "status": "active"}
+  ],
+  "reports": [
+    {"reportId": "RPT-001", "type": "Daily", "generatedDate": "2024-12-03", "period": "2024-12-03", "totalOrders": 10, "totalQuantity": 4530, "totalCost": 535000, "averageDelay": 0.75, "onTimePercentage": 85, "averageQuality": 87.5, "customerSatisfaction": 4.55, "costSavings": 25000, "timeSavings": 12.5},
+    {"reportId": "RPT-002", "type": "Weekly", "generatedDate": "2024-12-03", "period": "2024-11-27 to 2024-12-03", "totalOrders": 45, "totalQuantity": 18500, "totalCost": 2100000, "averageDelay": 0.82, "onTimePercentage": 87, "averageQuality": 88.2, "customerSatisfaction": 4.62, "costSavings": 95000, "timeSavings": 48},
+    {"reportId": "RPT-003", "type": "Monthly", "generatedDate": "2024-12-03", "period": "2024-11-01 to 2024-12-03", "totalOrders": 180, "totalQuantity": 72000, "totalCost": 8200000, "averageDelay": 0.88, "onTimePercentage": 86, "averageQuality": 87.8, "customerSatisfaction": 4.58, "costSavings": 350000, "timeSavings": 185}
+  ],
+  "analytics": [
+    {"metricId": "MET-001", "metricName": "On-Time Delivery Rate", "value": 85, "target": 90, "trend": "up", "period": "December 2024", "comparison": "+3% vs November"},
+    {"metricId": "MET-002", "metricName": "Average Cost per Ton", "value": 118, "target": 110, "trend": "down", "period": "December 2024", "comparison": "-5% vs November"},
+    {"metricId": "MET-003", "metricName": "Customer Satisfaction", "value": 4.55, "target": 4.7, "trend": "up", "period": "December 2024", "comparison": "+0.15 vs November"},
+    {"metricId": "MET-004", "metricName": "Fuel Efficiency", "value": 7.8, "target": 8.0, "trend": "stable", "period": "December 2024", "comparison": "0% vs November"},
+    {"metricId": "MET-005", "metricName": "Cost Savings", "value": 25000, "target": 20000, "trend": "up", "period": "Daily", "comparison": "+25% vs target"}
+  ],
+  "constraints": {
+    "minRakeSize": 500,
+    "maxRakeSize": 2000,
+    "minLoadPerVehicle": 30,
+    "maxLoadPerVehicle": 65,
+    "workingHours": "06:00-22:00",
+    "maxDeliveryDays": 30,
+    "minQualityScore": 80,
+    "maxCostPerTon": 150,
+    "minOnTimePercentage": 85
+  },
+  "summary": {
+    "totalOrders": 10,
+    "totalMaterials": 7,
+    "totalRoutes": 7,
+    "totalVehicles": 8,
+    "totalSuppliers": 4,
+    "totalStockyards": 3,
+    "totalQuantity": 4530,
+    "estimatedTotalCost": 1425000,
+    "estimatedDeliveryDays": "8-17",
+    "averageOnTimePercentage": 85,
+    "averageCustomerSatisfaction": 4.55,
+    "totalCostSavings": 25000,
+    "totalTimeSavings": 12.5
+  }
+}

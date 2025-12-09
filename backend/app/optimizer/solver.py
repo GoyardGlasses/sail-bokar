@@ -18,6 +18,8 @@ from .constraints import (
     add_rake_capacity_constraints,
     add_truck_capacity_constraints,
     add_order_assignment_constraints,
+    add_loading_time_constraints,
+    add_multi_destination_constraints,
 )
 from .objective import build_objective_function
 from .utils import (
@@ -81,7 +83,7 @@ class RakeFormationOptimizer:
             
             # Add constraints
             self._add_constraints(
-                model, rake_vars, truck_vars, order_vars, available_rakes
+                model, rake_vars, truck_vars, order_vars, available_rakes, ml_predictions
             )
             
             # Build objective
@@ -156,7 +158,7 @@ class RakeFormationOptimizer:
             }
         
         # Order variables
-        for order in orders:
+        for idx, order in enumerate(orders):
             order_id = order.get('order_id', f'ORD_{len(order_vars)+1}')
             order_vars[order_id] = {
                 'rail_assigned': model.NewBoolVariable(f'{order_id}_rail'),
@@ -164,6 +166,8 @@ class RakeFormationOptimizer:
                 'quantity': order.get('quantity_tonnes', 0),
                 'priority': order.get('priority', 'MEDIUM'),
                 'destination': order.get('destination', 'Kolkata'),
+                'due_date': order.get('due_date'),
+                'index': idx,
             }
         
         return rake_vars, truck_vars, order_vars
@@ -174,7 +178,8 @@ class RakeFormationOptimizer:
         rake_vars: Dict,
         truck_vars: Dict,
         order_vars: Dict,
-        available_rakes: int
+        available_rakes: int,
+        ml_predictions: Dict,
     ) -> None:
         """Add all constraints to the model."""
         add_rake_size_constraints(model, rake_vars)
@@ -183,6 +188,21 @@ class RakeFormationOptimizer:
         add_rake_capacity_constraints(model, rake_vars)
         add_truck_capacity_constraints(model, truck_vars)
         add_order_assignment_constraints(model, order_vars, rake_vars, truck_vars)
+
+        # Loading time / throughput constraint using ML-based throughput if available
+        throughputs = [
+            float(value)
+            for key, value in ml_predictions.items()
+            if isinstance(value, (int, float)) and str(key).startswith('throughput_')
+        ]
+        if throughputs:
+            avg_throughput = sum(throughputs) / len(throughputs)
+        else:
+            avg_throughput = 400.0
+
+        add_loading_time_constraints(model, rake_vars, throughput_tph=avg_throughput)
+
+        add_multi_destination_constraints(model, order_vars, available_rakes)
     
     def _extract_solution(
         self,
@@ -199,6 +219,32 @@ class RakeFormationOptimizer:
         total_cost = 0
         total_tonnage = 0
         
+        # Build helper lists of destinations for rail and road orders based on assignment
+        rail_orders: List[Dict[str, Any]] = []
+        road_orders: List[Dict[str, Any]] = []
+        for order in orders:
+            order_id = order.get('order_id') or f"ORD_{len(rail_orders) + len(road_orders) + 1}"
+            vars_dict = order_vars.get(order_id)
+            destination = order.get('destination', 'Kolkata')
+            material_type = order.get('material_type', 'Mixed')
+
+            if vars_dict is not None:
+                rail_assigned = solver.Value(vars_dict.get('rail_assigned')) if vars_dict.get('rail_assigned') is not None else 0
+                road_assigned = solver.Value(vars_dict.get('road_assigned')) if vars_dict.get('road_assigned') is not None else 0
+
+                if rail_assigned:
+                    rail_orders.append({
+                        'order_id': order_id,
+                        'destination': destination,
+                        'material_type': material_type,
+                    })
+                elif road_assigned:
+                    road_orders.append({
+                        'order_id': order_id,
+                        'destination': destination,
+                        'material_type': material_type,
+                    })
+
         # Extract rake solutions
         for rake_id, vars_dict in rake_vars.items():
             if solver.Value(vars_dict['assigned']):
@@ -206,13 +252,28 @@ class RakeFormationOptimizer:
                 tonnes = solver.Value(vars_dict['tonnes'])
                 
                 if tonnes > 0:
-                    delay = ml_predictions.get(f'delay_{rake_id}', 2.0)
-                    cost = calculate_rail_cost(tonnes, wagons, 'Kolkata', delay_hours=delay)
+                    # Take next rail-assigned order as the destination anchor if available
+                    order_info = rail_orders.pop(0) if rail_orders else None
+                    destination = (order_info or {}).get('destination', 'Kolkata')
+                    material_type = (order_info or {}).get('material_type', 'Mixed')
+
+                    # Prefer rake-specific delay, else destination-level, else default
+                    delay = ml_predictions.get(f'delay_{rake_id}')
+                    if delay is None:
+                        delay = ml_predictions.get(f'delay_{destination}', 2.0)
+
+                    demurrage_hours = float(ml_predictions.get('demurrage_hours', 0.5))
+                    cost = calculate_rail_cost(
+                        tonnes,
+                        wagons,
+                        destination,
+                        demurrage_hours=demurrage_hours,
+                    )
                     
                     rakes.append({
                         'rake_id': rake_id,
-                        'destination': 'Kolkata',
-                        'material_type': 'Mixed',
+                        'destination': destination,
+                        'material_type': material_type,
                         'tonnes': tonnes,
                         'wagons': wagons,
                         'estimated_cost': cost,
@@ -227,13 +288,22 @@ class RakeFormationOptimizer:
                 tonnes = solver.Value(vars_dict['tonnes'])
                 
                 if tonnes > 0:
-                    delay = ml_predictions.get(f'delay_{truck_id}', 1.5)
-                    cost = calculate_road_cost(tonnes, 200, truck_cost_per_km_per_tonne=30)
+                    # Take next road-assigned order as the destination anchor if available
+                    order_info = road_orders.pop(0) if road_orders else None
+                    destination = (order_info or {}).get('destination', 'Kolkata')
+                    material_type = (order_info or {}).get('material_type', 'Mixed')
+
+                    delay = ml_predictions.get(f'delay_{truck_id}')
+                    if delay is None:
+                        delay = ml_predictions.get(f'delay_{destination}', 1.5)
+
+                    distance_km = get_distance_to_destination(destination)
+                    cost = calculate_road_cost(tonnes, distance_km, truck_cost_per_km_per_tonne=30)
                     
                     trucks.append({
                         'truck_id': truck_id,
-                        'destination': 'Kolkata',
-                        'material_type': 'Mixed',
+                        'destination': destination,
+                        'material_type': material_type,
                         'tonnes': tonnes,
                         'estimated_cost': cost,
                         'estimated_delay_hours': delay,
@@ -289,7 +359,7 @@ class RakeFormationOptimizer:
             if rake_idx < available_rakes and tonnes >= 500:
                 wagons = 58 if tonnes <= 3654 else 59
                 delay = ml_predictions.get(f'delay_RAKE_{rake_idx+1:03d}', 2.0)
-                cost = calculate_rail_cost(tonnes, wagons, 'Kolkata', delay_hours=delay)
+                cost = calculate_rail_cost(tonnes, wagons, 'Kolkata', demurrage_hours=ml_predictions.get('demurrage_hours', 0.5))
                 
                 rakes.append({
                     'rake_id': f'RAKE_{rake_idx+1:03d}',

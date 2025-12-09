@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CostForm from '../components/CostForm'
 import CostResults from '../components/CostResults'
 import {
@@ -27,8 +27,15 @@ import {
 } from '../components/CostAdvancedAnalytics2'
 import { predictCost } from '../api/costApi'
 import { DollarSign, TrendingUp, BarChart3, Eye, Zap, Lock, GitBranch, MessageSquare, Share2, Target, Lightbulb, Brain, Bell, BarChart4, Layers } from 'lucide-react'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import { useImportedData } from '../hooks/useImportedData'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
+import InlineDecisionSummary from '../features/decisionSupport/components/InlineDecisionSummary'
 
 export default function CostPredictionPage() {
+  const { dataImported, getPrediction, lastUpdated } = useMLPredictions()
+  const [mlPrediction, setMlPrediction] = useState(null)
+  const [mlOptimization, setMlOptimization] = useState(null)
   const [costData, setCostData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -36,6 +43,16 @@ export default function CostPredictionPage() {
   const [mlModels] = useState({
     costEstimation: { name: 'Cost Estimation', accuracy: 92.1, status: 'active' },
   })
+  const { data: importedData, isLoaded } = useImportedData()
+
+  // Keep ML cost predictions in sync with latest pipeline outputs
+  useEffect(() => {
+    if (!getPrediction) return
+    const costPred = getPrediction('cost_prediction')
+    const optPred = getPrediction('cost_optimization')
+    setMlPrediction(costPred)
+    setMlOptimization(optPred)
+  }, [lastUpdated, getPrediction])
 
   const handlePredictCost = async (formData) => {
     setLoading(true)
@@ -73,6 +90,97 @@ export default function CostPredictionPage() {
     { id: 'ml', label: 'ML Features', icon: Brain },
   ]
 
+  const hasImportedOrders =
+    isLoaded && importedData && Array.isArray(importedData.orders) && importedData.orders.length > 0
+
+  let totalOrders = 0
+  let totalTonnage = 0
+  let totalCost = 0
+
+  if (hasImportedOrders) {
+    importedData.orders.forEach((o) => {
+      const qty = Number(o.totalQuantity ?? o.quantity ?? 0)
+      const costPerTonne = Number(
+        o.costPerTonne ??
+          o.ratePerTonne ??
+          o.estimatedCostPerTonne ??
+          0,
+      )
+      const explicitCost = Number(
+        o.totalCost ??
+          o.estimatedCost ??
+          o.cost ??
+          0,
+      )
+      const cost = explicitCost || (qty && costPerTonne ? costPerTonne * qty : 0)
+
+      if (Number.isFinite(qty) && qty > 0) {
+        totalTonnage += qty
+      }
+      if (Number.isFinite(cost) && cost > 0) {
+        totalCost += cost
+      }
+    })
+    totalOrders = importedData.orders.length
+  }
+
+  const avgCostPerTonneFromOrders =
+    totalTonnage > 0 ? totalCost / totalTonnage : null
+
+  const mlCostSource = Array.isArray(mlPrediction) ? mlPrediction[0] : mlPrediction
+  const mlOptSource = Array.isArray(mlOptimization) ? mlOptimization[0] : mlOptimization
+
+  const mlAvgCostPerTonne =
+    mlCostSource && typeof mlCostSource === 'object'
+      ? (() => {
+          const candidates = [
+            mlCostSource.avg_cost_per_tonne,
+            mlCostSource.average_cost_per_tonne,
+            mlCostSource.avgCostPerTonne,
+            mlCostSource.predicted_cost_per_tonne,
+            mlCostSource.cost_per_tonne,
+            mlCostSource.mean_cost,
+          ]
+          for (const c of candidates) {
+            const n = Number(c)
+            if (Number.isFinite(n) && n > 0) return n
+          }
+          return null
+        })()
+      : null
+
+  const mlCostConfidence =
+    mlCostSource && typeof mlCostSource === 'object'
+      ? (() => {
+          const raw =
+            typeof mlCostSource.confidence === 'number'
+              ? mlCostSource.confidence
+              : typeof mlCostSource.confidence_score === 'number'
+                ? mlCostSource.confidence_score
+                : typeof mlCostSource.probability === 'number'
+                  ? mlCostSource.probability
+                  : null
+          if (raw == null) return null
+          return raw <= 1 ? raw * 100 : raw
+        })()
+      : null
+
+  const mlSavingsPercent =
+    mlOptSource && typeof mlOptSource === 'object'
+      ? (() => {
+          const raw =
+            typeof mlOptSource.savings_percent === 'number'
+              ? mlOptSource.savings_percent
+              : typeof mlOptSource.cost_reduction_pct === 'number'
+                ? mlOptSource.cost_reduction_pct
+                : null
+          if (raw == null) return null
+          return raw <= 1 ? raw * 100 : raw
+        })()
+      : null
+
+  const activeTabLabel = tabs.find((t) => t.id === activeTab)?.label
+
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
@@ -84,10 +192,69 @@ export default function CostPredictionPage() {
         <p className="text-slate-600">Predict logistics costs and analyze cost drivers by destination</p>
       </div>
 
+      <InlineDataImport templateId="operations" />
+
       {/* Error Message */}
       {error && (
         <div className="card p-4 bg-red-50 border-l-4 border-red-500">
           <p className="text-sm text-red-800 font-medium">{error}</p>
+        </div>
+      )}
+
+      {(hasImportedOrders || mlAvgCostPerTonne !== null || mlSavingsPercent !== null) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {hasImportedOrders && (
+            <div className="card p-4">
+              <div className="flex items-start gap-3">
+                <DollarSign size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-slate-600">Dataset Cost Summary</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">
+                    {totalOrders.toLocaleString()} orders / {totalTonnage.toLocaleString()}T
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {typeof avgCostPerTonneFromOrders === 'number'
+                      ? `Avg ₹${avgCostPerTonneFromOrders.toFixed(1)} per tonne`
+                      : 'No cost fields detected in imported orders'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {mlAvgCostPerTonne !== null && (
+            <div className="card p-4">
+              <div className="flex items-start gap-3">
+                <Brain size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-slate-600">ML Predicted Cost/T</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">
+                    ₹{mlAvgCostPerTonne.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {typeof mlCostConfidence === 'number'
+                      ? `Confidence ${mlCostConfidence.toFixed(0)}%`
+                      : 'From cost_prediction model'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {mlSavingsPercent !== null && (
+            <div className="card p-4">
+              <div className="flex items-start gap-3">
+                <Target size={20} className="text-green-600 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-slate-600">Optimization Savings</p>
+                  <p className="text-2xl font-bold text-green-600 mt-1">
+                    {mlSavingsPercent.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">From cost_optimization model</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -188,6 +355,11 @@ export default function CostPredictionPage() {
           </div>
         </div>
       </div>
+      <InlineDecisionSummary
+        context="cost"
+        pageTitle="Cost Per Tonne Prediction"
+        activeView={activeTabLabel}
+      />
     </div>
   )
 }

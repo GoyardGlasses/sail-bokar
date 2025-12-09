@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { BarChart, Bar, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Zap, TrendingDown, Maximize2, Lock, Eye, Settings, History, Download, GitBranch, CheckCircle, AlertCircle, Brain } from 'lucide-react'
 import {
@@ -15,19 +15,32 @@ import {
   MultiAlgorithmComparison,
   ConstraintVisualization,
   SolutionValidation,
-  InteractiveParetoFront,
 } from '../components/OptimizationAdvancedFeatures2'
 import axios from 'axios'
+import { useMLPredictions } from '../context/MLPredictionsContext'
+import { useImportedData } from '../hooks/useImportedData'
+import InlineDataImport from '../features/dataImport/components/InlineDataImport'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
 export default function AdvancedOptimizationPage() {
+  const { dataImported, getPrediction } = useMLPredictions()
+  const { data: importedData, isLoaded } = useImportedData()
+  const [mlRouteOptimization, setMlRouteOptimization] = useState(null)
   const [orders, setOrders] = useState([
     { id: '1', material: 'HR_Coils', destination: 'Kolkata', quantity: 500, distance: 250 },
     { id: '2', material: 'CR_Coils', destination: 'Patna', quantity: 300, distance: 180 },
     { id: '3', material: 'Plates', destination: 'Ranchi', quantity: 400, distance: 150 }
   ])
   const [optimizationResult, setOptimizationResult] = useState(null)
+
+  // Get ML prediction when data is imported
+  useEffect(() => {
+    if (dataImported) {
+      const routeOpt = getPrediction('route_optimization')
+      setMlRouteOptimization(routeOpt)
+    }
+  }, [dataImported, getPrediction])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('results')
   const [mlModels] = useState({
@@ -39,6 +52,84 @@ export default function AdvancedOptimizationPage() {
     quantity: 100,
     distance: 250
   })
+
+  const hasImportedOrders = useMemo(() => {
+    return (
+      isLoaded &&
+      importedData &&
+      Array.isArray(importedData.orders) &&
+      importedData.orders.length > 0
+    )
+  }, [isLoaded, importedData])
+
+  // When imported data is available, map it into orders while keeping mocks as fallback
+  useEffect(() => {
+    if (!hasImportedOrders) return
+
+    try {
+      const mappedOrders = importedData.orders.map((o, index) => {
+        const id = o.id || o.orderId || (index + 1).toString()
+        const material = o.product || o.material || 'HR_Coils'
+        const destination = o.destination || 'Kolkata'
+        const quantity = Number(o.quantity ?? o.totalQuantity ?? o.tonnage ?? 100)
+        const distance = Number(o.distance ?? 250)
+
+        return {
+          id,
+          material,
+          destination,
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 100,
+          distance: Number.isFinite(distance) && distance > 0 ? distance : 250,
+        }
+      })
+
+      if (mappedOrders.length > 0) {
+        setOrders(mappedOrders)
+      }
+    } catch (err) {
+      console.error('Failed to map imported orders for Advanced Optimization:', err)
+    }
+  }, [hasImportedOrders, importedData])
+
+  const mlRouteSummary = useMemo(() => {
+    if (!mlRouteOptimization || typeof mlRouteOptimization !== 'object') return null
+
+    const raw = Array.isArray(mlRouteOptimization)
+      ? mlRouteOptimization[0]
+      : mlRouteOptimization
+
+    if (!raw || typeof raw !== 'object') return null
+
+    const optimalRoute =
+      raw.optimalRoute ||
+      raw.best_route ||
+      raw.recommended_route ||
+      null
+
+    const costRaw = Number(
+      raw.costSavings ??
+      raw.cost_savings ??
+      raw.expected_savings ??
+      0
+    )
+    const timeRaw = Number(
+      raw.timeSavings ??
+      raw.time_savings ??
+      raw.time_reduction ??
+      0
+    )
+
+    const costSavings = Number.isFinite(costRaw) && costRaw !== 0 ? costRaw : null
+    const timeSavings = Number.isFinite(timeRaw) && timeRaw !== 0 ? timeRaw : null
+
+    if (!optimalRoute && costSavings === null && timeSavings === null) return null
+
+    return {
+      optimalRoute,
+      costSavings,
+      timeSavings,
+    }
+  }, [mlRouteOptimization])
 
   const optimize = async () => {
     setLoading(true)
@@ -84,6 +175,42 @@ export default function AdvancedOptimizationPage() {
         </div>
         <p className="text-gray-600">NSGA2 Evolutionary Algorithm</p>
       </div>
+
+      <InlineDataImport templateId="operations" />
+
+      {(hasImportedOrders || mlRouteSummary) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {hasImportedOrders && (
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <p className="text-sm text-gray-600">Imported Orders Used</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
+                {importedData.orders.length.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Orders from uploaded dataset are feeding the optimizer
+              </p>
+            </div>
+          )}
+          {mlRouteSummary && (
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <p className="text-sm text-gray-600">ML Route Optimization Insight</p>
+              {mlRouteSummary.optimalRoute && (
+                <p className="text-sm font-semibold text-green-700 mt-1">
+                  Best Route: {mlRouteSummary.optimalRoute}
+                </p>
+              )}
+              <div className="mt-1 text-xs text-gray-600 space-y-1">
+                {mlRouteSummary.costSavings !== null && (
+                  <p>Cost savings: ₹{Math.round(mlRouteSummary.costSavings).toLocaleString()}</p>
+                )}
+                {mlRouteSummary.timeSavings !== null && (
+                  <p>Time savings: {mlRouteSummary.timeSavings.toFixed(1)} hours</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add Order */}
       <div className="bg-white rounded-lg shadow p-6">
@@ -194,7 +321,6 @@ export default function AdvancedOptimizationPage() {
               { id: 'export', label: 'Export', icon: Download },
               { id: 'algorithms', label: 'Algorithms', icon: GitBranch },
               { id: 'validation', label: 'Validation', icon: CheckCircle },
-              { id: 'pareto', label: 'Pareto', icon: AlertCircle },
             ].map(tab => {
               const Icon = tab.icon
               return (
@@ -239,28 +365,6 @@ export default function AdvancedOptimizationPage() {
             </div>
           </div>
 
-          {/* Pareto Front */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Maximize2 className="w-5 h-5 text-purple-600" />
-              Pareto Front (Non-Dominated Solutions)
-            </h2>
-            <ResponsiveContainer width="100%" height={400}>
-              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="cost" name="Cost (₹)" />
-                <YAxis dataKey="time" name="Time (hrs)" />
-                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                <Legend />
-                <Scatter
-                  name="Solutions"
-                  data={optimizationResult.pareto_front}
-                  fill="#8884d8"
-                />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-
           {/* Statistics */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Optimization Statistics</h2>
@@ -297,7 +401,6 @@ export default function AdvancedOptimizationPage() {
           {activeTab === 'export' && <ExportReportingOptimization />}
           {activeTab === 'algorithms' && <MultiAlgorithmComparison />}
           {activeTab === 'validation' && <SolutionValidation />}
-          {activeTab === 'pareto' && <InteractiveParetoFront />}
         </div>
       )}
 

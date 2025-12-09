@@ -157,14 +157,27 @@ export default function MaterialAvailabilityDashboard() {
 
     // Use imported materials if available
     if (importedData?.materials && Array.isArray(importedData.materials)) {
-      const enrichedMaterials = importedData.materials.map((m: any, idx: number) => ({
-        ...m,
-        trend: (Math.random() - 0.5) * 10,
-        reorderPoint: m.quantity * 0.2,
-        safetyStock: m.quantity * 0.15,
-        leadTime: Math.floor(Math.random() * 10) + 3,
-        quality: 4 + Math.random(),
-      }))
+      const enrichedMaterials = importedData.materials.map((m: any, idx: number) => {
+        const quantity = m.quantity || 0
+        const price = m.price || 0
+        return {
+          id: m.id || `m-${idx}`,
+          name: m.name || 'Unknown',
+          quantity: quantity,
+          unit: m.unit || 'tonnes',
+          price: price,
+          grade: m.grade || 'Standard',
+          stockyard: m.stockyard || 'Bokaro Main',
+          location: m.location || 'Unknown',
+          lastUpdated: m.lastUpdated || new Date().toISOString(),
+          trend: (Math.random() - 0.5) * 10,
+          reorderPoint: quantity * 0.2,
+          safetyStock: quantity * 0.15,
+          leadTime: Math.floor(Math.random() * 10) + 3,
+          supplier: m.supplier || 'Unknown',
+          quality: 4 + Math.random(),
+        }
+      })
       setMaterials(enrichedMaterials)
     }
   }, [isLoaded, importedData])
@@ -174,10 +187,11 @@ export default function MaterialAvailabilityDashboard() {
     m.stockyard.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const totalValue = materials.reduce((sum, m) => sum + m.quantity * m.price, 0)
-  const totalQuantity = materials.reduce((sum, m) => sum + m.quantity, 0)
+  // Calculate totals - always use materials array (has mock data by default)
+  const totalValue = materials.reduce((sum, m) => sum + ((m.quantity || 0) * (m.price || 0)), 0)
+  const totalQuantity = materials.reduce((sum, m) => sum + (m.quantity || 0), 0)
   const criticalAlerts = alerts.filter(a => a.severity === 'critical' || a.severity === 'high').length
-  const avgQuality = (materials.reduce((sum, m) => sum + m.quality, 0) / materials.length).toFixed(2)
+  const avgQuality = materials.length > 0 ? (materials.reduce((sum, m) => sum + (m.quality || 0), 0) / materials.length).toFixed(2) : '4.6'
 
   const getStockStatus = (material: Material) => {
     const percentage = (material.quantity / material.reorderPoint) * 100
@@ -247,7 +261,7 @@ export default function MaterialAvailabilityDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Total Value</p>
-              <p className="text-3xl font-bold text-gray-900">₹{(totalValue / 10000000).toFixed(1)}Cr</p>
+              <p className="text-3xl font-bold text-gray-900">₹{(totalValue / 10000000).toFixed(2)}Cr</p>
               <p className="text-xs text-gray-500 mt-2">inventory value</p>
             </div>
             <DollarSign className="w-12 h-12 text-purple-100" />
@@ -325,17 +339,17 @@ export default function MaterialAvailabilityDashboard() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-sm">Quantity</span>
-                      <span className="font-bold text-gray-900">{material.quantity.toLocaleString()} {material.unit}</span>
+                      <span className="font-bold text-gray-900">{(material.quantity || 0).toLocaleString()} {material.unit}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-sm">Location</span>
                       <span className="text-gray-900 text-sm flex items-center gap-1">
-                        <MapPin className="w-4 h-4" /> {material.location}
+                        <MapPin className="w-4 h-4" /> {material.location || 'Unknown'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-sm">Unit Price</span>
-                      <span className="font-semibold text-gray-900">₹{material.price.toLocaleString()}</span>
+                      <span className="font-semibold text-gray-900">₹{(material.price || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-sm">Trend</span>
@@ -401,15 +415,15 @@ export default function MaterialAvailabilityDashboard() {
                   </div>
                   <div>
                     <p className="text-gray-600 text-sm">Current Quantity</p>
-                    <p className="text-lg font-semibold text-gray-900">{selectedMaterial.quantity.toLocaleString()} {selectedMaterial.unit}</p>
+                    <p className="text-lg font-semibold text-gray-900">{(selectedMaterial.quantity || 0).toLocaleString()} {selectedMaterial.unit}</p>
                   </div>
                   <div>
                     <p className="text-gray-600 text-sm">Unit Price</p>
-                    <p className="text-lg font-semibold text-gray-900">₹{selectedMaterial.price.toLocaleString()}</p>
+                    <p className="text-lg font-semibold text-gray-900">₹{(selectedMaterial.price || 0).toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-gray-600 text-sm">Total Value</p>
-                    <p className="text-lg font-semibold text-green-600">₹{(selectedMaterial.quantity * selectedMaterial.price).toLocaleString()}</p>
+                    <p className="text-lg font-semibold text-green-600">₹{((selectedMaterial.quantity || 0) * (selectedMaterial.price || 0)).toLocaleString()}</p>
                   </div>
                 </div>
 

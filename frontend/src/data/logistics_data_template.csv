@@ -1,0 +1,21 @@
+orderId,customerId,customerName,material,quantity,unit,sourceStockyard,destination,deliveryDate,priority,specialRequirements,status
+ORD-2024-001,CUST-001,Tata Steel Limited,HR Coils,500,tons,Bokaro-Main,Kolkata Port,2024-12-10,high,Temperature controlled,pending
+ORD-2024-002,CUST-002,JSW Steel,CR Coils,350,tons,Bokaro-East,Mumbai Port,2024-12-15,medium,None,pending
+ORD-2024-003,CUST-003,NMDC Limited,Plates,400,tons,Bokaro-West,Durgapur,2024-12-08,urgent,Rush delivery,pending
+ORD-2024-004,CUST-004,ArcelorMittal,Wire Rods,250,tons,Bokaro-Main,Ranchi,2024-12-12,medium,None,pending
+ORD-2024-005,CUST-005,Essar Steel,TMT Bars,600,tons,Bokaro-East,Patna,2024-12-14,high,Bundled packaging,pending
+ORD-2024-006,CUST-001,Tata Steel Limited,Pig Iron,800,tons,Bokaro-Main,Hatia,2024-12-11,medium,None,pending
+ORD-2024-007,CUST-006,Jindal Steel,Billets,450,tons,Bokaro-West,Kolkata,2024-12-13,low,None,pending
+ORD-2024-008,CUST-007,SAIL Rourkela,HR Coils,550,tons,Bokaro-East,Durgapur,2024-12-09,high,None,pending
+ORD-2024-009,CUST-008,Vedanta Limited,Plates,320,tons,Bokaro-Main,Haldia,2024-12-16,medium,None,pending
+ORD-2024-010,CUST-009,Hindalco Industries,CR Coils,280,tons,Bokaro-West,Pune,2024-12-17,low,None,pending
+ORD-2024-011,CUST-002,JSW Steel,HR Coils,420,tons,Bokaro-Main,Kolkata,2024-12-12,high,None,pending
+ORD-2024-012,CUST-003,NMDC Limited,Wire Rods,380,tons,Bokaro-East,Dhanbad,2024-12-09,medium,None,pending
+ORD-2024-013,CUST-004,ArcelorMittal,TMT Bars,520,tons,Bokaro-West,Patna,2024-12-14,high,None,pending
+ORD-2024-014,CUST-005,Essar Steel,Plates,290,tons,Bokaro-Main,Ranchi,2024-12-11,low,None,pending
+ORD-2024-015,CUST-006,Jindal Steel,CR Coils,410,tons,Bokaro-East,Kolkata Port,2024-12-15,medium,None,pending
+ORD-2024-016,CUST-007,SAIL Rourkela,Pig Iron,650,tons,Bokaro-Main,Hatia,2024-12-10,high,None,pending
+ORD-2024-017,CUST-008,Vedanta Limited,Billets,380,tons,Bokaro-West,Durgapur,2024-12-13,medium,None,pending
+ORD-2024-018,CUST-009,Hindalco Industries,HR Coils,470,tons,Bokaro-East,Kolkata,2024-12-12,low,None,pending
+ORD-2024-019,CUST-001,Tata Steel Limited,Wire Rods,330,tons,Bokaro-Main,Patna,2024-12-14,high,None,pending
+ORD-2024-020,CUST-002,JSW Steel,Plates,510,tons,Bokaro-West,Haldia,2024-12-16,medium,None,pending
